@@ -29,16 +29,16 @@ export const BatchProgress: React.FC<BatchProgressProps> = ({
     return (
         <div className={`space-y-2 ${className}`}>
             {label && (
-                <div className="flex justify-between items-center text-sm">
-                    <span className="font-medium text-foreground">{label}</span>
+                <div className="flex items-center justify-between text-sm">
+                    <span className="text-foreground font-medium">{label}</span>
                     <span className="text-muted-foreground">
                         {Math.round(progressPercentage)}%
                     </span>
                 </div>
             )}
-            <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+            <div className="bg-secondary h-2 w-full overflow-hidden rounded-full">
                 <div
-                    className={`h-full bg-primary transition-all duration-300 ease-out ${
+                    className={`bg-primary h-full transition-all duration-300 ease-out ${
                         isActive ? "animate-pulse" : ""
                     }`}
                     style={{ width: `${progressPercentage}%` }}

@@ -14,13 +14,13 @@ export function DocumentPage() {
 
     if (!slug) {
         return (
-            <div className="container relative">
+            <div className="relative container">
                 <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
                     <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
                         <h3 className="mt-4 text-lg font-semibold">
                             Welcome to MDX Viewer
                         </h3>
-                        <p className="mb-4 mt-2 text-sm text-muted-foreground">
+                        <p className="text-muted-foreground mt-2 mb-4 text-sm">
                             Select a document from the sidebar to begin viewing.
                         </p>
                     </div>
@@ -31,11 +31,11 @@ export function DocumentPage() {
 
     if (isLoading) {
         return (
-            <div className="container relative">
+            <div className="relative container">
                 <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
                     <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
-                        <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mb-4"></div>
-                        <p className="text-sm text-muted-foreground">
+                        <div className="border-primary mb-4 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent"></div>
+                        <p className="text-muted-foreground text-sm">
                             Loading document...
                         </p>
                     </div>
@@ -46,13 +46,13 @@ export function DocumentPage() {
 
     if (error || !content) {
         return (
-            <div className="container relative">
+            <div className="relative container">
                 <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
                     <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
                         <h3 className="mt-4 text-lg font-semibold">
                             Document not found
                         </h3>
-                        <p className="mb-4 mt-2 text-sm text-muted-foreground">
+                        <p className="text-muted-foreground mt-2 mb-4 text-sm">
                             {error?.message ||
                                 "The document you are looking for does not exist."}
                         </p>

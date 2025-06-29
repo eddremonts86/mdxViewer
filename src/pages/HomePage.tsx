@@ -34,7 +34,7 @@ export function HomePage() {
                 </div>
                 <div className="flex items-center space-x-2">
                     <Badge variant="outline" className="text-xs">
-                        <Calendar className="w-3 h-3 mr-1" />
+                        <Calendar className="mr-1 h-3 w-3" />
                         Last 7 days
                     </Badge>
                 </div>
@@ -47,11 +47,11 @@ export function HomePage() {
                         <CardTitle className="text-sm font-medium">
                             Total Documents
                         </CardTitle>
-                        <FileText className="h-4 w-4 text-muted-foreground" />
+                        <FileText className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">24</div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                             <span className="text-emerald-600 dark:text-emerald-400">
                                 +3
                             </span>{" "}
@@ -65,11 +65,11 @@ export function HomePage() {
                         <CardTitle className="text-sm font-medium">
                             Page Views
                         </CardTitle>
-                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        <Eye className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">1,429</div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                             <span className="text-emerald-600 dark:text-emerald-400">
                                 +12.5%
                             </span>{" "}
@@ -83,11 +83,11 @@ export function HomePage() {
                         <CardTitle className="text-sm font-medium">
                             Active Users
                         </CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <Users className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">87</div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                             <span className="text-emerald-600 dark:text-emerald-400">
                                 +8.2%
                             </span>{" "}
@@ -101,11 +101,11 @@ export function HomePage() {
                         <CardTitle className="text-sm font-medium">
                             Growth Rate
                         </CardTitle>
-                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                        <TrendingUp className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">+24%</div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                             <span className="text-emerald-600 dark:text-emerald-400">
                                 +4.1%
                             </span>{" "}
@@ -129,13 +129,13 @@ export function HomePage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="pb-4">
-                        <div className="h-[200px] flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg">
+                        <div className="border-muted-foreground/25 flex h-[200px] items-center justify-center rounded-lg border-2 border-dashed">
                             <div className="text-center">
-                                <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground/50 mb-2" />
+                                <BarChart3 className="text-muted-foreground/50 mx-auto mb-2 h-12 w-12" />
                                 <p className="text-muted-foreground">
                                     Chart placeholder
                                 </p>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-muted-foreground text-xs">
                                     Analytics data would appear here
                                 </p>
                             </div>
@@ -154,45 +154,45 @@ export function HomePage() {
                     <CardContent>
                         <div className="space-y-4">
                             <div className="flex items-center space-x-4">
-                                <div className="w-2 h-2 bg-primary rounded-full"></div>
+                                <div className="bg-primary h-2 w-2 rounded-full"></div>
                                 <div className="flex-1 space-y-1">
-                                    <p className="text-sm font-medium leading-none">
+                                    <p className="text-sm leading-none font-medium">
                                         Introduction.md updated
                                     </p>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-muted-foreground text-xs">
                                         2 minutes ago
                                     </p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4">
-                                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                <div className="h-2 w-2 rounded-full bg-emerald-500"></div>
                                 <div className="flex-1 space-y-1">
-                                    <p className="text-sm font-medium leading-none">
+                                    <p className="text-sm leading-none font-medium">
                                         New user registered
                                     </p>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-muted-foreground text-xs">
                                         5 minutes ago
                                     </p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4">
-                                <div className="w-2 h-2 bg-primary rounded-full"></div>
+                                <div className="bg-primary h-2 w-2 rounded-full"></div>
                                 <div className="flex-1 space-y-1">
-                                    <p className="text-sm font-medium leading-none">
+                                    <p className="text-sm leading-none font-medium">
                                         Components showcase viewed
                                     </p>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-muted-foreground text-xs">
                                         12 minutes ago
                                     </p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4">
-                                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
                                 <div className="flex-1 space-y-1">
-                                    <p className="text-sm font-medium leading-none">
+                                    <p className="text-sm leading-none font-medium">
                                         API documentation updated
                                     </p>
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-muted-foreground text-xs">
                                         1 hour ago
                                     </p>
                                 </div>

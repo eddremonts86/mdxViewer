@@ -89,16 +89,16 @@ export function DocumentViewer({
     };
 
     return (
-        <div className="flex w-full ">
+        <div className="flex w-full">
             {/* Document Content */}
-            <div className="container relative flex-1 px-6 pt-6">
+            <div className="relative container flex-1 px-6 pt-6">
                 {/* Document Header */}
-                <div className="flex items-center justify-between py-4 space-y-2 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
+                <div className="flex items-center justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
                     <div>
                         <h1 className="text-2xl font-semibold tracking-tight">
                             {document.title}
                         </h1>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-muted-foreground text-sm">
                             Type: {document.type.toUpperCase()}
                         </p>
                     </div>
@@ -110,9 +110,9 @@ export function DocumentViewer({
                             disabled={isExporting}
                         >
                             {isExporting ? (
-                                <div className="w-4 h-4 mr-2 border-2 rounded-full animate-spin border-primary border-t-transparent"></div>
+                                <div className="border-primary mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></div>
                             ) : (
-                                <Download className="w-4 h-4 mr-2" />
+                                <Download className="mr-2 h-4 w-4" />
                             )}
                             PDF
                         </Button>
@@ -122,7 +122,7 @@ export function DocumentViewer({
                             onClick={handleDownloadHTML}
                             disabled={isExporting}
                         >
-                            <FileText className="w-4 h-4 mr-2" />
+                            <FileText className="mr-2 h-4 w-4" />
                             HTML
                         </Button>
                         <Button
@@ -131,7 +131,7 @@ export function DocumentViewer({
                             onClick={handlePrint}
                             disabled={isExporting}
                         >
-                            <Printer className="w-4 h-4 mr-2" />
+                            <Printer className="mr-2 h-4 w-4" />
                             Print
                         </Button>
                         <Button
@@ -139,7 +139,7 @@ export function DocumentViewer({
                             variant="outline"
                             onClick={handleShare}
                         >
-                            <Share className="w-4 h-4 mr-2" />
+                            <Share className="mr-2 h-4 w-4" />
                             Share
                         </Button>
                     </div>
@@ -157,7 +157,7 @@ export function DocumentViewer({
             </div>
 
             {/* Table of Contents Sidebar */}
-            <aside className="hidden border-l w-80 lg:block">
+            <aside className="hidden w-80 border-l lg:block">
                 <div className="sticky top-0 max-h-[calc(100vh-6rem)] overflow-y-auto p-4">
                     <TableOfContents
                         content={document.content}

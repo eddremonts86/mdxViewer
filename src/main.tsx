@@ -16,6 +16,9 @@ import "@fontsource/jetbrains-mono/500.css";
 import "@fontsource/jetbrains-mono/600.css";
 import "./assets/styles/index.css";
 
+// Import View Transitions CSS
+import "./assets/styles/view-transitions.css";
+
 // Create a client
 const queryClient = new QueryClient({
     defaultOptions: {

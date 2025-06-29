@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 
-import { Loader2, Plus, Trash2, Upload } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import type { FileItem } from "@/api/fileAPI";
+import { FileManagerToolbar } from "@/components/FileManagerToolbar";
 import { FileTreeNode } from "@/components/FileTreeNode";
 import { NoResults } from "@/components/NoResults";
 import { SearchInput } from "@/components/SearchInput";
@@ -163,7 +164,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         <>
             <aside
                 className={cn(
-                    "fixed left-0 top-0 z-40 h-screen w-80 transform bg-background border-r border-border transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
+                    "sidebar bg-background border-border fixed top-0 left-0 z-40 h-screen w-80 transform border-r transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
                     open
                         ? "translate-x-0"
                         : "-translate-x-full lg:translate-x-0"
@@ -171,70 +172,53 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             >
                 <div className="flex h-full flex-col">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-4 border-b border-border">
+                    <div className="border-border flex items-center justify-between border-b p-4">
                         <h2 className="text-lg font-semibold">Files</h2>
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleCreateFile()}
-                                title="New File"
-                            >
-                                <Plus className="h-4 w-4" />
-                            </Button>
-                            <input
-                                type="file"
-                                id="file-upload"
-                                multiple
-                                accept=".md,.mdx,.txt"
-                                onChange={handleUpload}
-                                className="hidden"
-                            />
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                    document
-                                        .getElementById("file-upload")
-                                        ?.click()
-                                }
-                                title="Upload Files"
-                                disabled={uploadFilesMutation.isPending}
-                            >
-                                {uploadFilesMutation.isPending ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                    <Upload className="h-4 w-4" />
-                                )}
-                            </Button>
-                            {selectedFiles.length > 0 && (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={handleDelete}
-                                    title="Delete Selected"
-                                    disabled={deleteFilesMutation.isPending}
-                                >
-                                    {deleteFilesMutation.isPending ? (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <Trash2 className="h-4 w-4" />
-                                    )}
-                                </Button>
-                            )}
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onOpenChange(false)}
-                                className="lg:hidden"
-                            >
-                                ✕
-                            </Button>
-                        </div>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onOpenChange(false)}
+                            className="lg:hidden"
+                        >
+                            ✕
+                        </Button>
                     </div>
 
+                    {/* File Manager Toolbar */}
+                    <FileManagerToolbar
+                        viewMode="list"
+                        onCreateFolder={() => handleCreateFolder()}
+                        onCreateFile={() => handleCreateFile()}
+                        onUpload={() => {
+                            const input = document.createElement("input");
+                            input.type = "file";
+                            input.multiple = true;
+                            input.accept = ".md,.mdx,.txt";
+                            input.onchange = event => {
+                                const target = event.target as HTMLInputElement;
+                                const files = target.files;
+                                if (files && files.length > 0) {
+                                    const reactEvent = {
+                                        target: target,
+                                        currentTarget: target,
+                                    } as React.ChangeEvent<HTMLInputElement>;
+                                    handleUpload(reactEvent);
+                                }
+                            };
+                            input.click();
+                        }}
+                        onDelete={handleDelete}
+                        onRefresh={() => window.location.reload()}
+                        hasSelectedFiles={selectedFiles.length > 0}
+                        disabled={
+                            createFileMutation.isPending ||
+                            createFolderMutation.isPending ||
+                            deleteFilesMutation.isPending
+                        }
+                    />
+
                     {/* Search */}
-                    <div className="p-4 border-b border-border">
+                    <div className="border-border border-b p-4">
                         <SearchInput
                             searchTerm={searchTerm}
                             onSearchChange={e => setSearchTerm(e.target.value)}
@@ -256,8 +240,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
                         {error && (
                             <div className="p-4">
-                                <Card className="p-4 border-destructive bg-destructive/10">
-                                    <p className="text-sm text-destructive">
+                                <Card className="border-destructive bg-destructive/10 p-4">
+                                    <p className="text-destructive text-sm">
                                         Failed to load files: {error.message}
                                     </p>
                                     <Button
@@ -290,8 +274,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
                     {/* Status */}
                     {selectedFiles.length > 0 && (
-                        <div className="p-4 border-t border-border">
-                            <div className="text-xs text-muted-foreground">
+                        <div className="border-border border-t p-4">
+                            <div className="text-muted-foreground text-xs">
                                 {selectedFiles.length} file
                                 {selectedFiles.length === 1 ? "" : "s"} selected
                             </div>
@@ -304,7 +288,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             {showCreateDialog && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                     <Card className="w-96 p-6">
-                        <h3 className="text-lg font-semibold mb-4">
+                        <h3 className="mb-4 text-lg font-semibold">
                             Create {createType === "file" ? "File" : "Folder"}
                         </h3>
                         <form
@@ -344,7 +328,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 placeholder={`${
                                     createType === "file" ? "File" : "Folder"
                                 } name`}
-                                className="w-full p-2 border border-border rounded mb-4"
+                                className="border-border mb-4 w-full rounded border p-2"
                                 autoFocus
                                 required
                             />
@@ -365,7 +349,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 >
                                     {createFileMutation.isPending ||
                                     createFolderMutation.isPending ? (
-                                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     ) : null}
                                     Create
                                 </Button>

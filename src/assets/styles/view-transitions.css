@@ -1,0 +1,426 @@
+/**
+ * CSS View Transitions styles for MDXViewer
+ * Provides smooth transitions between pages and states
+ *
+ * Features:
+ * - Cross-document (MPA) navigation transitions
+ * - Same-document (SPA) transitions
+ * - Custom animations for different transition types
+ * - Respect for user motion preferences
+ * - Semantic transition naming
+ */
+
+/* Enable cross-document view transitions */
+@view-transition {
+    navigation: auto;
+}
+
+/* Default transition root styles */
+::view-transition {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0s !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
+/* Default page transition animations */
+::view-transition-old(root) {
+    animation: fade-out 0.3s ease-out;
+}
+
+::view-transition-new(root) {
+    animation: fade-in 0.3s ease-in;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(1.02);
+    }
+}
+
+/* Route transition animations */
+::view-transition-old(route-transition) {
+    animation: slide-out-left 0.4s ease-in-out;
+}
+
+::view-transition-new(route-transition) {
+    animation: slide-in-right 0.4s ease-in-out;
+}
+
+@keyframes slide-out-left {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+@keyframes slide-in-right {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Modal transition animations */
+::view-transition-old(modal-transition) {
+    animation: modal-fade-out 0.2s ease-out;
+}
+
+::view-transition-new(modal-transition) {
+    animation: modal-fade-in 0.2s ease-in;
+}
+
+@keyframes modal-fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes modal-fade-out {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+}
+
+/* Theme transition animations */
+::view-transition-old(theme-transition) {
+    animation: theme-out 0.3s ease-in-out;
+}
+
+::view-transition-new(theme-transition) {
+    animation: theme-in 0.3s ease-in-out;
+}
+
+@keyframes theme-in {
+    from {
+        opacity: 0;
+        filter: brightness(0.5);
+    }
+
+    to {
+        opacity: 1;
+        filter: brightness(1);
+    }
+}
+
+@keyframes theme-out {
+    from {
+        opacity: 1;
+        filter: brightness(1);
+    }
+
+    to {
+        opacity: 0;
+        filter: brightness(1.5);
+    }
+}
+
+/* Breadcrumb navigation transitions */
+.breadcrumb-item {
+    view-transition-name: var(--breadcrumb-transition-name);
+}
+
+::view-transition-old(breadcrumb-item) {
+    animation: breadcrumb-out 0.25s ease-out;
+}
+
+::view-transition-new(breadcrumb-item) {
+    animation: breadcrumb-in 0.25s ease-in;
+}
+
+@keyframes breadcrumb-in {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes breadcrumb-out {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+}
+
+/* Document content transitions */
+.document-content {
+    view-transition-name: document-content;
+}
+
+::view-transition-old(document-content) {
+    animation: document-out 0.3s ease-out;
+}
+
+::view-transition-new(document-content) {
+    animation: document-in 0.3s ease-in;
+}
+
+@keyframes document-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes document-out {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* Sidebar transitions */
+.sidebar {
+    view-transition-name: sidebar;
+}
+
+::view-transition-old(sidebar) {
+    animation: sidebar-out 0.3s ease-out;
+}
+
+::view-transition-new(sidebar) {
+    animation: sidebar-in 0.3s ease-in;
+}
+
+@keyframes sidebar-in {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes sidebar-out {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+}
+
+/* Navigation header transitions */
+.navigation-header {
+    view-transition-name: navigation-header;
+}
+
+::view-transition-old(navigation-header) {
+    animation: header-out 0.2s ease-out;
+}
+
+::view-transition-new(navigation-header) {
+    animation: header-in 0.2s ease-in;
+}
+
+@keyframes header-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes header-out {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* File tree transitions */
+.file-tree-item {
+    view-transition-name: var(--file-tree-transition-name);
+}
+
+::view-transition-old(file-tree-item) {
+    animation: file-tree-out 0.2s ease-out;
+}
+
+::view-transition-new(file-tree-item) {
+    animation: file-tree-in 0.2s ease-in;
+}
+
+@keyframes file-tree-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes file-tree-out {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+/* Utility classes for custom transitions */
+.transition-slide-up {
+    view-transition-name: slide-up;
+}
+
+::view-transition-old(slide-up) {
+    animation: slide-up-out 0.3s ease-out;
+}
+
+::view-transition-new(slide-up) {
+    animation: slide-up-in 0.3s ease-in;
+}
+
+@keyframes slide-up-in {
+    from {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slide-up-out {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+}
+
+/* Smooth focus transitions */
+.focus-transition {
+    view-transition-name: focus-transition;
+}
+
+::view-transition-old(focus-transition) {
+    animation: focus-out 0.15s ease-out;
+}
+
+::view-transition-new(focus-transition) {
+    animation: focus-in 0.15s ease-in;
+}
+
+@keyframes focus-in {
+    from {
+        opacity: 0;
+        outline-offset: 4px;
+    }
+
+    to {
+        opacity: 1;
+        outline-offset: 2px;
+    }
+}
+
+@keyframes focus-out {
+    from {
+        opacity: 1;
+        outline-offset: 2px;
+    }
+
+    to {
+        opacity: 0;
+        outline-offset: 4px;
+    }
+}

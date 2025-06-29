@@ -72,7 +72,7 @@ const CustomCallout = ({ type = "note", children }: CalloutProps) => {
 
     return (
         <div
-            className={`my-4 p-4 border-l-4 rounded-r-md ${getCalloutStyles(
+            className={`my-4 rounded-r-md border-l-4 p-4 ${getCalloutStyles(
                 type
             )}`}
         >
@@ -86,16 +86,16 @@ const CustomCallout = ({ type = "note", children }: CalloutProps) => {
 
 // Custom Demo component for MDX
 const CustomDemo = ({ title, description, children }: DemoProps) => (
-    <div className="my-6 overflow-hidden border border-border rounded-lg">
-        <div className="p-4 border-b border-border bg-muted">
+    <div className="border-border my-6 overflow-hidden rounded-lg border">
+        <div className="border-border bg-muted border-b p-4">
             <h3 className="font-medium">{title}</h3>
             {description && (
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="text-muted-foreground mt-1 text-sm">
                     {description}
                 </p>
             )}
         </div>
-        <div className="p-4 bg-card">{children}</div>
+        <div className="bg-card p-4">{children}</div>
     </div>
 );
 

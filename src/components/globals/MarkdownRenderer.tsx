@@ -33,7 +33,7 @@ const createMarkdownComponents = () => ({
         return (
             <h1
                 id={id}
-                className="pb-4 mt-12 mb-8 font-sans text-4xl antialiased font-bold tracking-tight border-b scroll-m-20 lg:text-5xl border-border text-foreground"
+                className="border-border text-foreground mt-12 mb-8 scroll-m-20 border-b pb-4 font-sans text-4xl font-bold tracking-tight antialiased lg:text-5xl"
                 style={{
                     fontFamily:
                         "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -50,7 +50,7 @@ const createMarkdownComponents = () => ({
         return (
             <h2
                 id={id}
-                className="pb-4 mt-10 mb-6 font-sans text-3xl antialiased font-semibold tracking-tight border-b scroll-m-20 border-border first:mt-0 text-foreground"
+                className="border-border text-foreground mt-10 mb-6 scroll-m-20 border-b pb-4 font-sans text-3xl font-semibold tracking-tight antialiased first:mt-0"
                 style={{
                     fontFamily:
                         "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -67,7 +67,7 @@ const createMarkdownComponents = () => ({
         return (
             <h3
                 id={id}
-                className="mt-8 mb-5 font-sans text-2xl antialiased font-semibold tracking-tight scroll-m-20 text-foreground"
+                className="text-foreground mt-8 mb-5 scroll-m-20 font-sans text-2xl font-semibold tracking-tight antialiased"
                 style={{
                     fontFamily:
                         "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -84,7 +84,7 @@ const createMarkdownComponents = () => ({
         return (
             <h4
                 id={id}
-                className="mb-4 font-sans text-xl antialiased font-semibold tracking-tight scroll-m-20 mt-7 text-foreground"
+                className="text-foreground mt-7 mb-4 scroll-m-20 font-sans text-xl font-semibold tracking-tight antialiased"
                 style={{
                     fontFamily:
                         "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -101,7 +101,7 @@ const createMarkdownComponents = () => ({
         return (
             <h5
                 id={id}
-                className="mt-6 mb-3 font-sans text-lg antialiased font-semibold tracking-tight scroll-m-20 text-foreground"
+                className="text-foreground mt-6 mb-3 scroll-m-20 font-sans text-lg font-semibold tracking-tight antialiased"
                 style={{
                     fontFamily:
                         "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -118,7 +118,7 @@ const createMarkdownComponents = () => ({
         return (
             <h6
                 id={id}
-                className="mt-5 mb-2 font-sans text-base antialiased font-semibold tracking-tight scroll-m-20 text-foreground"
+                className="text-foreground mt-5 mb-2 scroll-m-20 font-sans text-base font-semibold tracking-tight antialiased"
                 style={{
                     fontFamily:
                         "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -132,7 +132,7 @@ const createMarkdownComponents = () => ({
     },
     p: ({ children }: React.ComponentProps<"p">) => (
         <p
-            className="leading-relaxed text-foreground mb-4 [&:not(:first-child)]:mt-4 font-sans text-base font-normal antialiased"
+            className="text-foreground mb-4 font-sans text-base leading-relaxed font-normal antialiased [&:not(:first-child)]:mt-4"
             style={{
                 fontFamily:
                     "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -145,7 +145,7 @@ const createMarkdownComponents = () => ({
     ),
     blockquote: ({ children }: React.ComponentProps<"blockquote">) => (
         <blockquote
-            className="py-6 pl-8 mt-8 mb-8 font-sans text-lg antialiased italic font-medium border-l-4 rounded-r-lg border-primary text-muted-foreground bg-muted/20"
+            className="border-primary text-muted-foreground bg-muted/20 mt-8 mb-8 rounded-r-lg border-l-4 py-6 pl-8 font-sans text-lg font-medium italic antialiased"
             style={{
                 fontFamily:
                     "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -154,7 +154,7 @@ const createMarkdownComponents = () => ({
             }}
         >
             <div className="relative">
-                <span className="absolute text-4xl -left-2 -top-2 text-primary/30">
+                <span className="text-primary/30 absolute -top-2 -left-2 text-4xl">
                     "
                 </span>
                 {children}
@@ -181,7 +181,7 @@ const createMarkdownComponents = () => ({
         </li>
     ),
     table: ({ children }: React.ComponentProps<"table">) => (
-        <div className="w-full my-10 overflow-x-auto border rounded-lg shadow-sm border-border">
+        <div className="border-border my-10 w-full overflow-x-auto rounded-lg border shadow-sm">
             <table className="w-full border-collapse">{children}</table>
         </div>
     ),
@@ -192,13 +192,13 @@ const createMarkdownComponents = () => ({
         <tbody>{children}</tbody>
     ),
     tr: ({ children }: React.ComponentProps<"tr">) => (
-        <tr className="transition-colors duration-200 border-b border-border hover:bg-muted/30">
+        <tr className="border-border hover:bg-muted/30 border-b transition-colors duration-200">
             {children}
         </tr>
     ),
     th: ({ children }: React.ComponentProps<"th">) => (
         <th
-            className="border-r border-border bg-muted/30 px-6 py-4 text-left font-semibold text-foreground font-sans antialiased [&[align=center]]:text-center [&[align=right]]:text-right"
+            className="border-border bg-muted/30 text-foreground border-r px-6 py-4 text-left font-sans font-semibold antialiased [&[align=center]]:text-center [&[align=right]]:text-right"
             style={{
                 fontFamily:
                     "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -210,7 +210,7 @@ const createMarkdownComponents = () => ({
     ),
     td: ({ children }: React.ComponentProps<"td">) => (
         <td
-            className="border-r border-border px-6 py-4 text-left text-foreground font-sans antialiased [&[align=center]]:text-center [&[align=right]]:text-right"
+            className="border-border text-foreground border-r px-6 py-4 text-left font-sans antialiased [&[align=center]]:text-center [&[align=right]]:text-right"
             style={{
                 fontFamily:
                     "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -248,7 +248,7 @@ const createMarkdownComponents = () => ({
             <a
                 href={href}
                 onClick={handleClick}
-                className="font-sans antialiased font-medium underline transition-all duration-200 text-primary underline-offset-4 hover:text-primary/80 decoration-primary/40 hover:decoration-primary/70"
+                className="text-primary hover:text-primary/80 decoration-primary/40 hover:decoration-primary/70 font-sans font-medium underline underline-offset-4 antialiased transition-all duration-200"
                 style={{
                     fontFamily:
                         "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -268,12 +268,12 @@ const createMarkdownComponents = () => ({
             <img
                 src={src}
                 alt={alt}
-                className="h-auto max-w-full mx-auto border shadow-lg rounded-xl border-border"
+                className="border-border mx-auto h-auto max-w-full rounded-xl border shadow-lg"
                 {...props}
             />
             {alt && (
                 <p
-                    className="mt-3 font-sans text-sm antialiased italic text-center text-muted-foreground"
+                    className="text-muted-foreground mt-3 text-center font-sans text-sm italic antialiased"
                     style={{
                         fontFamily:
                             "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -285,11 +285,11 @@ const createMarkdownComponents = () => ({
         </div>
     ),
     hr: () => (
-        <hr className="w-1/3 mx-auto my-12 border-t-2 opacity-50 border-border" />
+        <hr className="border-border mx-auto my-12 w-1/3 border-t-2 opacity-50" />
     ),
     strong: ({ children }: React.ComponentProps<"strong">) => (
         <strong
-            className="font-sans antialiased font-semibold text-foreground"
+            className="text-foreground font-sans font-semibold antialiased"
             style={{
                 fontFamily:
                     "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -301,7 +301,7 @@ const createMarkdownComponents = () => ({
     ),
     em: ({ children }: React.ComponentProps<"em">) => (
         <em
-            className="font-sans antialiased italic text-foreground"
+            className="text-foreground font-sans italic antialiased"
             style={{
                 fontFamily:
                     "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
@@ -336,12 +336,12 @@ export function MarkdownRenderer({ content, type }: MarkdownRendererProps) {
             const inline = !className?.includes("language-");
 
             return !inline && match ? (
-                <div className="my-6 group">
+                <div className="group my-6">
                     <SyntaxHighlighter
                         style={effectiveTheme === "dark" ? oneDark : oneLight}
                         language={match[1]}
                         PreTag="div"
-                        className="overflow-hidden border rounded-lg shadow-sm border-border"
+                        className="border-border overflow-hidden rounded-lg border shadow-sm"
                         customStyle={{
                             margin: 0,
                             padding: "1.25rem",
@@ -374,7 +374,7 @@ export function MarkdownRenderer({ content, type }: MarkdownRendererProps) {
                 <code
                     className={`${
                         className ?? ""
-                    } bg-muted px-2 py-1 rounded text-sm text-foreground border border-border font-mono`}
+                    } bg-muted text-foreground border-border rounded border px-2 py-1 font-mono text-sm`}
                     style={{
                         fontFamily:
                             "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', 'Menlo', 'Consolas', monospace",
@@ -423,7 +423,7 @@ export function MarkdownRenderer({ content, type }: MarkdownRendererProps) {
     }, [content, type, codeComponent]);
 
     return (
-        <div className="space-y-4 markdown-content max-w-none">
+        <div className="markdown-content max-w-none space-y-4">
             {renderedContent}
         </div>
     );

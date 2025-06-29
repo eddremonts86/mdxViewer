@@ -22,10 +22,10 @@ export function SearchInput({
 }: SearchInputProps) {
     return (
         <div className="bg-card/50">
-            <div className="relative group">
+            <div className="group relative">
                 <Search
                     className={cn(
-                        "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-200",
+                        "absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors duration-200",
                         searchTerm
                             ? "text-primary"
                             : "text-muted-foreground group-focus-within:text-primary"
@@ -37,8 +37,8 @@ export function SearchInput({
                     value={searchTerm}
                     onChange={onSearchChange}
                     className={cn(
-                        "pl-9 pr-9 h-9 text-sm transition-all duration-200",
-                        "focus:ring-2 focus:ring-primary/20 focus:border-primary",
+                        "h-9 pr-9 pl-9 text-sm transition-all duration-200",
+                        "focus:ring-primary/20 focus:border-primary focus:ring-2",
                         searchTerm && "border-primary/50"
                     )}
                 />
@@ -46,23 +46,23 @@ export function SearchInput({
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="absolute p-0 transition-colors duration-200 -translate-y-1/2 right-1 top-1/2 h-7 w-7 hover:bg-destructive/10 hover:text-destructive"
+                        className="hover:bg-destructive/10 hover:text-destructive absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 p-0 transition-colors duration-200"
                         onClick={onClearSearch}
                     >
-                        <X className="w-3 h-3" />
+                        <X className="h-3 w-3" />
                         <span className="sr-only">Clear search</span>
                     </Button>
                 )}
             </div>
             {searchTerm && (
-                <div className="mt-3 duration-300 animate-in slide-in-from-top-1">
+                <div className="animate-in slide-in-from-top-1 mt-3 duration-300">
                     <div className="flex items-center justify-between text-xs">
                         {isTyping ? (
-                            <span className="font-medium text-muted-foreground animate-pulse">
+                            <span className="text-muted-foreground animate-pulse font-medium">
                                 Searching...
                             </span>
                         ) : (
-                            <span className="font-medium text-primary">
+                            <span className="text-primary font-medium">
                                 {resultsCount} result
                                 {resultsCount !== 1 ? "s" : ""} found
                             </span>

@@ -1,3 +1,4 @@
+import { TransitionLink } from "@/components/TransitionLink";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { FileNode } from "@/types";
@@ -8,7 +9,7 @@ import {
     Folder,
     FolderOpen,
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 interface FileTreeNodeProps {
     node: FileNode;
@@ -42,7 +43,7 @@ const highlightText = (text: string, searchTerm?: string) => {
         regex.test(part) ? (
             <mark
                 key={`${part}-${index}`}
-                className="px-1 bg-yellow-200 rounded dark:bg-yellow-800"
+                className="rounded bg-yellow-200 px-1 dark:bg-yellow-800"
             >
                 {part}
             </mark>
@@ -137,19 +138,19 @@ export function FileTreeNode({
         }
 
         return (
-            <File className="w-4 h-4 min-w-4 flex-shrink-0 text-muted-foreground" />
+            <File className="text-muted-foreground h-4 w-4 min-w-4 flex-shrink-0" />
         );
     };
 
     const nodeElement = (
         <div
             className={cn(
-                "group flex items-center w-full text-left text-sm transition-colors",
+                "group flex w-full items-center text-left text-sm transition-colors",
                 "hover:bg-accent hover:text-accent-foreground rounded-sm",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                "focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none",
                 level === 0 ? "pl-2" : "",
                 isActive && "bg-accent text-accent-foreground font-medium",
-                isSelected && "bg-primary/10 border border-primary/20",
+                isSelected && "bg-primary/10 border-primary/20 border",
                 isMultiSelectMode && "cursor-pointer"
             )}
             style={{
@@ -169,7 +170,7 @@ export function FileTreeNode({
                         e.stopPropagation();
                         handleToggle();
                     }}
-                    className="h-6 w-6 p-0 mr-1 hover:bg-accent"
+                    className="hover:bg-accent mr-1 h-6 w-6 p-0"
                 >
                     {isExpanded ? (
                         <ChevronDown className="h-3 w-3" />
@@ -183,7 +184,7 @@ export function FileTreeNode({
             {isMultiSelectMode && (
                 <div
                     className={cn(
-                        "w-4 h-4 mr-2 border rounded-sm flex items-center justify-center",
+                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border",
                         isSelected
                             ? "bg-primary border-primary text-primary-foreground"
                             : "border-border"
@@ -191,7 +192,7 @@ export function FileTreeNode({
                 >
                     {isSelected && (
                         <svg
-                            className="w-3 h-3"
+                            className="h-3 w-3"
                             viewBox="0 0 24 24"
                             fill="currentColor"
                         >
@@ -205,7 +206,7 @@ export function FileTreeNode({
             {getIcon()}
 
             {/* File/folder name */}
-            <span className="flex-1 ml-2 truncate">
+            <span className="ml-2 flex-1 truncate">
                 {highlightText(node.name, searchTerm)}
             </span>
         </div>
@@ -215,20 +216,21 @@ export function FileTreeNode({
         <div>
             {/* Node content */}
             {node.type === "file" ? (
-                <Link
+                <TransitionLink
                     to={node.path}
                     className="block"
                     onClick={handleNodeClick}
+                    transitionName="file-navigation"
                 >
                     {nodeElement}
-                </Link>
+                </TransitionLink>
             ) : (
                 nodeElement
             )}
 
             {/* Children (for folders) */}
             {node.type === "folder" && isExpanded && node.children && (
-                <div className="space-y-0.5 ml-0">
+                <div className="ml-0 space-y-0.5">
                     {node.children.map(child => (
                         <FileTreeNode
                             key={child.path}

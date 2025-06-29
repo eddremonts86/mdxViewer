@@ -1,5 +1,6 @@
-import { Sidebar } from "@/components/Sidebar";
 import { ModeToggle } from "@/components/mode-toggle";
+import { NotificationCenter } from "@/components/NotificationCenter";
+import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { navigationItems } from "@/const";
@@ -9,6 +10,27 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 
 export function Layout() {
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+    const [showNotifications, setShowNotifications] = useState<boolean>(false);
+    const [notifications, setNotifications] = useState([
+        {
+            id: "1",
+            title: "Welcome to MDXViewer",
+            message:
+                "You can view and edit MDX files with live preview functionality.",
+            type: "info" as const,
+            timestamp: new Date(),
+            isRead: false,
+        },
+        {
+            id: "2",
+            title: "File Management",
+            message:
+                "Use the sidebar to create, upload, and organize your documents.",
+            type: "success" as const,
+            timestamp: new Date(Date.now() - 60000),
+            isRead: false,
+        },
+    ]);
     const location = useLocation();
 
     const toggleSidebar = (): void => {
@@ -16,25 +38,25 @@ export function Layout() {
     };
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <div className="bg-background text-foreground min-h-screen">
             {/* Header */}
-            <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <div className="flex items-center h-16 px-6">
+            <header className="border-border bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
+                <div className="flex h-16 items-center px-6">
                     {/* Left side */}
-                    <div className="flex items-center flex-1 space-x-4">
+                    <div className="flex flex-1 items-center space-x-4">
                         <Button
                             variant="ghost"
                             size="icon"
                             className="lg:hidden"
                             onClick={toggleSidebar}
                         >
-                            <Menu className="w-5 h-5" />
+                            <Menu className="h-5 w-5" />
                             <span className="sr-only">Toggle Menu</span>
                         </Button>
 
                         <div className="flex items-center space-x-3">
-                            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary">
-                                <span className="text-sm font-bold text-primary-foreground">
+                            <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
+                                <span className="text-primary-foreground text-sm font-bold">
                                     M
                                 </span>
                             </div>
@@ -45,7 +67,7 @@ export function Layout() {
                     </div>
 
                     {/* Navigation in center */}
-                    <nav className="flex items-center justify-center flex-1 space-x-1 md:space-x-2">
+                    <nav className="flex flex-1 items-center justify-center space-x-1 md:space-x-2">
                         {navigationItems.map(item => {
                             const Icon = item.icon;
                             const isActive =
@@ -58,11 +80,11 @@ export function Layout() {
                                     key={item.path}
                                     variant={isActive ? "default" : "ghost"}
                                     size="sm"
-                                    className="flex items-center px-2 space-x-1 md:space-x-2 md:px-3"
+                                    className="flex items-center space-x-1 px-2 md:space-x-2 md:px-3"
                                     asChild
                                 >
                                     <Link to={item.path}>
-                                        <Icon className="w-4 h-4" />
+                                        <Icon className="h-4 w-4" />
                                         <span className="hidden text-sm md:inline">
                                             {item.name}
                                         </span>
@@ -73,14 +95,30 @@ export function Layout() {
                     </nav>
 
                     {/* Right side */}
-                    <div className="flex items-center justify-end flex-1 space-x-4">
-                        <Button variant="ghost" size="icon">
-                            <Bell className="w-5 h-5" />
+                    <div className="flex flex-1 items-center justify-end space-x-4">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() =>
+                                setShowNotifications(!showNotifications)
+                            }
+                            className="relative"
+                        >
+                            <Bell className="h-5 w-5" />
+                            {notifications.filter(n => !n.isRead).length >
+                                0 && (
+                                <span className="bg-destructive absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full text-xs text-white">
+                                    {
+                                        notifications.filter(n => !n.isRead)
+                                            .length
+                                    }
+                                </span>
+                            )}
                             <span className="sr-only">Notifications</span>
                         </Button>
 
                         <Button variant="ghost" size="icon">
-                            <Settings className="w-5 h-5" />
+                            <Settings className="h-5 w-5" />
                             <span className="sr-only">Settings</span>
                         </Button>
 
@@ -88,6 +126,38 @@ export function Layout() {
                     </div>
                 </div>
             </header>
+
+            {/* Notification Center overlay */}
+            {showNotifications && (
+                <div className="fixed inset-0 z-50">
+                    <button
+                        className="absolute inset-0 cursor-default bg-black/20"
+                        onClick={() => setShowNotifications(false)}
+                        aria-label="Close notifications"
+                    />
+                    <div className="absolute top-16 right-6 max-w-md">
+                        <NotificationCenter
+                            notifications={notifications}
+                            onDismiss={id => {
+                                setNotifications(prev =>
+                                    prev.filter(n => n.id !== id)
+                                );
+                            }}
+                            onMarkAsRead={id => {
+                                setNotifications(prev =>
+                                    prev.map(n =>
+                                        n.id === id ? { ...n, isRead: true } : n
+                                    )
+                                );
+                            }}
+                            onClearAll={() => {
+                                setNotifications([]);
+                                setShowNotifications(false);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
 
             <div className="flex h-[calc(100vh-4rem)]">
                 {/* Sidebar */}

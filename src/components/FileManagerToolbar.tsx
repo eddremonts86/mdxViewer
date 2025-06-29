@@ -68,7 +68,7 @@ export const FileManagerToolbar: React.FC<FileManagerToolbarProps> = ({
         <TooltipProvider>
             <div
                 className={cn(
-                    "flex items-center gap-2 p-2 border-b bg-background",
+                    "bg-background flex items-center gap-2 border-b p-2",
                     className
                 )}
             >
@@ -81,9 +81,9 @@ export const FileManagerToolbar: React.FC<FileManagerToolbarProps> = ({
                                 size="sm"
                                 onClick={onCreateFolder}
                                 disabled={disabled}
-                                className="w-8 h-8 p-0"
+                                className="h-8 w-8 p-0"
                             >
-                                <FolderPlus className="w-4 h-4" />
+                                <FolderPlus className="h-4 w-4" />
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -98,9 +98,9 @@ export const FileManagerToolbar: React.FC<FileManagerToolbarProps> = ({
                                 size="sm"
                                 onClick={onCreateFile}
                                 disabled={disabled}
-                                className="w-8 h-8 p-0"
+                                className="h-8 w-8 p-0"
                             >
-                                <FileText className="w-4 h-4" />
+                                <FileText className="h-4 w-4" />
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -120,9 +120,9 @@ export const FileManagerToolbar: React.FC<FileManagerToolbarProps> = ({
                                 size="sm"
                                 onClick={onUpload}
                                 disabled={disabled}
-                                className="w-8 h-8 p-0"
+                                className="h-8 w-8 p-0"
                             >
-                                <Upload className="w-4 h-4" />
+                                <Upload className="h-4 w-4" />
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -137,9 +137,9 @@ export const FileManagerToolbar: React.FC<FileManagerToolbarProps> = ({
                                 size="sm"
                                 onClick={onDownload}
                                 disabled={disabled || !hasSelectedFiles}
-                                className="w-8 h-8 p-0"
+                                className="h-8 w-8 p-0"
                             >
-                                <Download className="w-4 h-4" />
+                                <Download className="h-4 w-4" />
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -154,9 +154,9 @@ export const FileManagerToolbar: React.FC<FileManagerToolbarProps> = ({
                                 size="sm"
                                 onClick={onDelete}
                                 disabled={disabled || !hasSelectedFiles}
-                                className="w-8 h-8 p-0 text-destructive hover:text-destructive"
+                                className="text-destructive hover:text-destructive h-8 w-8 p-0"
                             >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="h-4 w-4" />
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -178,9 +178,9 @@ export const FileManagerToolbar: React.FC<FileManagerToolbarProps> = ({
                                 size="sm"
                                 onClick={() => onViewModeChange?.("list")}
                                 disabled={disabled}
-                                className="w-8 h-8 p-0"
+                                className="h-8 w-8 p-0"
                             >
-                                <List className="w-4 h-4" />
+                                <List className="h-4 w-4" />
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -197,9 +197,9 @@ export const FileManagerToolbar: React.FC<FileManagerToolbarProps> = ({
                                 size="sm"
                                 onClick={() => onViewModeChange?.("grid")}
                                 disabled={disabled}
-                                className="w-8 h-8 p-0"
+                                className="h-8 w-8 p-0"
                             >
-                                <Grid3X3 className="w-4 h-4" />
+                                <Grid3X3 className="h-4 w-4" />
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -219,9 +219,9 @@ export const FileManagerToolbar: React.FC<FileManagerToolbarProps> = ({
                             size="sm"
                             onClick={onRefresh}
                             disabled={disabled}
-                            className="w-8 h-8 p-0"
+                            className="h-8 w-8 p-0"
                         >
-                            <RefreshCw className="w-4 h-4" />
+                            <RefreshCw className="h-4 w-4" />
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>

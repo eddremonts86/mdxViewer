@@ -87,7 +87,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             case "success":
                 return <CheckCircle className="h-4 w-4 text-green-600" />;
             case "error":
-                return <AlertCircle className="h-4 w-4 text-destructive" />;
+                return <AlertCircle className="text-destructive h-4 w-4" />;
             case "warning":
                 return <AlertCircle className="h-4 w-4 text-yellow-600" />;
             case "info":
@@ -114,8 +114,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         return (
             <Card className={cn("w-full max-w-md", className)}>
                 <CardContent className="p-6 text-center">
-                    <Info className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground">
+                    <Info className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
+                    <p className="text-muted-foreground text-sm">
                         No notifications to display
                     </p>
                 </CardContent>
@@ -127,7 +127,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         <Card className={cn("w-full max-w-md", className)}>
             <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-medium text-foreground">
+                    <CardTitle className="text-foreground text-base font-medium">
                         Notifications
                         {unreadCount > 0 && (
                             <Badge
@@ -143,7 +143,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                             variant="ghost"
                             size="sm"
                             onClick={onClearAll}
-                            className="text-xs text-muted-foreground hover:text-foreground"
+                            className="text-muted-foreground hover:text-foreground text-xs"
                         >
                             Clear All
                         </Button>
@@ -156,8 +156,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                         key={notification.id}
                         type="button"
                         className={cn(
-                            "w-full text-left border rounded-lg p-3 transition-colors",
-                            "hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary",
+                            "w-full rounded-lg border p-3 text-left transition-colors",
+                            "hover:bg-muted/50 focus:ring-primary focus:ring-2 focus:outline-none",
                             !notification.isRead &&
                                 "bg-primary/5 border-primary/20",
                             compact && "p-2"
@@ -167,12 +167,12 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                         aria-label={`Notification: ${notification.title}`}
                     >
                         <div className="flex items-start gap-3">
-                            <div className="flex-shrink-0 mt-0.5">
+                            <div className="mt-0.5 flex-shrink-0">
                                 {getNotificationIcon(notification.type)}
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between mb-1">
-                                    <h4 className="text-sm font-medium text-foreground truncate">
+                            <div className="min-w-0 flex-1">
+                                <div className="mb-1 flex items-center justify-between">
+                                    <h4 className="text-foreground truncate text-sm font-medium">
                                         {notification.title}
                                     </h4>
                                     <div className="flex items-center gap-2">
@@ -193,7 +193,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                                                     e
                                                 )
                                             }
-                                            className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                                            className="text-muted-foreground hover:text-foreground h-6 w-6 p-0"
                                         >
                                             <X className="h-3 w-3" />
                                         </Button>
@@ -201,7 +201,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                                 </div>
                                 <p
                                     className={cn(
-                                        "text-sm text-muted-foreground",
+                                        "text-muted-foreground text-sm",
                                         expandedId === notification.id
                                             ? "line-clamp-none"
                                             : "line-clamp-2"
@@ -211,7 +211,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                                 </p>
                                 {expandedId === notification.id && (
                                     <div className="mt-2 flex items-center justify-between">
-                                        <span className="text-xs text-muted-foreground">
+                                        <span className="text-muted-foreground text-xs">
                                             {notification.timestamp.toLocaleString()}
                                         </span>
                                         {notification.actionLabel &&

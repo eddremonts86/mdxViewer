@@ -59,7 +59,7 @@ export const CreateDialog: React.FC<CreateDialogProps> = ({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className={className}>
-                    <FolderPlus className="h-4 w-4 mr-2" />
+                    <FolderPlus className="mr-2 h-4 w-4" />
                     Create New
                 </Button>
             </DialogTrigger>
@@ -86,7 +86,7 @@ export const CreateDialog: React.FC<CreateDialogProps> = ({
                             onClick={() => setItemType("file")}
                             className="flex-1"
                         >
-                            <FileText className="h-4 w-4 mr-2" />
+                            <FileText className="mr-2 h-4 w-4" />
                             File
                         </Button>
                         <Button
@@ -98,7 +98,7 @@ export const CreateDialog: React.FC<CreateDialogProps> = ({
                             onClick={() => setItemType("folder")}
                             className="flex-1"
                         >
-                            <FolderPlus className="h-4 w-4 mr-2" />
+                            <FolderPlus className="mr-2 h-4 w-4" />
                             Folder
                         </Button>
                     </div>

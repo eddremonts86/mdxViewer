@@ -436,12 +436,12 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                             <Button
                                 variant="ghost"
                                 className={cn(
-                                    "w-full justify-start px-2 py-1 h-auto text-left",
+                                    "h-auto w-full justify-start px-2 py-1 text-left",
                                     level > 0 && "ml-4"
                                 )}
                                 onClick={() => handleMoveToFolder(item.path)}
                             >
-                                <Folder className="w-4 h-4 mr-2" />
+                                <Folder className="mr-2 h-4 w-4" />
                                 {item.name}
                             </Button>
                             {hasChildren &&
@@ -654,7 +654,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
     // Render chevron icon for folders
     const renderChevronIcon = (isExpanded: boolean, hasChildren: boolean) => {
-        if (!hasChildren) return <div className="w-4 h-4" />;
+        if (!hasChildren) return <div className="h-4 w-4" />;
         return isExpanded ? (
             <ChevronDown size={14} />
         ) : (
@@ -699,7 +699,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         return (
             <div
                 key={item.path}
-                className="select-none relative"
+                className="relative select-none"
                 draggable
                 onDragStart={e => handleDragStart(e, item.path, item.name)}
                 onDragEnd={handleDragEnd}
@@ -714,9 +714,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             >
                 {/* Drop zone overlay for better visual feedback */}
                 {isDropTarget && (
-                    <div className="absolute inset-0 bg-blue-500/20 border-2 border-blue-500 border-dashed rounded-md pointer-events-none z-10 animate-pulse">
+                    <div className="pointer-events-none absolute inset-0 z-10 animate-pulse rounded-md border-2 border-dashed border-blue-500 bg-blue-500/20">
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-medium shadow-lg">
+                            <div className="rounded bg-blue-500 px-2 py-1 text-xs font-medium text-white shadow-lg">
                                 Drop "{draggedItemName}" here
                             </div>
                         </div>
@@ -726,15 +726,15 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                 <button
                     type="button"
                     className={cn(
-                        "flex items-center gap-2 px-2 py-1 text-sm rounded-md cursor-pointer group relative transition-all duration-200 w-full text-left border-0 bg-transparent",
-                        "hover:bg-accent/50 focus-within:bg-accent/50 focus:outline-none focus:ring-2 focus:ring-ring",
+                        "group relative flex w-full cursor-pointer items-center gap-2 rounded-md border-0 bg-transparent px-2 py-1 text-left text-sm transition-all duration-200",
+                        "hover:bg-accent/50 focus-within:bg-accent/50 focus:ring-ring focus:ring-2 focus:outline-none",
                         selectedFiles.includes(item.path) && "bg-accent",
-                        isBeingDragged && "opacity-40 scale-95 shadow-lg",
+                        isBeingDragged && "scale-95 opacity-40 shadow-lg",
                         isDropTarget && "bg-blue-50 dark:bg-blue-900/20",
                         isAnimating &&
-                            "animate-pulse bg-green-50 dark:bg-green-900/20 border-green-300 border-2",
+                            "animate-pulse border-2 border-green-300 bg-green-50 dark:bg-green-900/20",
                         canReceiveDrop &&
-                            "hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 hover:border-dashed hover:border-2",
+                            "hover:border-2 hover:border-dashed hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20",
                         !canReceiveDrop &&
                             isDragging &&
                             isFolder &&
@@ -776,7 +776,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                             onKeyDown={e =>
                                 handleFolderToggleKeyDown(e, item.path)
                             }
-                            className="flex items-center justify-center w-4 h-4 rounded-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+                            className="hover:bg-accent focus:ring-ring flex h-4 w-4 items-center justify-center rounded-sm focus:ring-2 focus:outline-none"
                             aria-label={`${
                                 isExpanded ? "Collapse" : "Expand"
                             } folder ${item.name}`}
@@ -786,7 +786,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     )}
 
                     {/* File/Folder icon */}
-                    <div className="flex items-center justify-center w-4 h-4">
+                    <div className="flex h-4 w-4 items-center justify-center">
                         {renderFileIcon(isFolder, isExpanded, !!hasChildren)}
                     </div>
 
@@ -795,7 +795,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
                     {/* Drag over indicator */}
                     {dragOverFolder === item.path && isFolder && (
-                        <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                        <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
                             Drop here
                         </span>
                     )}
@@ -806,7 +806,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                className="w-6 h-6 p-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
                                 onClick={e => e.stopPropagation()}
                                 aria-label={`Actions for ${item.name}`}
                             >
@@ -815,7 +815,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                             align="end"
-                            className="backdrop-blur-[90%] bg-background/90"
+                            className="bg-background/90 backdrop-blur-[90%]"
                         >
                             {isFolder && (
                                 <>
@@ -878,8 +878,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         <>
             {/* Drag indicator floating cursor */}
             {isDragging && (
-                <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-50">
-                    <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg">
+                <div className="pointer-events-none fixed top-0 left-0 z-50 h-full w-full">
+                    <div className="absolute top-2 left-2 rounded bg-blue-600 px-2 py-1 text-xs text-white shadow-lg">
                         Moving: {draggedItemName}
                     </div>
                 </div>
@@ -887,15 +887,15 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
             <aside
                 className={cn(
-                    "fixed left-0 top-0 z-40 h-screen w-80 transform bg-background border-r border-border transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
+                    "bg-background border-border fixed top-0 left-0 z-40 h-screen w-80 transform border-r transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
                     open
                         ? "translate-x-0"
                         : "-translate-x-full lg:translate-x-0"
                 )}
             >
-                <div className="flex flex-col h-full">
+                <div className="flex h-full flex-col">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-4 border-b border-border">
+                    <div className="border-border flex items-center justify-between border-b p-4">
                         <h2 className="text-lg font-semibold">Files</h2>
                         <div className="flex items-center gap-1">
                             <Button
@@ -904,7 +904,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 onClick={() => handleCreateFile()}
                                 title="New File"
                             >
-                                <Plus className="w-4 h-4" />
+                                <Plus className="h-4 w-4" />
                             </Button>
                             <input
                                 type="file"
@@ -926,9 +926,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 disabled={uploadFilesMutation.isPending}
                             >
                                 {uploadFilesMutation.isPending ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <Loader2 className="h-4 w-4 animate-spin" />
                                 ) : (
-                                    <Upload className="w-4 h-4" />
+                                    <Upload className="h-4 w-4" />
                                 )}
                             </Button>
                             <Button
@@ -941,7 +941,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                         : "Enter Selection Mode"
                                 }
                                 className={cn(
-                                    "text-xs px-2",
+                                    "px-2 text-xs",
                                     isSelectionModeActive && "bg-accent"
                                 )}
                             >
@@ -960,9 +960,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
                     {/* Selection Controls Bar - Only show when there are selected files */}
                     {selectedFiles.length > 0 && (
-                        <div className="flex items-center justify-between px-4 py-2 border-b bg-accent/20 border-border">
+                        <div className="bg-accent/20 border-border flex items-center justify-between border-b px-4 py-2">
                             <div className="flex items-center gap-2">
-                                <span className="text-xs text-muted-foreground">
+                                <span className="text-muted-foreground text-xs">
                                     {selectedFiles.length} selected
                                 </span>
                                 <Button
@@ -987,12 +987,12 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 size="sm"
                                 onClick={handleDelete}
                                 disabled={deleteFilesMutation.isPending}
-                                className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                                className="h-6 px-2 text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
                             >
                                 {deleteFilesMutation.isPending ? (
-                                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                    <Loader2 className="mr-1 h-3 w-3 animate-spin" />
                                 ) : (
-                                    <Trash2 className="w-3 h-3 mr-1" />
+                                    <Trash2 className="mr-1 h-3 w-3" />
                                 )}
                                 Delete
                             </Button>
@@ -1000,7 +1000,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     )}
 
                     {/* Search */}
-                    <div className="p-4 border-b border-border">
+                    <div className="border-border border-b p-4">
                         <SearchInput
                             searchTerm={searchTerm}
                             onSearchChange={e => setSearchTerm(e.target.value)}
@@ -1013,8 +1013,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
                     {/* Folder Controls */}
                     {!searchTerm && filteredFiles.length > 0 && (
-                        <div className="flex items-center justify-between px-4 py-2 border-b border-border">
-                            <span className="text-xs font-medium text-muted-foreground">
+                        <div className="border-border flex items-center justify-between border-b px-4 py-2">
+                            <span className="text-muted-foreground text-xs font-medium">
                                 FOLDERS
                             </span>
                             <div className="flex items-center gap-1">
@@ -1041,7 +1041,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     {/* Content */}
                     <section
                         className={cn(
-                            "flex-1 overflow-auto relative",
+                            "relative flex-1 overflow-auto",
                             isDragging && "bg-blue-50/30 dark:bg-blue-900/10"
                         )}
                         onDragOver={e => handleDragOver(e, "", true)}
@@ -1051,13 +1051,13 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     >
                         {/* Global drag overlay */}
                         {isDragging && (
-                            <div className="absolute inset-0 bg-blue-500/5 border-2 border-blue-300 border-dashed rounded-lg pointer-events-none z-20 flex items-center justify-center">
-                                <div className="bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg border border-blue-300">
+                            <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-blue-500/5">
+                                <div className="rounded-lg border border-blue-300 bg-white px-4 py-2 shadow-lg dark:bg-gray-800">
                                     <div className="text-sm font-medium text-blue-700 dark:text-blue-300">
                                         📁 Drop to move "{draggedItemName}" to
                                         root folder
                                     </div>
-                                    <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                                    <div className="mt-1 text-xs text-blue-600 dark:text-blue-400">
                                         Or drop on a specific folder below
                                     </div>
                                 </div>
@@ -1065,15 +1065,15 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         )}
                         {isLoading && (
                             <div className="flex items-center justify-center p-8">
-                                <Loader2 className="w-6 h-6 animate-spin" />
+                                <Loader2 className="h-6 w-6 animate-spin" />
                                 <span className="ml-2">Loading files...</span>
                             </div>
                         )}
 
                         {error && (
                             <div className="p-4">
-                                <Card className="p-4 border-destructive bg-destructive/10">
-                                    <p className="text-sm text-destructive">
+                                <Card className="border-destructive bg-destructive/10 p-4">
+                                    <p className="text-destructive text-sm">
                                         Failed to load files: {error.message}
                                     </p>
                                     <Button
@@ -1096,7 +1096,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                         onClearSearch={() => setSearchTerm("")}
                                     />
                                 ) : (
-                                    <div className="p-2 space-y-1">
+                                    <div className="space-y-1 p-2">
                                         {filteredFiles.map(item =>
                                             renderFileItem(item)
                                         )}
@@ -1108,8 +1108,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
                     {/* Status Info - Only show when in selection mode but no files selected */}
                     {isSelectionModeActive && selectedFiles.length === 0 && (
-                        <div className="p-3 border-t border-border bg-muted/20">
-                            <div className="text-xs text-center text-muted-foreground">
+                        <div className="border-border bg-muted/20 border-t p-3">
+                            <div className="text-muted-foreground text-center text-xs">
                                 Selection mode active - click checkboxes to
                                 select items
                             </div>
@@ -1127,21 +1127,21 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
             {/* Move Item Dialog */}
             <Dialog open={showMoveDialog} onOpenChange={setShowMoveDialog}>
-                <DialogContent className="backdrop-blur-[90%] bg-background/90">
+                <DialogContent className="bg-background/90 backdrop-blur-[90%]">
                     <DialogHeader>
                         <DialogTitle>Move "{moveItemName}"</DialogTitle>
                         <DialogDescription>
                             Select a destination folder for "{moveItemName}"
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="max-h-96 overflow-auto space-y-1">
+                    <div className="max-h-96 space-y-1 overflow-auto">
                         {/* Root folder option */}
                         <Button
                             variant="ghost"
-                            className="w-full justify-start px-2 py-1 h-auto text-left"
+                            className="h-auto w-full justify-start px-2 py-1 text-left"
                             onClick={() => handleMoveToFolder("")}
                         >
-                            <Folder className="w-4 h-4 mr-2" />
+                            <Folder className="mr-2 h-4 w-4" />
                             📁 Root Folder
                         </Button>
                         {/* Folder list */}

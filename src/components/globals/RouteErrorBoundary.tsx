@@ -52,15 +52,15 @@ export function RouteErrorBoundary() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="flex min-h-screen items-center justify-center p-4">
             <Card className="w-full max-w-lg">
                 <CardHeader className="text-center">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
-                        <AlertCircle className="h-6 w-6 text-destructive" />
+                    <div className="bg-destructive/10 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
+                        <AlertCircle className="text-destructive h-6 w-6" />
                     </div>
                     <CardTitle className="text-xl">
                         {errorStatus && (
-                            <span className="text-muted-foreground text-sm block mb-1">
+                            <span className="text-muted-foreground mb-1 block text-sm">
                                 Error {errorStatus}
                             </span>
                         )}
@@ -91,10 +91,10 @@ export function RouteErrorBoundary() {
 
                     {process.env.NODE_ENV === "development" && error && (
                         <details className="mt-4">
-                            <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
+                            <summary className="text-muted-foreground hover:text-foreground cursor-pointer text-sm">
                                 Ver detalles del error
                             </summary>
-                            <pre className="mt-2 text-xs bg-muted p-3 rounded overflow-auto">
+                            <pre className="bg-muted mt-2 overflow-auto rounded p-3 text-xs">
                                 {error.stack ?? JSON.stringify(error, null, 2)}
                             </pre>
                         </details>

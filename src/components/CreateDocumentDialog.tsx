@@ -180,8 +180,8 @@ export function CreateDocumentDialog({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <Card className="w-[500px] p-6 max-h-[80vh] overflow-y-auto">
-                <div className="flex items-center gap-2 mb-6">
+            <Card className="max-h-[80vh] w-[500px] overflow-y-auto p-6">
+                <div className="mb-6 flex items-center gap-2">
                     <Plus className="h-5 w-5" />
                     <h3 className="text-lg font-semibold">
                         Create New Document
@@ -191,10 +191,10 @@ export function CreateDocumentDialog({
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Error Display */}
                     {error && (
-                        <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+                        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                             <div className="flex items-center gap-2">
                                 <svg
-                                    className="w-4 h-4 flex-shrink-0"
+                                    className="h-4 w-4 flex-shrink-0"
                                     fill="currentColor"
                                     viewBox="0 0 20 20"
                                 >
@@ -211,7 +211,7 @@ export function CreateDocumentDialog({
 
                     {/* File Name */}
                     <div>
-                        <label className="block text-sm font-medium mb-2">
+                        <label className="mb-2 block text-sm font-medium">
                             Document Name *
                         </label>
                         <input
@@ -219,7 +219,7 @@ export function CreateDocumentDialog({
                             value={fileName}
                             onChange={e => setFileName(e.target.value)}
                             placeholder="Enter document name"
-                            className="w-full p-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="border-border focus:ring-primary w-full rounded-md border p-3 focus:ring-2 focus:outline-none"
                             required
                             autoFocus
                         />
@@ -227,11 +227,11 @@ export function CreateDocumentDialog({
 
                     {/* Extension Selection */}
                     <div>
-                        <label className="block text-sm font-medium mb-2">
+                        <label className="mb-2 block text-sm font-medium">
                             File Extension *
                         </label>
                         <div className="flex gap-3">
-                            <label className="flex items-center gap-2 cursor-pointer">
+                            <label className="flex cursor-pointer items-center gap-2">
                                 <input
                                     type="radio"
                                     name="extension"
@@ -240,11 +240,11 @@ export function CreateDocumentDialog({
                                     onChange={e =>
                                         setExtension(e.target.value as "md")
                                     }
-                                    className="w-4 h-4"
+                                    className="h-4 w-4"
                                 />
                                 <span>.md (Markdown)</span>
                             </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
+                            <label className="flex cursor-pointer items-center gap-2">
                                 <input
                                     type="radio"
                                     name="extension"
@@ -253,7 +253,7 @@ export function CreateDocumentDialog({
                                     onChange={e =>
                                         setExtension(e.target.value as "mdx")
                                     }
-                                    className="w-4 h-4"
+                                    className="h-4 w-4"
                                 />
                                 <span>.mdx (MDX)</span>
                             </label>
@@ -262,13 +262,13 @@ export function CreateDocumentDialog({
 
                     {/* Target Folder */}
                     <div>
-                        <label className="block text-sm font-medium mb-2">
+                        <label className="mb-2 block text-sm font-medium">
                             Destination Folder
                         </label>
                         <select
                             value={targetFolder}
                             onChange={e => setTargetFolder(e.target.value)}
-                            className="w-full p-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="border-border focus:ring-primary w-full rounded-md border p-3 focus:ring-2 focus:outline-none"
                         >
                             {availableFolders.map(folder => (
                                 <option key={folder.path} value={folder.path}>
@@ -280,14 +280,14 @@ export function CreateDocumentDialog({
 
                     {/* Create New Folder Option */}
                     <div>
-                        <label className="flex items-center gap-2 cursor-pointer">
+                        <label className="flex cursor-pointer items-center gap-2">
                             <input
                                 type="checkbox"
                                 checked={createNewFolder}
                                 onChange={e =>
                                     setCreateNewFolder(e.target.checked)
                                 }
-                                className="w-4 h-4"
+                                className="h-4 w-4"
                             />
                             <span className="text-sm font-medium">
                                 Create new folder
@@ -296,7 +296,7 @@ export function CreateDocumentDialog({
 
                         {createNewFolder && (
                             <div className="mt-2">
-                                <div className="flex items-center gap-2 mb-2">
+                                <div className="mb-2 flex items-center gap-2">
                                     <FolderPlus className="h-4 w-4" />
                                     <span className="text-sm">
                                         New folder name:
@@ -309,15 +309,15 @@ export function CreateDocumentDialog({
                                         setNewFolderName(e.target.value)
                                     }
                                     placeholder="Enter folder name"
-                                    className="w-full p-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                    className="border-border focus:ring-primary w-full rounded-md border p-3 focus:ring-2 focus:outline-none"
                                 />
                             </div>
                         )}
                     </div>
 
                     {/* Preview Path */}
-                    <div className="p-3 bg-muted rounded-md">
-                        <div className="text-sm text-muted-foreground mb-1">
+                    <div className="bg-muted rounded-md p-3">
+                        <div className="text-muted-foreground mb-1 text-sm">
                             File will be created at:
                         </div>
                         <div className="font-mono text-sm">
@@ -364,7 +364,7 @@ export function CreateDocumentDialog({
                         >
                             {(createFileMutation.isPending ||
                                 createFolderMutation.isPending) && (
-                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             )}
                             Create Document
                         </Button>

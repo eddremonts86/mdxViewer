@@ -9,30 +9,30 @@ export function ThemeTest() {
     };
 
     return (
-        <div className="p-4 border rounded mb-4 bg-card text-card-foreground">
-            <h3 className="text-lg font-semibold mb-2">Theme Test</h3>
+        <div className="bg-card text-card-foreground mb-4 rounded border p-4">
+            <h3 className="mb-2 text-lg font-semibold">Theme Test</h3>
             <p className="mb-2">
                 Current theme: <strong>{theme}</strong>
             </p>
-            <p className="mb-2 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mb-2 text-sm">
                 Document classes: {document.documentElement.className}
             </p>
             <div className="space-x-2">
                 <button
                     onClick={() => handleThemeChange("light")}
-                    className="px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1"
                 >
                     Light
                 </button>
                 <button
                     onClick={() => handleThemeChange("dark")}
-                    className="px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1"
                 >
                     Dark
                 </button>
                 <button
                     onClick={() => handleThemeChange("system")}
-                    className="px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1"
                 >
                     System
                 </button>

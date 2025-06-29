@@ -8,7 +8,7 @@ export function SimpleThemeToggle() {
     console.log("SimpleThemeToggle rendered, current theme:", theme);
 
     return (
-        <div className="flex space-x-1 border rounded-md p-1">
+        <div className="flex space-x-1 rounded-md border p-1">
             <Button
                 variant={theme === "light" ? "default" : "ghost"}
                 size="sm"

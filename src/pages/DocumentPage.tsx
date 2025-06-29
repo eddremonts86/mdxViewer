@@ -1,10 +1,23 @@
 import { DocumentViewer } from "@/components/globals/DocumentViewer";
+import { NavigationBreadcrumb } from "@/components/NavigationBreadcrumb";
 import { useFileContent } from "@/hooks/api/useFiles";
 import type { Document } from "@/types";
-import { useParams } from "react-router-dom";
+import { transitionToRoute } from "@/utils/viewTransitions";
+import { useNavigate, useParams } from "react-router-dom";
+
+// Type for breadcrumb items
+type BreadcrumbItemType = "folder" | "file" | "root";
+
+interface LocalBreadcrumbItem {
+    name: string;
+    path: string;
+    type?: BreadcrumbItemType;
+    isActive?: boolean;
+}
 
 export function DocumentPage() {
     const { "*": slug } = useParams();
+    const navigate = useNavigate();
 
     // Remove 'document/' prefix if it exists
     const filePath = slug?.startsWith("document/") ? slug.slice(9) : slug;
@@ -15,15 +28,77 @@ export function DocumentPage() {
         error,
     } = useFileContent(filePath ?? "", !!filePath);
 
+    // Create breadcrumb items from file path
+    const createBreadcrumbItems = (path: string): LocalBreadcrumbItem[] => {
+        if (!path)
+            return [
+                {
+                    name: "Home",
+                    path: "/",
+                    type: "root",
+                    isActive: false,
+                },
+            ];
+
+        const segments = path.split("/").filter(Boolean);
+        const items: LocalBreadcrumbItem[] = [
+            { name: "Home", path: "/", type: "root", isActive: false },
+        ];
+
+        let currentPath = "";
+        segments.forEach((segment, index) => {
+            currentPath += `/${segment}`;
+            const isLast = index === segments.length - 1;
+
+            let navigationPath: string;
+            let itemType: BreadcrumbItemType;
+
+            if (isLast) {
+                // Current file
+                navigationPath = `/document${currentPath}`;
+                itemType = "file";
+            } else {
+                // Parent folder - for now navigate to home
+                // In the future, we could implement folder-specific views
+                navigationPath = "/";
+                itemType = "folder";
+            }
+
+            items.push({
+                name: segment.replace(/\.(md|mdx)$/, ""),
+                path: navigationPath,
+                type: itemType,
+                isActive: isLast,
+            });
+        });
+
+        return items;
+    };
+
+    const breadcrumbItems = filePath ? createBreadcrumbItems(filePath) : [];
+
+    const handleBreadcrumbNavigation = async (path: string) => {
+        // Use View Transitions utility for smooth navigation
+        await transitionToRoute(
+            () => {
+                navigate(path);
+            },
+            {
+                transitionName: "breadcrumb-navigation",
+                debug: process.env.NODE_ENV === "development",
+            }
+        );
+    };
+
     if (!filePath) {
         return (
-            <div className="container relative">
+            <div className="relative container">
                 <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
                     <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
                         <h3 className="mt-4 text-lg font-semibold">
                             Welcome to MDX Viewer
                         </h3>
-                        <p className="mb-4 mt-2 text-sm text-muted-foreground">
+                        <p className="text-muted-foreground mt-2 mb-4 text-sm">
                             Select a document from the sidebar to begin viewing.
                         </p>
                     </div>
@@ -34,11 +109,11 @@ export function DocumentPage() {
 
     if (isLoading) {
         return (
-            <div className="container relative">
+            <div className="relative container">
                 <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
                     <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
-                        <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mb-4"></div>
-                        <p className="text-sm text-muted-foreground">
+                        <div className="border-primary mb-4 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent"></div>
+                        <p className="text-muted-foreground text-sm">
                             Loading document...
                         </p>
                     </div>
@@ -49,13 +124,13 @@ export function DocumentPage() {
 
     if (error || !fileData) {
         return (
-            <div className="container relative">
+            <div className="relative container">
                 <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
                     <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
                         <h3 className="mt-4 text-lg font-semibold">
                             Document not found
                         </h3>
-                        <p className="mb-4 mt-2 text-sm text-muted-foreground">
+                        <p className="text-muted-foreground mt-2 mb-4 text-sm">
                             {error?.message ??
                                 "The document you are looking for does not exist."}
                         </p>
@@ -104,9 +179,23 @@ export function DocumentPage() {
     };
 
     return (
-        <DocumentViewer
-            document={document}
-            tableOfContents={getTableOfContents(content)}
-        />
+        <div className="w-full">
+            {/* Navigation Breadcrumb */}
+            {filePath && (
+                <NavigationBreadcrumb
+                    items={breadcrumbItems}
+                    onNavigate={handleBreadcrumbNavigation}
+                    isLoading={isLoading}
+                    className="navigation-header"
+                />
+            )}
+
+            <div className="document-content">
+                <DocumentViewer
+                    document={document}
+                    tableOfContents={getTableOfContents(content)}
+                />
+            </div>
+        </div>
     );
 }

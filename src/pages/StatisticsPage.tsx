@@ -31,7 +31,7 @@ export function StatisticsPage() {
                 </div>
                 <div className="flex items-center space-x-2">
                     <Badge variant="outline" className="text-xs">
-                        <Calendar className="w-3 h-3 mr-1" />
+                        <Calendar className="mr-1 h-3 w-3" />
                         Last 30 days
                     </Badge>
                 </div>
@@ -44,11 +44,11 @@ export function StatisticsPage() {
                         <CardTitle className="text-sm font-medium">
                             Total Views
                         </CardTitle>
-                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        <Eye className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">12,489</div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                             <span className="text-emerald-600 dark:text-emerald-400">
                                 +20.1%
                             </span>{" "}
@@ -62,11 +62,11 @@ export function StatisticsPage() {
                         <CardTitle className="text-sm font-medium">
                             Unique Visitors
                         </CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <Users className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">2,350</div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                             <span className="text-emerald-600 dark:text-emerald-400">
                                 +180.1%
                             </span>{" "}
@@ -80,11 +80,11 @@ export function StatisticsPage() {
                         <CardTitle className="text-sm font-medium">
                             Documents
                         </CardTitle>
-                        <FileText className="h-4 w-4 text-muted-foreground" />
+                        <FileText className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">573</div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                             <span className="text-emerald-600 dark:text-emerald-400">
                                 +19%
                             </span>{" "}
@@ -98,11 +98,11 @@ export function StatisticsPage() {
                         <CardTitle className="text-sm font-medium">
                             Avg. Time
                         </CardTitle>
-                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                        <TrendingUp className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">4:12</div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                             <span className="text-emerald-600 dark:text-emerald-400">
                                 +7%
                             </span>{" "}
@@ -122,13 +122,13 @@ export function StatisticsPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[300px] flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg">
+                        <div className="border-muted-foreground/25 flex h-[300px] items-center justify-center rounded-lg border-2 border-dashed">
                             <div className="text-center">
-                                <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground/50 mb-2" />
+                                <BarChart3 className="text-muted-foreground/50 mx-auto mb-2 h-12 w-12" />
                                 <p className="text-muted-foreground">
                                     Views Chart
                                 </p>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-muted-foreground text-xs">
                                     Chart visualization would appear here
                                 </p>
                             </div>
@@ -144,13 +144,13 @@ export function StatisticsPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[300px] flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg">
+                        <div className="border-muted-foreground/25 flex h-[300px] items-center justify-center rounded-lg border-2 border-dashed">
                             <div className="text-center">
-                                <TrendingUp className="h-12 w-12 mx-auto text-muted-foreground/50 mb-2" />
+                                <TrendingUp className="text-muted-foreground/50 mx-auto mb-2 h-12 w-12" />
                                 <p className="text-muted-foreground">
                                     Engagement Chart
                                 </p>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-muted-foreground text-xs">
                                     Engagement data would appear here
                                 </p>
                             </div>
@@ -169,12 +169,12 @@ export function StatisticsPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center justify-between rounded-lg border p-4">
                             <div>
                                 <p className="font-medium">
                                     Introduction to MDX
                                 </p>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-muted-foreground text-sm">
                                     Getting started guide
                                 </p>
                             </div>
@@ -185,10 +185,10 @@ export function StatisticsPage() {
                                 </p>
                             </div>
                         </div>
-                        <div className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center justify-between rounded-lg border p-4">
                             <div>
                                 <p className="font-medium">Interactive Demo</p>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-muted-foreground text-sm">
                                     Interactive examples
                                 </p>
                             </div>
@@ -199,10 +199,10 @@ export function StatisticsPage() {
                                 </p>
                             </div>
                         </div>
-                        <div className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center justify-between rounded-lg border p-4">
                             <div>
                                 <p className="font-medium">API Reference</p>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-muted-foreground text-sm">
                                     Complete API documentation
                                 </p>
                             </div>

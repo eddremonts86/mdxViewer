@@ -71,11 +71,11 @@ export class ErrorBoundary extends Component<
             }
 
             return (
-                <div className="flex items-center justify-center min-h-screen p-4 bg-background">
+                <div className="bg-background flex min-h-screen items-center justify-center p-4">
                     <Card className="w-full max-w-2xl">
                         <CardHeader className="text-center">
-                            <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-destructive/10">
-                                <AlertTriangle className="w-8 h-8 text-destructive" />
+                            <div className="bg-destructive/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+                                <AlertTriangle className="text-destructive h-8 w-8" />
                             </div>
                             <CardTitle className="text-2xl">
                                 Oops! Something went wrong
@@ -93,7 +93,7 @@ export class ErrorBoundary extends Component<
                                     onClick={this.handleRetry}
                                     className="w-full sm:w-auto"
                                 >
-                                    <RefreshCw className="w-4 h-4 mr-2" />
+                                    <RefreshCw className="mr-2 h-4 w-4" />
                                     Try again
                                 </Button>
                                 <Button
@@ -101,7 +101,7 @@ export class ErrorBoundary extends Component<
                                     variant="outline"
                                     className="w-full sm:w-auto"
                                 >
-                                    <Home className="w-4 h-4 mr-2" />
+                                    <Home className="mr-2 h-4 w-4" />
                                     Go home
                                 </Button>
                                 <Button
@@ -109,7 +109,7 @@ export class ErrorBoundary extends Component<
                                     variant="outline"
                                     className="w-full sm:w-auto"
                                 >
-                                    <RefreshCw className="w-4 h-4 mr-2" />
+                                    <RefreshCw className="mr-2 h-4 w-4" />
                                     Reload page
                                 </Button>
                             </div>
@@ -119,7 +119,7 @@ export class ErrorBoundary extends Component<
                                 process.env.NODE_ENV === "development") &&
                                 this.state.error && (
                                     <details className="mt-6">
-                                        <summary className="text-sm font-medium cursor-pointer text-muted-foreground hover:text-foreground">
+                                        <summary className="text-muted-foreground hover:text-foreground cursor-pointer text-sm font-medium">
                                             View error details (for developers)
                                         </summary>
                                         <div className="mt-4 space-y-4">
@@ -127,7 +127,7 @@ export class ErrorBoundary extends Component<
                                                 <h4 className="mb-2 text-sm font-medium">
                                                     Error:
                                                 </h4>
-                                                <pre className="p-3 overflow-auto text-xs rounded bg-muted">
+                                                <pre className="bg-muted overflow-auto rounded p-3 text-xs">
                                                     {this.state.error.toString()}
                                                 </pre>
                                             </div>
@@ -136,7 +136,7 @@ export class ErrorBoundary extends Component<
                                                     <h4 className="mb-2 text-sm font-medium">
                                                         Stack Trace:
                                                     </h4>
-                                                    <pre className="p-3 overflow-auto text-xs rounded bg-muted">
+                                                    <pre className="bg-muted overflow-auto rounded p-3 text-xs">
                                                         {
                                                             this.state.errorInfo
                                                                 .componentStack
@@ -149,7 +149,7 @@ export class ErrorBoundary extends Component<
                                 )}
 
                             {/* Help Text */}
-                            <div className="text-sm text-center text-muted-foreground">
+                            <div className="text-muted-foreground text-center text-sm">
                                 <p>
                                     If the problem persists, please reload the
                                     page or contact technical support.

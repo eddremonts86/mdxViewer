@@ -55,25 +55,25 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className={`sm:max-w-md ${className}`}>
                 <DialogHeader>
-                    <DialogTitle className="flex items-center space-x-2 text-destructive">
-                        <AlertTriangle className="w-5 h-5" />
+                    <DialogTitle className="text-destructive flex items-center space-x-2">
+                        <AlertTriangle className="h-5 w-5" />
                         <span>
                             Delete {itemType === "file" ? "File" : "Folder"}
                         </span>
                     </DialogTitle>
                     <DialogDescription>
                         Are you sure you want to delete{" "}
-                        <span className="font-semibold text-foreground">
+                        <span className="text-foreground font-semibold">
                             "{itemName}"
                         </span>
                         ?
                         {itemType === "folder" && (
-                            <span className="block mt-2 text-destructive/80">
+                            <span className="text-destructive/80 mt-2 block">
                                 This will also delete all files and subfolders
                                 inside it.
                             </span>
                         )}
-                        <span className="block mt-2 font-medium">
+                        <span className="mt-2 block font-medium">
                             This action cannot be undone.
                         </span>
                     </DialogDescription>
@@ -95,9 +95,9 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({
                         className="flex items-center space-x-2"
                     >
                         {isLoading ? (
-                            <div className="w-4 h-4 border-b-2 border-white rounded-full animate-spin" />
+                            <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
                         ) : (
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="h-4 w-4" />
                         )}
                         <span>{getButtonText()}</span>
                     </Button>

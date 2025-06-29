@@ -4,27 +4,27 @@ export function SimpleThemeTest() {
     const { theme, setTheme } = useSimpleTheme();
 
     return (
-        <div className="p-4 border rounded mb-4 bg-card text-card-foreground">
-            <h3 className="text-lg font-semibold mb-2">Simple Theme Test</h3>
+        <div className="bg-card text-card-foreground mb-4 rounded border p-4">
+            <h3 className="mb-2 text-lg font-semibold">Simple Theme Test</h3>
             <p className="mb-2">
                 Current theme: <strong>{theme}</strong>
             </p>
             <div className="space-x-2">
                 <button
                     onClick={() => setTheme("light")}
-                    className="px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1"
                 >
                     Light
                 </button>
                 <button
                     onClick={() => setTheme("dark")}
-                    className="px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1"
                 >
                     Dark
                 </button>
                 <button
                     onClick={() => setTheme("system")}
-                    className="px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1"
                 >
                     System
                 </button>

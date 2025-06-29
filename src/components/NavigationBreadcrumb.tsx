@@ -104,7 +104,7 @@ export const NavigationBreadcrumb: React.FC<NavigationBreadcrumbProps> = ({
 
     return (
         <nav
-            className={`flex items-center space-x-2 p-3 bg-card/50 border-b border-border ${className}`}
+            className={`bg-card/50 border-border flex items-center space-x-2 border-b p-3 ${className}`}
             aria-label="Navigation breadcrumb"
         >
             {/* Back button */}
@@ -152,7 +152,7 @@ export const NavigationBreadcrumb: React.FC<NavigationBreadcrumbProps> = ({
                                 }
                             >
                                 {getIcon(item.type)}
-                                <span className="truncate max-w-32 sm:max-w-none">
+                                <span className="max-w-32 truncate sm:max-w-none">
                                     {item.name}
                                 </span>
                                 {(item.isActive ?? false) && (
@@ -167,7 +167,7 @@ export const NavigationBreadcrumb: React.FC<NavigationBreadcrumbProps> = ({
 
                             {/* Separator */}
                             {!isLast && (
-                                <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                <ChevronRight className="text-muted-foreground h-4 w-4 flex-shrink-0" />
                             )}
                         </React.Fragment>
                     );
@@ -176,8 +176,8 @@ export const NavigationBreadcrumb: React.FC<NavigationBreadcrumbProps> = ({
 
             {/* Loading indicator */}
             {isLoading && (
-                <div className="flex items-center space-x-2 text-muted-foreground">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
+                <div className="text-muted-foreground flex items-center space-x-2">
+                    <div className="border-primary h-4 w-4 animate-spin rounded-full border-b-2" />
                     <span className="text-sm">Loading...</span>
                 </div>
             )}
@@ -186,7 +186,7 @@ export const NavigationBreadcrumb: React.FC<NavigationBreadcrumbProps> = ({
             <Button
                 variant="ghost"
                 size="sm"
-                className="flex items-center space-x-1 ml-auto"
+                className="ml-auto flex items-center space-x-1"
                 aria-label="Navigation history"
             >
                 <History className="h-4 w-4" />
