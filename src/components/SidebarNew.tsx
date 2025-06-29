@@ -1,3 +1,7 @@
+import { useMemo, useState } from "react";
+
+import { Loader2, Plus, Trash2, Upload } from "lucide-react";
+
 import type { FileItem } from "@/api/fileAPI";
 import { FileTreeNode } from "@/components/FileTreeNode";
 import { NoResults } from "@/components/NoResults";
@@ -12,8 +16,7 @@ import {
     useUploadFiles,
 } from "@/hooks/api/useFiles";
 import { cn } from "@/lib/utils";
-import { Loader2, Plus, Trash2, Upload } from "lucide-react";
-import { useMemo, useState } from "react";
+import type { FileNode } from "@/types";
 
 interface SidebarProps {
     open: boolean;
@@ -66,23 +69,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         return filterItems(files);
     }, [files, searchTerm]);
 
-    const handleToggleFolder = (path: string) => {
-        setExpandedFolders((prev) => {
-            const newSet = new Set(prev);
-            if (newSet.has(path)) {
-                newSet.delete(path);
-            } else {
-                newSet.add(path);
-            }
-            return newSet;
-        });
-    };
-
     const handleSelectFile = (path: string) => {
-        setSelectedFiles((prev) =>
-            prev.includes(path)
-                ? prev.filter((p) => p !== path)
-                : [...prev, path]
+        setSelectedFiles(prev =>
+            prev.includes(path) ? prev.filter(p => p !== path) : [...prev, path]
         );
     };
 
@@ -126,13 +115,11 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     };
 
     // Convert FileItem to FileNode for compatibility with FileTreeNode
-    const convertToFileNode = (item: FileItem): any => ({
+    const convertToFileNode = (item: FileItem): FileNode => ({
         name: item.name,
         path: item.path,
         type: item.type,
         extension: item.extension,
-        size: item.size,
-        lastModified: item.lastModified,
         children: item.children?.map(convertToFileNode) || [],
     });
 
@@ -140,7 +127,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         items: FileItem[],
         level: number = 0
     ): React.ReactNode => {
-        return items.map((item) => (
+        return items.map(item => (
             <FileTreeNode
                 key={item.path}
                 node={convertToFileNode(item)}
@@ -150,9 +137,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                 }
                 setExpandedFolder={(path: string | null) => {
                     if (path) {
-                        setExpandedFolders((prev) => new Set([...prev, path]));
+                        setExpandedFolders(prev => new Set([...prev, path]));
                     } else {
-                        setExpandedFolders((prev) => {
+                        setExpandedFolders(prev => {
                             const newSet = new Set(prev);
                             newSet.delete(item.path);
                             return newSet;
@@ -166,8 +153,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                 onToggleSelect={() => handleSelectFile(item.path)}
                 onCreateFile={handleCreateFile}
                 onCreateFolder={handleCreateFolder}
-                onDeleteItem={(path) => setSelectedFiles([path])}
-                onContextMenu={(e) => e.preventDefault()}
+                onDeleteItem={path => setSelectedFiles([path])}
+                onContextMenu={e => e.preventDefault()}
             />
         ));
     };
@@ -250,9 +237,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     <div className="p-4 border-b border-border">
                         <SearchInput
                             searchTerm={searchTerm}
-                            onSearchChange={(e) =>
-                                setSearchTerm(e.target.value)
-                            }
+                            onSearchChange={e => setSearchTerm(e.target.value)}
                             onClearSearch={() => setSearchTerm("")}
                             resultsCount={filteredFiles.length}
                             hasResults={filteredFiles.length > 0}
@@ -323,7 +308,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                             Create {createType === "file" ? "File" : "Folder"}
                         </h3>
                         <form
-                            onSubmit={async (e) => {
+                            onSubmit={async e => {
                                 e.preventDefault();
                                 const formData = new FormData(e.currentTarget);
                                 const name = formData.get("name") as string;

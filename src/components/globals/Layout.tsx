@@ -46,7 +46,7 @@ export function Layout() {
 
                     {/* Navigation in center */}
                     <nav className="flex items-center justify-center flex-1 space-x-1 md:space-x-2">
-                        {navigationItems.map((item) => {
+                        {navigationItems.map(item => {
                             const Icon = item.icon;
                             const isActive =
                                 location.pathname === item.path ||
@@ -74,18 +74,12 @@ export function Layout() {
 
                     {/* Right side */}
                     <div className="flex items-center justify-end flex-1 space-x-4">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                        >
+                        <Button variant="ghost" size="icon">
                             <Bell className="w-5 h-5" />
                             <span className="sr-only">Notifications</span>
                         </Button>
 
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                        >
+                        <Button variant="ghost" size="icon">
                             <Settings className="w-5 h-5" />
                             <span className="sr-only">Settings</span>
                         </Button>
@@ -97,10 +91,7 @@ export function Layout() {
 
             <div className="flex h-[calc(100vh-4rem)]">
                 {/* Sidebar */}
-                <Sidebar
-                    open={sidebarOpen}
-                    onOpenChange={setSidebarOpen}
-                />
+                <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
 
                 {/* Main Content */}
                 <main className="flex-1 overflow-auto">

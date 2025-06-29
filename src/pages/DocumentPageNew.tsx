@@ -80,7 +80,7 @@ export function DocumentPage() {
         const lines = content.split("\n");
         const toc: Array<{ level: number; title: string; id: string }> = [];
 
-        lines.forEach((line) => {
+        lines.forEach(line => {
             const match = line.match(/^(#{1,6})\s+(.+)$/);
             if (match) {
                 const level = match[1].length;

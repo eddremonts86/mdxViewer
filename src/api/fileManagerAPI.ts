@@ -288,7 +288,7 @@ export class FileManagerAPI {
             }
         }
 
-        const successCount = results.filter((r) => r.success).length;
+        const successCount = results.filter(r => r.success).length;
         const totalCount = results.length;
 
         console.log(

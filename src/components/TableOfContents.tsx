@@ -55,8 +55,8 @@ export function TableOfContents({
     useEffect(() => {
         // Observar elementos en el viewport para resaltar el activo
         const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
+            entries => {
+                entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         setActiveId(entry.target.id);
                     }

@@ -30,8 +30,7 @@ export function CreateDocumentDialog({
     // Calculate path depth for validation
     const calculateDepth = (pathStr: string): number => {
         if (!pathStr || pathStr === "/") return 0;
-        return pathStr.split("/").filter((segment) => segment.length > 0)
-            .length;
+        return pathStr.split("/").filter(segment => segment.length > 0).length;
     };
 
     // Validate depth before submission
@@ -68,7 +67,7 @@ export function CreateDocumentDialog({
             folders.push({ path: "", name: "📁 Root", depth: 0 });
         }
 
-        items.forEach((item) => {
+        items.forEach(item => {
             if (item.type === "folder") {
                 const fullPath = currentPath
                     ? `${currentPath}/${item.originalName || item.name}`
@@ -189,10 +188,7 @@ export function CreateDocumentDialog({
                     </h3>
                 </div>
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="space-y-4"
-                >
+                <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Error Display */}
                     {error && (
                         <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
@@ -221,7 +217,7 @@ export function CreateDocumentDialog({
                         <input
                             type="text"
                             value={fileName}
-                            onChange={(e) => setFileName(e.target.value)}
+                            onChange={e => setFileName(e.target.value)}
                             placeholder="Enter document name"
                             className="w-full p-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                             required
@@ -241,7 +237,7 @@ export function CreateDocumentDialog({
                                     name="extension"
                                     value="md"
                                     checked={extension === "md"}
-                                    onChange={(e) =>
+                                    onChange={e =>
                                         setExtension(e.target.value as "md")
                                     }
                                     className="w-4 h-4"
@@ -254,7 +250,7 @@ export function CreateDocumentDialog({
                                     name="extension"
                                     value="mdx"
                                     checked={extension === "mdx"}
-                                    onChange={(e) =>
+                                    onChange={e =>
                                         setExtension(e.target.value as "mdx")
                                     }
                                     className="w-4 h-4"
@@ -271,14 +267,11 @@ export function CreateDocumentDialog({
                         </label>
                         <select
                             value={targetFolder}
-                            onChange={(e) => setTargetFolder(e.target.value)}
+                            onChange={e => setTargetFolder(e.target.value)}
                             className="w-full p-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                         >
-                            {availableFolders.map((folder) => (
-                                <option
-                                    key={folder.path}
-                                    value={folder.path}
-                                >
+                            {availableFolders.map(folder => (
+                                <option key={folder.path} value={folder.path}>
                                     {folder.name}
                                 </option>
                             ))}
@@ -291,7 +284,7 @@ export function CreateDocumentDialog({
                             <input
                                 type="checkbox"
                                 checked={createNewFolder}
-                                onChange={(e) =>
+                                onChange={e =>
                                     setCreateNewFolder(e.target.checked)
                                 }
                                 className="w-4 h-4"
@@ -312,7 +305,7 @@ export function CreateDocumentDialog({
                                 <input
                                     type="text"
                                     value={newFolderName}
-                                    onChange={(e) =>
+                                    onChange={e =>
                                         setNewFolderName(e.target.value)
                                     }
                                     placeholder="Enter folder name"

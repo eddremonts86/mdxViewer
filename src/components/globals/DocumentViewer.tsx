@@ -147,10 +147,7 @@ export function DocumentViewer({
 
                 {/* Document Content */}
                 <div className="pb-8">
-                    <div
-                        ref={contentRef}
-                        className="max-w-none"
-                    >
+                    <div ref={contentRef} className="max-w-none">
                         <MarkdownRenderer
                             content={document.content}
                             type={document.type}

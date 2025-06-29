@@ -1,11 +1,11 @@
 /* App-specific styles - keep minimal to avoid conflicts with shadcn/ui */
 
 #root {
-  width: 100%;
-  height: 100vh;
+    width: 100%;
+    height: 100vh;
 }
 
 /* Remove any default styles that might interfere with theming */
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }

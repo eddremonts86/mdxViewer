@@ -105,11 +105,7 @@ const CustomButton = ({
     variant = "default",
     onClick,
 }: CustomButtonProps) => (
-    <Button
-        variant={variant}
-        onClick={onClick}
-        className="my-2"
-    >
+    <Button variant={variant} onClick={onClick} className="my-2">
         {children}
     </Button>
 );

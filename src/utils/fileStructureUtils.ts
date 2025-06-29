@@ -1,11 +1,11 @@
 import type { FileNode } from "@/types";
 
 /**
- * Utilidad para crear dinámicamente la estructura de archivos
- * basada en los archivos reales en public/content/
+ * Utility to dynamically create file structure
+ * based on real files in public/content/
  */
 
-// Función para crear automáticamente la estructura de archivos
+// Function to automatically create file structure
 export const createFileStructureFromDirectory = async (): Promise<
     FileNode[]
 > => {
@@ -115,7 +115,7 @@ export const addFileToStructure = (
     fileName: string,
     fileExtension: string
 ): FileNode[] => {
-    const pathParts = folderPath.split("/").filter((part) => part);
+    const pathParts = folderPath.split("/").filter(part => part);
     const filePath = `/${folderPath}/${fileName.replace(/\.(md|mdx)$/, "")}`;
 
     const newFile: FileNode = {
@@ -125,7 +125,7 @@ export const addFileToStructure = (
         extension: fileExtension,
     };
 
-    // Crear una copia de la estructura
+    // Create a copy of the structure
     const updatedStructure = JSON.parse(JSON.stringify(structure));
 
     // Encontrar la carpeta objetivo
@@ -142,7 +142,7 @@ export const addFileToStructure = (
 
         if (!fileExists) {
             targetFolder.children.push(newFile);
-            // Ordenar los archivos alfabéticamente
+            // Sort files alphabetically
             targetFolder.children.sort((a: FileNode, b: FileNode) =>
                 a.name.localeCompare(b.name)
             );

@@ -57,7 +57,7 @@ export class FileSystemAPI {
         const folderMap = new Map<string, FileNode>();
         const rootFolders: FileNode[] = [];
 
-        filePaths.forEach((filePath) => {
+        filePaths.forEach(filePath => {
             const parts = filePath.split("/");
             const fileName = parts.pop()!;
             const folderName = parts[0];
@@ -86,7 +86,7 @@ export class FileSystemAPI {
         });
 
         // Ordenar todo alfabéticamente
-        rootFolders.forEach((folder) => {
+        rootFolders.forEach(folder => {
             if (folder.children) {
                 folder.children.sort((a, b) => a.name.localeCompare(b.name));
             }
@@ -168,7 +168,7 @@ export class FileSystemAPI {
         const frontmatter: Record<string, string> = {};
 
         // Parse YAML simple
-        frontmatterText.split("\n").forEach((line) => {
+        frontmatterText.split("\n").forEach(line => {
             const colonIndex = line.indexOf(":");
             if (colonIndex > 0) {
                 const key = line.slice(0, colonIndex).trim();

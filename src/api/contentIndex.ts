@@ -31,5 +31,5 @@ export const CONTENT_FILES = [
     "project docs/Untitled-1.md",
     "test-directo.md",
     "test-funcionando.md",
-    "test-simple.md"
+    "test-simple.md",
 ];

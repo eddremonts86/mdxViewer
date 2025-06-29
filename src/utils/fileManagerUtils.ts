@@ -244,7 +244,7 @@ export class FileManagerUtils {
         content: string = ""
     ): Promise<{ success: boolean; error?: string }> {
         try {
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 100));
             console.log(`[Simulated] Creating file: ${path}`, {
                 content: content.substring(0, 100) + "...",
             });
@@ -264,7 +264,7 @@ export class FileManagerUtils {
         path: string
     ): Promise<{ success: boolean; error?: string }> {
         try {
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 100));
             console.log(`[Simulated] Creating folder: ${path}`);
             return { success: true };
         } catch (error) {
@@ -282,7 +282,7 @@ export class FileManagerUtils {
         path: string
     ): Promise<{ success: boolean; error?: string }> {
         try {
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 100));
             console.log(`[Simulated] Deleting file: ${path}`);
             return { success: true };
         } catch (error) {
@@ -300,7 +300,7 @@ export class FileManagerUtils {
         path: string
     ): Promise<{ success: boolean; error?: string }> {
         try {
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 100));
             console.log(`[Simulated] Deleting folder: ${path}`);
             return { success: true };
         } catch (error) {
@@ -386,7 +386,7 @@ export class FileManagerUtils {
             });
         }
 
-        const hasFailures = results.some((op) => op.status === "failed");
+        const hasFailures = results.some(op => op.status === "failed");
 
         return {
             ...updatedBatch,

@@ -31,7 +31,7 @@ export const extractTextFromReactNode = (children: React.ReactNode): string => {
 
     if (Array.isArray(children)) {
         return children
-            .map((child) => (typeof child === "string" ? child : ""))
+            .map(child => (typeof child === "string" ? child : ""))
             .join("")
             .trim();
     }

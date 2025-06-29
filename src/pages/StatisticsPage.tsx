@@ -30,10 +30,7 @@ export function StatisticsPage() {
                     </p>
                 </div>
                 <div className="flex items-center space-x-2">
-                    <Badge
-                        variant="outline"
-                        className="text-xs"
-                    >
+                    <Badge variant="outline" className="text-xs">
                         <Calendar className="w-3 h-3 mr-1" />
                         Last 30 days
                     </Badge>

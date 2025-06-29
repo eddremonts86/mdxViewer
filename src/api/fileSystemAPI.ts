@@ -1,9 +1,20 @@
 import type { Document, FileNode } from "@/types";
 
+// Define proper metadata type instead of using 'any'
+interface FileMetadata {
+    title?: string;
+    description?: string;
+    author?: string;
+    date?: string;
+    tags?: string[];
+    category?: string;
+    [key: string]: string | string[] | number | boolean | undefined;
+}
+
 /**
- * API para gestionar el sistema de archivos dinámico
- * Lee archivos reales desde public/content/
- * Se actualiza automáticamente cuando cambia contentIndex.ts
+ * API for managing dynamic file system
+ * Reads real files from public/content/
+ * Updates automatically when contentIndex.ts changes
  */
 export class FileSystemAPI {
     private static readonly baseUrl = "/content";
@@ -11,11 +22,11 @@ export class FileSystemAPI {
     private static lastModified = 0;
 
     /**
-     * Carga el índice de archivos dinámicamente
+     * Loads file index dynamically
      */
     private static async loadContentIndex(): Promise<string[]> {
         try {
-            // Para Vite, usar import dinámico con timestamp como query param
+            // For Vite, use dynamic import with timestamp as query param
             const timestamp = Date.now();
             const module = await import(
                 /* @vite-ignore */ `./contentIndex.ts?t=${timestamp}`
@@ -101,13 +112,13 @@ export class FileSystemAPI {
         const folderMap = new Map<string, FileNode>();
         const rootFolders: FileNode[] = [];
 
-        filePaths.forEach((filePath) => {
+        filePaths.forEach(filePath => {
             const parts = filePath.split("/");
             const fileName = parts.pop()!;
             const folderName = parts[0];
             const extension = fileName.split(".").pop() as "md" | "mdx";
 
-            // Crear o encontrar carpeta
+            // Create or find folder
             if (!folderMap.has(folderName)) {
                 const folder: FileNode = {
                     name: folderName,
@@ -129,8 +140,8 @@ export class FileSystemAPI {
             });
         });
 
-        // Ordenar todo alfabéticamente
-        rootFolders.forEach((folder) => {
+        // Sort everything alphabetically
+        rootFolders.forEach(folder => {
             if (folder.children) {
                 folder.children.sort((a, b) => a.name.localeCompare(b.name));
             }
@@ -213,7 +224,7 @@ export class FileSystemAPI {
         const frontmatter: Record<string, string> = {};
 
         // Parse YAML simple
-        frontmatterText.split("\n").forEach((line) => {
+        frontmatterText.split("\n").forEach(line => {
             const colonIndex = line.indexOf(":");
             if (colonIndex > 0) {
                 const key = line.slice(0, colonIndex).trim();
@@ -270,7 +281,7 @@ export class FileSystemAPI {
         name: string;
         content?: string;
         type: "md" | "mdx";
-        metadata?: any;
+        metadata?: FileMetadata;
     }): Promise<{ success: boolean; error?: string }> {
         try {
             // This would normally make an API call to the server

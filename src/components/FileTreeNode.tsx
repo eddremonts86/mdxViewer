@@ -165,7 +165,7 @@ export function FileTreeNode({
                 <Button
                     variant="ghost"
                     size="sm"
-                    onClick={(e) => {
+                    onClick={e => {
                         e.stopPropagation();
                         handleToggle();
                     }}
@@ -229,7 +229,7 @@ export function FileTreeNode({
             {/* Children (for folders) */}
             {node.type === "folder" && isExpanded && node.children && (
                 <div className="space-y-0.5 ml-0">
-                    {node.children.map((child) => (
+                    {node.children.map(child => (
                         <FileTreeNode
                             key={child.path}
                             node={child}

@@ -1,30 +1,30 @@
 #!/bin/bash
 
-# Script para validar que el código sigue las instrucciones del agente AI
-# Uso: ./scripts/validate-ai-rules.sh
+# Script to validate that code follows AI agent instructions
+# Usage: ./scripts/validate-ai-rules.sh
 
-echo "🤖 Validando adherencia a las reglas del Agente AI..."
+echo "🤖 Validating adherence to AI Agent rules..."
 
-# Colores para output
+# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Contadores
+# Counters
 ERRORS=0
 WARNINGS=0
 
-# 1. Verificar que existe el archivo de instrucciones
+# 1. Check if instructions file exists
 if [ ! -f ".ai-instructions.md" ]; then
-  echo -e "${RED}❌ ERROR: No se encuentra .ai-instructions.md${NC}"
+  echo -e "${RED}❌ ERROR: .ai-instructions.md not found${NC}"
   ERRORS=$((ERRORS + 1))
 else
-  echo -e "${GREEN}✅ Archivo de instrucciones encontrado${NC}"
+  echo -e "${GREEN}✅ Instructions file found${NC}"
 fi
 
-# 2. Verificar estructura de carpetas
-echo -e "\n📁 Verificando estructura de carpetas..."
+# 2. Check folder structure
+echo -e "\n📁 Checking folder structure..."
 
 REQUIRED_DIRS=(
   "src/components"

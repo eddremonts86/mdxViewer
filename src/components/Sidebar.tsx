@@ -119,10 +119,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         if (event) {
             event.stopPropagation();
         }
-        setSelectedFiles((prev) =>
-            prev.includes(path)
-                ? prev.filter((p) => p !== path)
-                : [...prev, path]
+        setSelectedFiles(prev =>
+            prev.includes(path) ? prev.filter(p => p !== path) : [...prev, path]
         );
     };
 
@@ -186,7 +184,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         // Check depth before allowing folder creation
         const calculateDepth = (pathStr: string): number => {
             if (!pathStr || pathStr === "/") return 0;
-            return pathStr.split("/").filter((segment) => segment.length > 0)
+            return pathStr.split("/").filter(segment => segment.length > 0)
                 .length;
         };
 
@@ -217,7 +215,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                             description: `Folder "${folderName}" has been created successfully.`,
                         });
                     },
-                    onError: (error) => {
+                    onError: error => {
                         console.error("Folder creation failed:", error);
                         const errorMessage =
                             error instanceof Error
@@ -297,12 +295,12 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
     // Helper function to handle folder auto-expansion animation
     const handleFolderAutoExpansion = (targetPath: string) => {
-        setAnimatingFolders((folders) => new Set([...folders, targetPath]));
-        setExpandedFolders((folders) => new Set([...folders, targetPath]));
+        setAnimatingFolders(folders => new Set([...folders, targetPath]));
+        setExpandedFolders(folders => new Set([...folders, targetPath]));
 
         // Remove animation class after animation completes
         setTimeout(() => {
-            setAnimatingFolders((folders) => {
+            setAnimatingFolders(folders => {
                 const newSet = new Set(folders);
                 newSet.delete(targetPath);
                 return newSet;
@@ -310,7 +308,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         }, 300); // Animation duration
     };
     const toggleFolder = (path: string) => {
-        setExpandedFolders((prev) => {
+        setExpandedFolders(prev => {
             const newSet = new Set(prev);
             if (newSet.has(path)) {
                 newSet.delete(path);
@@ -400,8 +398,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             const targetName =
                 targetPath === ""
                     ? "root folder"
-                    : filteredFiles.find((f) => f.path === targetPath)?.name ??
-                      "destination folder";
+                    : (filteredFiles.find(f => f.path === targetPath)?.name ??
+                      "destination folder");
 
             toast({
                 variant: "success",
@@ -429,7 +427,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         level = 0
     ): React.ReactNode[] => {
         return items
-            .map((item) => {
+            .map(item => {
                 if (item.type === "folder" && item.path !== moveItemPath) {
                     const hasChildren =
                         item.children && item.children.length > 0;
@@ -572,8 +570,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             const targetName =
                 targetPath === ""
                     ? "root folder"
-                    : filteredFiles.find((f) => f.path === targetPath)?.name ??
-                      "destination folder";
+                    : (filteredFiles.find(f => f.path === targetPath)?.name ??
+                      "destination folder");
 
             toast({
                 variant: "success",
@@ -609,7 +607,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
         // Reset styles of all draggable elements with smooth transition
         const dragElements = document.querySelectorAll('[draggable="true"]');
-        dragElements.forEach((el) => {
+        dragElements.forEach(el => {
             const element = el as HTMLElement;
             element.style.opacity = "";
             element.style.transform = "";
@@ -618,7 +616,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
         // Clear transition after animation
         setTimeout(() => {
-            dragElements.forEach((el) => {
+            dragElements.forEach(el => {
                 (el as HTMLElement).style.transition = "";
             });
         }, 200);
@@ -632,7 +630,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         if (checked) {
             handleSelectFile(itemPath);
         } else {
-            setSelectedFiles((files) => files.filter((p) => p !== itemPath));
+            setSelectedFiles(files => files.filter(p => p !== itemPath));
         }
     };
     const handleFileItemKeyDown = (e: React.KeyboardEvent, item: FileItem) => {
@@ -672,23 +670,12 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     ) => {
         if (isFolder) {
             return isExpanded && hasChildren ? (
-                <FolderOpen
-                    size={14}
-                    className="text-blue-500"
-                />
+                <FolderOpen size={14} className="text-blue-500" />
             ) : (
-                <Folder
-                    size={14}
-                    className="text-blue-500"
-                />
+                <Folder size={14} className="text-blue-500" />
             );
         }
-        return (
-            <File
-                size={14}
-                className="text-gray-500"
-            />
-        );
+        return <File size={14} className="text-gray-500" />;
     };
 
     const renderFileItem = (
@@ -714,16 +701,16 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                 key={item.path}
                 className="select-none relative"
                 draggable
-                onDragStart={(e) => handleDragStart(e, item.path, item.name)}
+                onDragStart={e => handleDragStart(e, item.path, item.name)}
                 onDragEnd={handleDragEnd}
-                onDragOver={(e) => handleDragOver(e, item.path, isFolder)}
+                onDragOver={e => handleDragOver(e, item.path, isFolder)}
                 onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, item.path, isFolder)}
+                onDrop={e => handleDrop(e, item.path, isFolder)}
                 role="treeitem"
                 tabIndex={0}
                 aria-expanded={isFolder ? isExpanded : undefined}
                 aria-selected={selectedFiles.includes(item.path)}
-                onKeyDown={(e) => handleFileItemKeyDown(e, item)}
+                onKeyDown={e => handleFileItemKeyDown(e, item)}
             >
                 {/* Drop zone overlay for better visual feedback */}
                 {isDropTarget && (
@@ -754,8 +741,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                             "opacity-60"
                     )}
                     style={{ paddingLeft: `${8 + indentLevel}px` }}
-                    onClick={(e) => handleItemClick(item, e)}
-                    onKeyDown={(e) => handleFileItemKeyDown(e, item)}
+                    onClick={e => handleItemClick(item, e)}
+                    onKeyDown={e => handleFileItemKeyDown(e, item)}
                     title={
                         canReceiveDrop
                             ? `Drop "${draggedItemName}" here`
@@ -770,11 +757,11 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         selectedFiles.includes(item.path)) && (
                         <Checkbox
                             checked={selectedFiles.includes(item.path)}
-                            onCheckedChange={(checked) =>
+                            onCheckedChange={checked =>
                                 handleCheckboxChange(item.path, checked)
                             }
                             className="flex-shrink-0"
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={e => e.stopPropagation()}
                         />
                     )}
 
@@ -782,11 +769,11 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     {isFolder && (
                         <button
                             type="button"
-                            onClick={(e) => {
+                            onClick={e => {
                                 e.stopPropagation();
                                 toggleFolder(item.path);
                             }}
-                            onKeyDown={(e) =>
+                            onKeyDown={e =>
                                 handleFolderToggleKeyDown(e, item.path)
                             }
                             className="flex items-center justify-center w-4 h-4 rounded-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
@@ -820,7 +807,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 variant="ghost"
                                 size="sm"
                                 className="w-6 h-6 p-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
-                                onClick={(e) => e.stopPropagation()}
+                                onClick={e => e.stopPropagation()}
                                 aria-label={`Actions for ${item.name}`}
                             >
                                 <MoreHorizontal size={12} />
@@ -837,10 +824,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                             handleCreateFile(item.path)
                                         }
                                     >
-                                        <Plus
-                                            size={14}
-                                            className="mr-2"
-                                        />
+                                        <Plus size={14} className="mr-2" />
                                         New File
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
@@ -848,10 +832,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                             handleCreateFolder(item.path)
                                         }
                                     >
-                                        <Plus
-                                            size={14}
-                                            className="mr-2"
-                                        />
+                                        <Plus size={14} className="mr-2" />
                                         New Folder
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
@@ -865,10 +846,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 }}
                                 className="text-blue-600 focus:text-blue-600"
                             >
-                                <Move
-                                    size={14}
-                                    className="mr-2"
-                                />
+                                <Move size={14} className="mr-2" />
                                 Move to...
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -877,10 +855,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 }
                                 className="text-red-600 focus:text-red-600"
                             >
-                                <Trash2
-                                    size={14}
-                                    className="mr-2"
-                                />
+                                <Trash2 size={14} className="mr-2" />
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -890,7 +865,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                 {/* Render children if folder is expanded */}
                 {isFolder && isExpanded && hasChildren && (
                     <div>
-                        {item.children!.map((child) =>
+                        {item.children!.map(child =>
                             renderFileItem(child, level + 1)
                         )}
                     </div>
@@ -1028,9 +1003,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     <div className="p-4 border-b border-border">
                         <SearchInput
                             searchTerm={searchTerm}
-                            onSearchChange={(e) =>
-                                setSearchTerm(e.target.value)
-                            }
+                            onSearchChange={e => setSearchTerm(e.target.value)}
                             onClearSearch={() => setSearchTerm("")}
                             resultsCount={filteredFiles.length}
                             hasResults={filteredFiles.length > 0}
@@ -1071,9 +1044,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                             "flex-1 overflow-auto relative",
                             isDragging && "bg-blue-50/30 dark:bg-blue-900/10"
                         )}
-                        onDragOver={(e) => handleDragOver(e, "", true)}
+                        onDragOver={e => handleDragOver(e, "", true)}
                         onDragLeave={handleDragLeave}
-                        onDrop={(e) => handleDrop(e, "", true)}
+                        onDrop={e => handleDrop(e, "", true)}
                         aria-label="File explorer content"
                     >
                         {/* Global drag overlay */}
@@ -1124,7 +1097,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                     />
                                 ) : (
                                     <div className="p-2 space-y-1">
-                                        {filteredFiles.map((item) =>
+                                        {filteredFiles.map(item =>
                                             renderFileItem(item)
                                         )}
                                     </div>
@@ -1153,10 +1126,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             />
 
             {/* Move Item Dialog */}
-            <Dialog
-                open={showMoveDialog}
-                onOpenChange={setShowMoveDialog}
-            >
+            <Dialog open={showMoveDialog} onOpenChange={setShowMoveDialog}>
                 <DialogContent className="backdrop-blur-[90%] bg-background/90">
                     <DialogHeader>
                         <DialogTitle>Move "{moveItemName}"</DialogTitle>

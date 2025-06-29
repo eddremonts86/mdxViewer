@@ -90,7 +90,7 @@ export function DocumentPage() {
         const toc: Array<{ level: number; title: string; id: string }> = [];
         const headingRegex = /^(#{1,6})\s+(.+)$/;
 
-        lines.forEach((line) => {
+        lines.forEach(line => {
             const match = headingRegex.exec(line);
             if (match) {
                 const level = match[1].length;
