@@ -1,0 +1,35 @@
+// Auto-generated file index
+// Run: node scripts/generateIndex.js to update
+
+export const CONTENT_FILES = [
+    "api/reference.md",
+    "docs/getting-started.md",
+    "docs/introduction.md",
+    "examples/Untitled-1.md",
+    "examples/anchor-navigation-test.md",
+    "examples/auto-refresh-test.md",
+    "examples/components-showcase.mdx",
+    "examples/interactive-demo.mdx",
+    "examples/list-test.md",
+    "examples/mdx-navigation-test.mdx",
+    "examples/theme-test.md",
+    "examples/typography-showcase.md",
+    "guides/comprehensive-markdown-test.md",
+    "guides/comprehensive-mdx-test-backup.mdx",
+    "guides/comprehensive-mdx-test-fixed.mdx",
+    "guides/comprehensive-mdx-test.mdx",
+    "guides/markdown-complete-test.md",
+    "guides/mdx-complete-test-backup.mdx",
+    "guides/mdx-complete-test-fixed.mdx",
+    "guides/mdx-complete-test.mdx",
+    "guides/setup.md",
+    "guides/sistema-funcionando.md",
+    "guides/sonarCube.mdx",
+    "project docs/MDXViewer-QuickGuide.md",
+    "project docs/Proyecto-React-18_Visualizador-Avanza.md",
+    "project docs/README.md",
+    "project docs/Untitled-1.md",
+    "test-directo.md",
+    "test-funcionando.md",
+    "test-simple.md"
+];

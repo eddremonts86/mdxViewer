@@ -1,0 +1,715 @@
+---
+title: "Guía Completa de MDX - Prueba Exhaustiva"
+description: "Documento completo que incluye TODOS los elementos posibles de MDX"
+author: "MDX Viewer Team"
+date: "2025-06-28"
+tags: ["mdx", "react", "componentes", "markdown"]
+version: "1.0.0"
+---
+
+import { useState, useEffect } from 'react';
+
+export const Contador = ({ inicial = 0 }) => {
+  const [count, setCount] = useState(inicial);
+
+  return (
+    <div style={{
+      border: '2px solid #007acc',
+      padding: '20px',
+      borderRadius: '8px',
+      margin: '20px 0',
+      textAlign: 'center'
+    }}>
+      <h3>Componente React Interactivo</h3>
+      <p>Contador: <strong>{count}</strong></p>
+      <button
+        onClick={() => setCount(count + 1)}
+        style={{
+          backgroundColor: '#007acc',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          marginRight: '10px'
+        }}
+      >
+        Incrementar
+      </button>
+      <button
+        onClick={() => setCount(count - 1)}
+        style={{
+          backgroundColor: '#dc3545',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          marginRight: '10px'
+        }}
+      >
+        Decrementar
+      </button>
+      <button
+        onClick={() => setCount(inicial)}
+        style={{
+          backgroundColor: '#6c757d',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          borderRadius: '4px',
+          cursor: 'pointer'
+        }}
+      >
+        Reset
+      </button>
+    </div>
+  );
+};
+
+export const AlertaPersonalizada = ({ tipo = 'info', children }) => {
+  const estilos = {
+    info: { backgroundColor: '#d1ecf1', borderColor: '#bee5eb', color: '#0c5460' },
+    warning: { backgroundColor: '#fff3cd', borderColor: '#ffeaa7', color: '#856404' },
+    error: { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' },
+    success: { backgroundColor: '#d4edda', borderColor: '#c3e6cb', color: '#155724' }
+  };
+
+  return (
+    <div style={{
+      ...estilos[tipo],
+      border: '1px solid',
+      padding: '15px',
+      borderRadius: '5px',
+      margin: '20px 0'
+    }}>
+      {children}
+    </div>
+  );
+};
+
+export const TarjetaConDatos = ({ titulo, datos }) => {
+  return (
+    <div style={{
+      border: '1px solid #ddd',
+      borderRadius: '8px',
+      padding: '20px',
+      margin: '20px 0',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    }}>
+      <h4 style={{ marginTop: 0, color: '#333' }}>{titulo}</h4>
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {datos.map((item, index) => (
+          <li key={index} style={{
+            padding: '8px 0',
+            borderBottom: index < datos.length - 1 ? '1px solid #eee' : 'none'
+          }}>
+            <strong>{item.clave}:</strong> {item.valor}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export const CodigoEjecutable = ({ codigo, lenguaje = 'javascript' }) => {
+  const [resultado, setResultado] = useState('');
+  const [ejecutando, setEjecutando] = useState(false);
+
+  const ejecutarCodigo = () => {
+    setEjecutando(true);
+    try {
+      // Simulación de ejecución de código
+      setTimeout(() => {
+        setResultado(`Resultado: ${eval(codigo)}`);
+        setEjecutando(false);
+      }, 1000);
+    } catch (error) {
+      setResultado(`Error: ${error.message}`);
+      setEjecutando(false);
+    }
+  };
+
+  return (
+    <div style={{ margin: '20px 0' }}>
+      <pre style={{
+        backgroundColor: '#f8f9fa',
+        padding: '15px',
+        borderRadius: '5px',
+        border: '1px solid #e9ecef',
+        overflow: 'auto'
+      }}>
+        <code>{codigo}</code>
+      </pre>
+      <button
+        onClick={ejecutarCodigo}
+        disabled={ejecutando}
+        style={{
+          backgroundColor: '#28a745',
+          color: 'white',
+          border: 'none',
+          padding: '8px 16px',
+          borderRadius: '4px',
+          cursor: ejecutando ? 'wait' : 'pointer',
+          marginTop: '10px'
+        }}
+      >
+        {ejecutando ? 'Ejecutando...' : 'Ejecutar Código'}
+      </button>
+      {resultado && (
+        <div style={{
+          marginTop: '10px',
+          padding: '10px',
+          backgroundColor: '#e9ecef',
+          borderRadius: '4px',
+          fontFamily: 'monospace'
+        }}>
+          {resultado}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const GraficoBarra = ({ datos, altura = 200 }) => {
+  const max = Math.max(...datos.map(d => d.valor));
+
+  return (
+    <div style={{ margin: '20px 0' }}>
+      <h4>Gráfico de Barras Interactivo</h4>
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-end',
+        height: `${altura}px`,
+        border: '1px solid #ddd',
+        padding: '10px',
+        backgroundColor: '#f9f9f9'
+      }}>
+        {datos.map((item, index) => (
+          <div key={index} style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            margin: '0 5px',
+            flex: 1
+          }}>
+            <div
+              style={{
+                width: '100%',
+                backgroundColor: `hsl(${index * 60}, 70%, 50%)`,
+                height: `${(item.valor / max) * (altura - 60)}px`,
+                borderRadius: '4px 4px 0 0',
+                transition: 'all 0.3s ease',
+                cursor: 'pointer'
+              }}
+              title={`${item.label}: ${item.valor}`}
+            />
+            <span style={{
+              fontSize: '12px',
+              marginTop: '5px',
+              textAlign: 'center',
+              wordBreak: 'break-word'
+            }}>
+              {item.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+# Guía Completa de MDX - Prueba Exhaustiva
+
+Esta es una guía completa que incluye **TODOS** los elementos posibles de MDX, incluyendo componentes React interactivos.
+
+## Información del Documento
+
+<TarjetaConDatos
+  titulo="Metadatos del Documento"
+  datos={[
+    { clave: "Título", valor: "Guía Completa de MDX" },
+    { clave: "Autor", valor: "MDX Viewer Team" },
+    { clave: "Fecha", valor: "28 de Junio, 2025" },
+    { clave: "Versión", valor: "1.0.0" },
+    { clave: "Tipo", valor: "Documento de Prueba" }
+  ]}
+/>
+
+## Componentes React Interactivos
+
+### Contador Simple
+
+<Contador inicial={5} />
+
+### Contador desde Cero
+
+<Contador />
+
+## Alertas Personalizadas
+
+<AlertaPersonalizada tipo="info">
+  **Información:** Este es un componente de alerta informativa creado con React dentro de MDX.
+</AlertaPersonalizada>
+
+<AlertaPersonalizada tipo="warning">
+  **Advertencia:** Los componentes React en MDX permiten crear documentación interactiva.
+</AlertaPersonalizada>
+
+<AlertaPersonalizada tipo="error">
+  **Error:** Este es un ejemplo de mensaje de error usando un componente personalizado.
+</AlertaPersonalizada>
+
+<AlertaPersonalizada tipo="success">
+  **Éxito:** ¡Los componentes React funcionan perfectamente en MDX!
+</AlertaPersonalizada>
+
+## Código Ejecutable (Simulado)
+
+<CodigoEjecutable codigo="2 + 2" />
+
+<CodigoEjecutable codigo="Math.PI * 2" />
+
+<CodigoEjecutable codigo="new Date().toLocaleDateString()" />
+
+## Gráficos con Datos
+
+<GraficoBarra
+  datos={[
+    { label: "React", valor: 85 },
+    { label: "Vue", valor: 65 },
+    { label: "Angular", valor: 70 },
+    { label: "Svelte", valor: 45 }
+  ]}
+  altura={250}
+/>
+
+## Todos los Elementos de Markdown
+
+### Encabezados (todos los niveles)
+
+# Encabezado H1
+## Encabezado H2
+### Encabezado H3
+#### Encabezado H4
+##### Encabezado H5
+###### Encabezado H6
+
+### Formateo de Texto
+
+Este párrafo incluye **texto en negrita**, *texto en cursiva*, ***texto en negrita y cursiva***, ~~texto tachado~~, y `código inline`.
+
+### Listas Complejas
+
+#### Lista No Ordenada Anidada
+
+* Elemento principal 1
+  * Sub-elemento 1.1
+  * Sub-elemento 1.2
+    * Sub-sub-elemento 1.2.1
+    * Sub-sub-elemento 1.2.2
+* Elemento principal 2
+  * Sub-elemento 2.1
+
+#### Lista Ordenada Anidada
+
+1. Primer elemento
+   1. Sub-elemento 1.1
+   2. Sub-elemento 1.2
+      1. Sub-sub-elemento 1.2.1
+      2. Sub-sub-elemento 1.2.2
+2. Segundo elemento
+
+#### Lista de Tareas
+
+- [x] Tarea completada
+- [ ] Tarea pendiente
+- [x] Otra tarea completada
+  - [x] Sub-tarea completada
+  - [ ] Sub-tarea pendiente
+
+### Enlaces y Referencias
+
+[Enlace simple](https://example.com)
+
+[Enlace con título](https://example.com "Título del enlace")
+
+[Enlace de referencia][1]
+
+[1]: https://example.com "Referencia 1"
+
+### Imágenes
+
+![Imagen de ejemplo](https://via.placeholder.com/400x300/007acc/ffffff?text=MDX+Test)
+
+### Código con Resaltado
+
+#### JavaScript con React
+
+```javascript
+import React, { useState, useEffect } from 'react';
+
+const ComponenteEjemplo = ({ datos }) => {
+  const [estado, setEstado] = useState(null);
+  const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        setCargando(true);
+        const respuesta = await fetch('/api/datos');
+        const resultado = await respuesta.json();
+        setEstado(resultado);
+      } catch (error) {
+        console.error('Error cargando datos:', error);
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    cargarDatos();
+  }, []);
+
+  if (cargando) {
+    return <div>Cargando...</div>;
+  }
+
+  return (
+    <div className="componente">
+      <h2>Datos Cargados</h2>
+      {estado && (
+        <ul>
+          {estado.map(item => (
+            <li key={item.id}>
+              {item.nombre}: {item.valor}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+export default ComponenteEjemplo;
+```
+
+#### TypeScript
+
+```typescript
+interface DatosUsuario {
+  id: number;
+  nombre: string;
+  email: string;
+  activo: boolean;
+}
+
+type EstadoApp = 'cargando' | 'exitoso' | 'error';
+
+class GestorUsuarios {
+  private usuarios: DatosUsuario[] = [];
+  private estado: EstadoApp = 'cargando';
+
+  constructor(private apiUrl: string) {}
+
+  async cargarUsuarios(): Promise<void> {
+    try {
+      this.estado = 'cargando';
+      const respuesta = await fetch(`${this.apiUrl}/usuarios`);
+
+      if (!respuesta.ok) {
+        throw new Error(`Error HTTP: ${respuesta.status}`);
+      }
+
+      this.usuarios = await respuesta.json();
+      this.estado = 'exitoso';
+    } catch (error) {
+      console.error('Error cargando usuarios:', error);
+      this.estado = 'error';
+    }
+  }
+
+  obtenerUsuariosActivos(): DatosUsuario[] {
+    return this.usuarios.filter(usuario => usuario.activo);
+  }
+
+  buscarPorEmail(email: string): DatosUsuario | undefined {
+    return this.usuarios.find(usuario => usuario.email === email);
+  }
+}
+```
+
+#### Python
+
+```python
+from typing import List, Dict, Optional
+import asyncio
+import aiohttp
+from dataclasses import dataclass
+from datetime import datetime
+
+@dataclass
+class Usuario:
+    id: int
+    nombre: str
+    email: str
+    activo: bool = True
+    fecha_creacion: datetime = None
+
+    def __post_init__(self):
+        if self.fecha_creacion is None:
+            self.fecha_creacion = datetime.now()
+
+class GestorUsuariosAsync:
+    def __init__(self, api_url: str):
+        self.api_url = api_url
+        self.usuarios: List[Usuario] = []
+
+    async def cargar_usuarios(self) -> None:
+        """Carga usuarios de la API de forma asíncrona."""
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.get(f"{self.api_url}/usuarios") as response:
+                    response.raise_for_status()
+                    datos = await response.json()
+
+                    self.usuarios = [
+                        Usuario(**usuario_data)
+                        for usuario_data in datos
+                    ]
+
+            except aiohttp.ClientError as e:
+                print(f"Error cargando usuarios: {e}")
+                raise
+
+    def filtrar_activos(self) -> List[Usuario]:
+        """Retorna solo usuarios activos."""
+        return [u for u in self.usuarios if u.activo]
+
+    def buscar_por_email(self, email: str) -> Optional[Usuario]:
+        """Busca un usuario por email."""
+        return next(
+            (u for u in self.usuarios if u.email == email),
+            None
+        )
+
+    async def crear_usuario(self, datos: Dict) -> Usuario:
+        """Crea un nuevo usuario."""
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f"{self.api_url}/usuarios",
+                json=datos
+            ) as response:
+                response.raise_for_status()
+                usuario_data = await response.json()
+                nuevo_usuario = Usuario(**usuario_data)
+                self.usuarios.append(nuevo_usuario)
+                return nuevo_usuario
+
+# Ejemplo de uso
+async def main():
+    gestor = GestorUsuariosAsync("https://api.ejemplo.com")
+    await gestor.cargar_usuarios()
+
+    usuarios_activos = gestor.filtrar_activos()
+    print(f"Usuarios activos: {len(usuarios_activos)}")
+
+    # Crear nuevo usuario
+    nuevo_usuario = await gestor.crear_usuario({
+        "nombre": "Juan Pérez",
+        "email": "juan@ejemplo.com"
+    })
+    print(f"Usuario creado: {nuevo_usuario.nombre}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Tablas Complejas
+
+| Framework | Lenguaje | Tipo | Popularidad | Curva Aprendizaje | Ecosistema |
+|-----------|----------|------|-------------|-------------------|------------|
+| **React** | JavaScript/TypeScript | Librería | ⭐⭐⭐⭐⭐ | Media | 🔥 Extenso |
+| **Vue.js** | JavaScript/TypeScript | Framework | ⭐⭐⭐⭐ | Fácil | 📈 Creciendo |
+| **Angular** | TypeScript | Framework | ⭐⭐⭐ | Difícil | 🏢 Empresarial |
+| **Svelte** | JavaScript | Compilador | ⭐⭐⭐ | Fácil | 🚀 Emergente |
+
+### Citas con Componentes
+
+> **Nota Importante**
+>
+> <AlertaPersonalizada tipo="info">
+>   Las citas pueden contener componentes React, lo que permite crear documentación muy rica e interactiva.
+> </AlertaPersonalizada>
+>
+> Esto es especialmente útil para documentación técnica.
+
+### Matemáticas LaTeX
+
+La fórmula cuadrática es: $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$
+
+Ecuaciones más complejas:
+
+$$
+\begin{aligned}
+\nabla \times \vec{\mathbf{B}} -\, \frac1c\, \frac{\partial\vec{\mathbf{E}}}{\partial t} &= \frac{4\pi}{c}\vec{\mathbf{j}} \\
+\nabla \cdot \vec{\mathbf{E}} &= 4 \pi \rho \\
+\nabla \times \vec{\mathbf{E}}\, +\, \frac1c\, \frac{\partial\vec{\mathbf{B}}}{\partial t} &= \vec{\mathbf{0}} \\
+\nabla \cdot \vec{\mathbf{B}} &= 0
+\end{aligned}
+$$
+
+### HTML Embebido con Componentes
+
+<div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+  <div style={{ flex: 1, minWidth: '250px' }}>
+    <h4>Columna 1</h4>
+    <p>Contenido de la primera columna usando JSX.</p>
+    <Contador inicial={1} />
+  </div>
+
+  <div style={{ flex: 1, minWidth: '250px' }}>
+    <h4>Columna 2</h4>
+    <p>Contenido de la segunda columna.</p>
+    <AlertaPersonalizada tipo="success">
+      ¡Componentes en layout flexible!
+    </AlertaPersonalizada>
+  </div>
+</div>
+
+## Datos Dinámicos
+
+<TarjetaConDatos
+  titulo="Estadísticas del Proyecto"
+  datos={[
+    { clave: "Componentes React", valor: "6" },
+    { clave: "Líneas de código", valor: "500+" },
+    { clave: "Elementos Markdown", valor: "Todos" },
+    { clave: "Interactividad", valor: "100%" }
+  ]}
+/>
+
+## Componentes Anidados
+
+<AlertaPersonalizada tipo="warning">
+  **Advertencia:** Esta alerta contiene un contador anidado:
+
+  <Contador inicial={10} />
+
+  Los componentes pueden anidarse sin problemas en MDX.
+</AlertaPersonalizada>
+
+## Variables y Expresiones JSX
+
+export const proyecto = {
+  nombre: "MDX Viewer",
+  version: "1.0.0",
+  tecnologias: ["React", "TypeScript", "Tailwind CSS"],
+  caracteristicas: ["Syntax Highlighting", "Componentes React", "Temas"]
+};
+
+### Información del Proyecto
+
+- **Nombre:** {proyecto.nombre}
+- **Versión:** {proyecto.version}
+- **Tecnologías:** {proyecto.tecnologias.join(", ")}
+- **Características:** {proyecto.caracteristicas.length} implementadas
+
+### Lista Dinámica
+
+{proyecto.caracteristicas.map((caracteristica, index) => (
+  <div key={index} style={{
+    padding: '10px',
+    margin: '5px 0',
+    backgroundColor: '#f8f9fa',
+    borderRadius: '4px',
+    border: '1px solid #dee2e6'
+  }}>
+    ✅ {caracteristica}
+  </div>
+))}
+
+## Gráfico Comparativo
+
+<GraficoBarra
+  datos={[
+    { label: "Markdown", valor: 70 },
+    { label: "MDX", valor: 95 },
+    { label: "HTML", valor: 60 },
+    { label: "JSX", valor: 90 }
+  ]}
+  altura={300}
+/>
+
+---
+
+## Conclusión
+
+Este documento de MDX demuestra **todas las capacidades avanzadas**:
+
+### ✅ Elementos Incluidos
+
+- **Frontmatter** con metadatos YAML
+- **Imports** de React y hooks
+- **Componentes personalizados** exportados e importados
+- **Estado interactivo** con useState y useEffect
+- **Todos los elementos Markdown** estándar
+- **Código con sintaxis** en múltiples lenguajes
+- **Matemáticas** LaTeX/KaTeX
+- **HTML y JSX** embebidos
+- **Variables y expresiones** dinámicas
+- **Componentes anidados**
+- **Estilos inline** y CSS-in-JS
+- **Event handlers** y interactividad
+- **Datos dinámicos** y renderizado condicional
+
+### 🎯 Capacidades Demostradas
+
+1. **Interactividad completa** - Botones, contadores, formularios
+2. **Visualización de datos** - Gráficos personalizados
+3. **Componentes reutilizables** - Alertas, tarjetas, código ejecutable
+4. **Integración perfecta** - Markdown + React sin conflictos
+5. **Flexibilidad total** - Desde texto simple hasta aplicaciones complejas
+
+¡Este es el poder completo de MDX en acción! 🚀✨
+
+export const EstadisticasFinales = () => {
+  const stats = {
+    componentesReact: 6,
+    lineasCodigo: 800,
+    elementosMarkdown: 25,
+    interactividad: "100%"
+  };
+
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      color: 'white',
+      padding: '30px',
+      borderRadius: '10px',
+      margin: '30px 0',
+      textAlign: 'center'
+    }}>
+      <h3>🎉 Estadísticas Finales del Documento</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '20px', marginTop: '20px' }}>
+        <div>
+          <div style={{ fontSize: '2em', fontWeight: 'bold' }}>{stats.componentesReact}</div>
+          <div>Componentes React</div>
+        </div>
+        <div>
+          <div style={{ fontSize: '2em', fontWeight: 'bold' }}>{stats.lineasCodigo}+</div>
+          <div>Líneas de Código</div>
+        </div>
+        <div>
+          <div style={{ fontSize: '2em', fontWeight: 'bold' }}>{stats.elementosMarkdown}+</div>
+          <div>Elementos Markdown</div>
+        </div>
+        <div>
+          <div style={{ fontSize: '2em', fontWeight: 'bold' }}>{stats.interactividad}</div>
+          <div>Interactividad</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+<EstadisticasFinales />

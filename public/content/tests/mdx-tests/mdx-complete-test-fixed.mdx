@@ -1,0 +1,398 @@
+---
+title: "Guía Completa de MDX - Prueba Exhaustiva"
+description: "Documento completo que incluye TODOS los elementos posibles de MDX"
+author: "MDX Viewer Team"
+date: "2025-06-28"
+tags: ["mdx", "react", "componentes", "markdown"]
+version: "1.0.0"
+---
+
+import { useEffect, useState } from 'react';
+
+export const Contador = ({ inicial = 0 }) => {
+  const [count, setCount] = useState(inicial);
+
+  return (
+    <div style={{
+      border: '2px solid #007acc',
+      padding: '20px',
+      borderRadius: '8px',
+      margin: '20px 0',
+      textAlign: 'center'
+    }}>
+      <h3>Componente React Interactivo</h3>
+      <p>Contador: <strong>{count}</strong></p>
+      <button
+        onClick={() => setCount(count + 1)}
+        style={{
+          backgroundColor: '#007acc',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          marginRight: '10px'
+        }}
+      >
+        Incrementar
+      </button>
+      <button
+        onClick={() => setCount(count - 1)}
+        style={{
+          backgroundColor: '#dc3545',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          marginRight: '10px'
+        }}
+      >
+        Decrementar
+      </button>
+      <button
+        onClick={() => setCount(inicial)}
+        style={{
+          backgroundColor: '#6c757d',
+          color: 'white',
+          border: 'none',
+          padding: '10px 20px',
+          borderRadius: '4px',
+          cursor: 'pointer'
+        }}
+      >
+        Reset
+      </button>
+    </div>
+  );
+};
+
+export const AlertaPersonalizada = ({ tipo = 'info', children }) => {
+  const estilos = {
+    info: { backgroundColor: '#d1ecf1', borderColor: '#bee5eb', color: '#0c5460' },
+    warning: { backgroundColor: '#fff3cd', borderColor: '#ffeaa7', color: '#856404' },
+    error: { backgroundColor: '#f8d7da', borderColor: '#f5c6cb', color: '#721c24' },
+    success: { backgroundColor: '#d4edda', borderColor: '#c3e6cb', color: '#155724' }
+  };
+
+  return (
+    <div style={{
+      ...estilos[tipo],
+      border: '1px solid',
+      padding: '15px',
+      borderRadius: '5px',
+      margin: '20px 0'
+    }}>
+      {children}
+    </div>
+  );
+};
+
+export const TarjetaConDatos = ({ titulo, datos = [] }) => {
+  return (
+    <div style={{
+      border: '1px solid #ddd',
+      borderRadius: '8px',
+      padding: '20px',
+      margin: '20px 0',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    }}>
+      <h4 style={{ marginTop: 0, color: '#333' }}>{titulo}</h4>
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {datos.map((item, index) => (
+          <li key={index} style={{
+            padding: '8px 0',
+            borderBottom: index < datos.length - 1 ? '1px solid #eee' : 'none'
+          }}>
+            <strong>{item.etiqueta}:</strong> {item.valor}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export const CodigoEjecutable = ({ codigo, lenguaje = 'javascript' }) => {
+  const [resultado, setResultado] = useState('');
+  const [ejecutando, setEjecutando] = useState(false);
+
+  const ejecutarCodigo = () => {
+    setEjecutando(true);
+    try {
+      // Simulación de ejecución de código
+      setTimeout(() => {
+        if (codigo.includes('2 + 2')) {
+          setResultado('Resultado: 4');
+        } else if (codigo.includes('factorial')) {
+          setResultado('Resultado: 120 (5!)');
+        } else {
+          setResultado(`Resultado: Código ${lenguaje} ejecutado correctamente`);
+        }
+        setEjecutando(false);
+      }, 1000);
+    } catch (error) {
+      setResultado(`Error: ${error.message}`);
+      setEjecutando(false);
+    }
+  };
+
+  return (
+    <div style={{ margin: '20px 0' }}>
+      <pre style={{
+        backgroundColor: '#f8f9fa',
+        padding: '15px',
+        borderRadius: '5px',
+        border: '1px solid #e9ecef',
+        overflow: 'auto'
+      }}>
+        <code>{codigo}</code>
+      </pre>
+      <button
+        onClick={ejecutarCodigo}
+        disabled={ejecutando}
+        style={{
+          marginTop: '10px',
+          padding: '8px 16px',
+          backgroundColor: ejecutando ? '#ccc' : '#007acc',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: ejecutando ? 'not-allowed' : 'pointer'
+        }}
+      >
+        {ejecutando ? 'Ejecutando...' : 'Ejecutar Código'}
+      </button>
+      {resultado && (
+        <div style={{
+          marginTop: '10px',
+          padding: '10px',
+          backgroundColor: '#e9f7ef',
+          border: '1px solid #c3e6cb',
+          borderRadius: '4px'
+        }}>
+          {resultado}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const GraficoBarra = ({ datos = [], altura = 200 }) => {
+  const max = Math.max(...datos.map(d => d.valor));
+
+  return (
+    <div style={{ margin: '20px 0' }}>
+      <h4>Gráfico de Barras Interactivo</h4>
+      <div style={{
+        backgroundColor: '#f9f9f9',
+        border: '1px solid #ddd',
+        borderRadius: '8px',
+        padding: '20px',
+        height: `${altura}px`,
+        display: 'flex',
+        alignItems: 'end',
+        gap: '10px'
+      }}>
+        {datos.map((item, index) => (
+          <div key={index} style={{ textAlign: 'center', flex: 1 }}>
+            <div
+              style={{
+                backgroundColor: '#007acc',
+                height: `${(item.valor / max) * (altura - 60)}px`,
+                marginBottom: '5px',
+                borderRadius: '4px 4px 0 0',
+                transition: 'height 0.3s ease'
+              }}
+            />
+            <div style={{ fontSize: '12px', fontWeight: 'bold' }}>
+              {item.nombre}
+            </div>
+            <div style={{ fontSize: '10px', color: '#666' }}>
+              {item.valor}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+# Guía Completa de MDX - Prueba Exhaustiva
+
+Esta es una guía completa que incluye **TODOS** los elementos posibles de MDX, incluyendo componentes React interactivos.
+
+## Información del Documento
+
+<TarjetaConDatos
+  titulo="Metadatos del Documento"
+  datos={[
+    { etiqueta: "Título", valor: "Guía Completa de MDX" },
+    { etiqueta: "Autor", valor: "MDX Viewer Team" },
+    { etiqueta: "Fecha", valor: "2025-06-28" },
+    { etiqueta: "Versión", valor: "1.0.0" }
+  ]}
+/>
+
+## Componentes React Interactivos
+
+### Contador Simple
+
+<Contador inicial={5} />
+
+### Contador desde Cero
+
+<Contador />
+
+## Alertas Personalizadas
+
+<AlertaPersonalizada tipo="info">
+**Información importante**: Este es un mensaje informativo que demuestra cómo los componentes React pueden renderizar contenido Markdown.
+</AlertaPersonalizada>
+
+<AlertaPersonalizada tipo="warning">
+**Advertencia**: Los componentes personalizados permiten crear interfaces más ricas.
+</AlertaPersonalizada>
+
+<AlertaPersonalizada tipo="error">
+**Error**: Este es un ejemplo de mensaje de error.
+</AlertaPersonalizada>
+
+<AlertaPersonalizada tipo="success">
+**Éxito**: ¡Los componentes React en MDX funcionan perfectamente!
+</AlertaPersonalizada>
+
+## Código Ejecutable
+
+### Ejemplo Simple
+
+<CodigoEjecutable codigo="console.log(2 + 2)" />
+
+### Ejemplo de Función
+
+<CodigoEjecutable
+  codigo={`function factorial(n) {
+  if (n <= 1) return 1;
+  return n * factorial(n - 1);
+}
+console.log(factorial(5));`}
+/>
+
+## Visualización de Datos
+
+<GraficoBarra
+  datos={[
+    { nombre: "React", valor: 85 },
+    { nombre: "Vue", valor: 72 },
+    { nombre: "Angular", valor: 68 },
+    { nombre: "Svelte", valor: 45 }
+  ]}
+  altura={300}
+/>
+
+## Markdown Tradicional
+
+### Listas
+
+1. **Primer elemento** con texto en negrita
+2. *Segundo elemento* con texto en cursiva
+3. ***Tercer elemento*** con ambos
+4. Cuarto elemento con `código inline`
+
+- Elemento de lista no ordenada
+- Otro elemento
+  - Sub-elemento anidado
+  - Otro sub-elemento
+- Último elemento
+
+### Tablas
+
+| Framework | Popularidad | Curva Aprendizaje | Rendimiento |
+|-----------|-------------|-------------------|-------------|
+| React     | ⭐⭐⭐⭐⭐      | ⭐⭐⭐⭐          | ⭐⭐⭐⭐⭐       |
+| Vue       | ⭐⭐⭐⭐       | ⭐⭐⭐⭐⭐        | ⭐⭐⭐⭐        |
+| Angular   | ⭐⭐⭐        | ⭐⭐              | ⭐⭐⭐⭐⭐       |
+
+### Código
+
+```javascript
+// Ejemplo de código JavaScript
+function saludar(nombre) {
+    return `¡Hola, ${nombre}! Bienvenido a MDX.`;
+}
+
+const mensaje = saludar("Desarrollador");
+console.log(mensaje);
+```
+
+```python
+# Ejemplo de código Python
+def calcular_fibonacci(n):
+    if n <= 1:
+        return n
+    return calcular_fibonacci(n-1) + calcular_fibonacci(n-2)
+
+print(f"Fibonacci(10) = {calcular_fibonacci(10)}")
+```
+
+### Citas
+
+> "MDX es la evolución natural de Markdown para la era de los componentes."
+>
+> — Un desarrollador muy sabio
+
+### Enlaces
+
+- [Documentación oficial de MDX](https://mdxjs.com)
+- [React Documentation](https://react.dev)
+- [MDX Playground](https://mdxjs.com/playground/)
+
+## Combinando Markdown y React
+
+Este párrafo demuestra cómo podemos combinar **texto en negrita**, *cursiva*, `código inline`, y hasta componentes React como <Contador inicial={10} /> directamente en el flujo del texto.
+
+### Lista con Componentes
+
+1. **Primer elemento**: Texto normal
+2. **Alerta integrada**:
+   <AlertaPersonalizada tipo="info">
+   Una alerta dentro de una lista
+   </AlertaPersonalizada>
+3. **Tercer elemento**: Más texto normal
+
+## Casos Avanzados
+
+### Componentes Anidados
+
+<AlertaPersonalizada tipo="success">
+Este componente contiene **Markdown** y otro componente:
+
+<Contador inicial={100} />
+
+¿No es genial?
+</AlertaPersonalizada>
+
+### Datos Dinámicos
+
+<TarjetaConDatos
+  titulo="Estadísticas del Proyecto"
+  datos={[
+    { etiqueta: "Componentes", valor: "15+" },
+    { etiqueta: "Líneas de código", valor: "1,500+" },
+    { etiqueta: "Tests", valor: "98%" },
+    { etiqueta: "Cobertura", valor: "95%" }
+  ]}
+/>
+
+## Conclusión
+
+MDX representa la perfecta fusión entre:
+
+- **Simplicidad de Markdown**: Para escribir contenido
+- **Poder de React**: Para crear interfaces interactivas
+- **Flexibilidad de JavaScript**: Para lógica compleja
+
+Esta combinación permite crear documentación verdaderamente interactiva y experiencias de usuario excepcionales.
+
+---
+
+*Documento generado el 28 de junio de 2025*

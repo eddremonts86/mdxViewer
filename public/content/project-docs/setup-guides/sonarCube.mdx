@@ -1,0 +1,136 @@
+
+
+### Resumen Paso a Paso para la Integración de SonarQube Local y SonarLint
+
+El objetivo es establecer un sistema robusto de análisis de calidad de código que funcione en tu máquina local y se integre en tu proceso de desarrollo. Esto se divide en tres fases principales: **Configuración del Servidor SonarQube**, **Análisis del Proyecto** y **Integración en el IDE (VS Code)**.
+
+-----
+
+#### Fase 1: Configuración del Servidor SonarQube Local (Community Edition con Docker)
+
+Este paso establece la plataforma central para el análisis de código.
+
+1.  **Verificar o Instalar Docker Desktop:**
+
+      * **Acción:** Asegúrate de que Docker Desktop esté instalado y en ejecución en el sistema operativo. Si no lo está, descarga e instala la versión adecuada para tu sistema.
+      * **Verificación:** Ejecuta `docker --version` en la terminal para confirmar la instalación.
+
+2.  **Crear una Red Docker (Opcional pero Recomendado):**
+
+      * **Acción:** Crea una red dedicada para los contenedores de SonarQube y PostgreSQL para facilitar la comunicación.
+      * **Comando:** `docker network create sonarqube-net`
+      * **Verificación:** Ejecuta `docker network ls` y busca `sonarqube-net` en la lista.
+
+3.  **Iniciar el Contenedor de Base de Datos PostgreSQL:**
+
+      * **Acción:** Despliega una instancia de PostgreSQL que SonarQube usará para almacenar sus datos.
+      * **Comando:**
+        ```bash
+        docker run -d --name sonarqube-db \
+          --network sonarqube-net \
+          -p 5432:5432 \
+          -e POSTGRES_USER=sonar \
+          -e POSTGRES_PASSWORD=sonar \
+          -e POSTGRES_DB=sonar \
+          postgres:15 # Usar una versión compatible y estable de PostgreSQL
+        ```
+      * **Verificación:** Ejecuta `docker ps` y verifica que el contenedor `sonarqube-db` esté en estado `Up`.
+
+4.  **Iniciar el Contenedor de SonarQube (Community Edition):**
+
+      * **Acción:** Despliega la instancia del servidor SonarQube.
+      * **Comando:**
+        ```bash
+        docker run -d --name sonarqube \
+          --network sonarqube-net \
+          -p 9000:9000 \
+          -e SONAR_JDBC_URL=jdbc:postgresql://sonarqube-db:5432/sonar \
+          -e SONAR_JDBC_USERNAME=sonar \
+          -e SONAR_JDBC_PASSWORD=sonar \
+          sonarqube:10.5-community # Usar la última versión de la Community Edition
+        ```
+      * **Verificación:** Ejecuta `docker ps` y verifica que el contenedor `sonarqube` esté en estado `Up`. Espera unos minutos para que se inicialice completamente.
+
+5.  **Acceder a la Interfaz Web de SonarQube y Configurar Credenciales Iniciales:**
+
+      * **Acción:** Abre un navegador web y navega a la URL del servidor SonarQube. Cambia las credenciales por defecto.
+      * **URL:** `http://localhost:9000`
+      * **Credenciales por defecto:** `admin` / `admin`
+      * **Proceso:** Inicia sesión con las credenciales por defecto. El sistema te pedirá automáticamente que cambies la contraseña. Realiza este cambio.
+
+-----
+
+#### Fase 2: Análisis del Proyecto con SonarQube Server
+
+Este paso implica la integración de tu proyecto con el servidor SonarQube para realizar análisis completos.
+
+1.  **Crear un Proyecto en SonarQube:**
+
+      * **Acción:** Dentro de la interfaz web de SonarQube (`http://localhost:9000`), crea un nuevo proyecto.
+      * **Proceso:** Haz clic en "Create new project". Sigue el asistente, proporciona un "Project key" y un "Display name". Selecciona la opción de "Locally" para la configuración manual.
+
+2.  **Generar un Token de Proyecto:**
+
+      * **Acción:** Durante el proceso de creación del proyecto en SonarQube, se te pedirá generar un token para la autenticación del análisis.
+      * **Proceso:** Proporciona un nombre para el token y haz clic en "Generate". **Copia este token de inmediato**, ya que solo se mostrará una vez. Guárdalo de forma segura.
+
+3.  **Configurar el SonarScanner CLI:**
+
+      * **Acción:** Descarga e instala el SonarScanner CLI, la herramienta que ejecuta el análisis en tu código y lo envía al servidor SonarQube.
+      * **Proceso:** Sigue las instrucciones proporcionadas por SonarQube en la sección "Analyze your project" (después de crear el proyecto). Generalmente implica descargar un archivo ZIP, descomprimirlo y añadir su directorio `bin` a tu `PATH` del sistema.
+      * **Verificación:** Abre una nueva terminal y ejecuta `sonar-scanner --version`. Debería mostrar la versión instalada.
+
+4.  **Ejecutar el Primer Análisis del Proyecto:**
+
+      * **Acción:** Navega a la raíz de tu proyecto en la terminal y ejecuta el comando de análisis proporcionado por SonarQube.
+      * **Comando de Ejemplo (puede variar ligeramente según el lenguaje):**
+        ```bash
+        # Asegúrate de estar en la raíz de tu proyecto
+        sonar-scanner \
+          -Dsonar.projectKey=YOUR_PROJECT_KEY \
+          -Dsonar.sources=. \
+          -Dsonar.host.url=http://localhost:9000 \
+          -Dsonar.token=YOUR_PROJECT_TOKEN
+        ```
+          * Reemplaza `YOUR_PROJECT_KEY` con la clave de tu proyecto creada en SonarQube.
+          * Reemplaza `YOUR_PROJECT_TOKEN` con el token generado previamente.
+      * **Verificación:** Una vez que el comando finalice, ve a la interfaz web de SonarQube (`http://localhost:9000`) y navega al dashboard de tu proyecto. Deberías ver los resultados del análisis.
+
+-----
+
+#### Fase 3: Integración de SonarLint con VS Code
+
+Esta fase permite la retroalimentación en tiempo real y la conexión con tu servidor SonarQube local.
+
+1.  **Instalar la Extensión SonarLint en VS Code:**
+
+      * **Acción:** Abre VS Code, ve a la sección de Extensiones (`Ctrl+Shift+X`) y busca `SonarLint` (publicada por SonarSource).
+      * **Proceso:** Haz clic en "Instalar".
+
+2.  **Conectar SonarLint al Servidor SonarQube Local:**
+
+      * **Acción:** Vincula SonarLint en tu VS Code al servidor SonarQube que acabas de configurar, para que use las mismas reglas.
+      * **Proceso:**
+          * Abre la Paleta de Comandos en VS Code (`Ctrl+Shift+P`).
+          * Escribe `SonarLint` y selecciona **"SonarLint: Connect to SonarQube/SonarCloud"**.
+          * Selecciona **"SonarQube"** (no SonarCloud).
+          * Cuando se te solicite la URL del servidor, introduce `http://localhost:9000`.
+          * Cuando se te solicite el token, **genera un nuevo "User Token"** desde la interfaz web de SonarQube (My Account \> Security \> Generate Tokens). No uses el token de proyecto de la Fase 2; este es un token de usuario.
+          * Introduce el "User Token" en VS Code.
+
+3.  **Vincular el Espacio de Trabajo Local al Proyecto de SonarQube:**
+
+      * **Acción:** Conecta tu carpeta de proyecto abierta en VS Code con el proyecto correspondiente en tu servidor SonarQube.
+      * **Proceso:**
+          * Abre la Paleta de Comandos (`Ctrl+Shift+P`).
+          * Escribe `SonarLint` y selecciona **"SonarLint: Bind Current Workspace to a SonarQube/SonarCloud Project"**.
+          * Selecciona el proyecto que creaste en la Fase 2 de la lista.
+
+4.  **Verificar el Análisis en Tiempo Real:**
+
+      * **Acción:** Abre un archivo de código en tu proyecto.
+      * **Verificación:** SonarLint debería comenzar a analizar el código y mostrar los "code smells", errores o vulnerabilidades directamente en el editor (subrayados), en el panel de "Problemas" de VS Code, y proporcionar "Quick Fixes" cuando estén disponibles.
+
+-----
+
+Este flujo de trabajo te proporciona una potente herramienta de análisis de calidad de código gratuita, con retroalimentación inmediata en tu IDE y análisis centralizados en tu servidor local.

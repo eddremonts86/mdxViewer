@@ -1,0 +1,273 @@
+---
+title: "Test MDX con Componentes React"
+description: "Documento MDX que combina navegación anchor con componentes React"
+author: "MDX Viewer Team"
+date: "2025-06-28"
+tags: ["mdx", "react", "navegación", "componentes"]
+---
+
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState } from 'react'
+
+export const NavigationCounter = () => {
+  const [count, setCount] = useState(0)
+
+  return (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle>Contador de Navegación</CardTitle>
+        <CardDescription>
+          Cada vez que navegues usando un enlace anchor, incrementa este contador
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="text-center">
+          <span className="text-4xl font-bold">{count}</span>
+        </div>
+        <div className="flex gap-2 justify-center">
+          <Button onClick={() => setCount(count + 1)}>
+            +1 Navegación
+          </Button>
+          <Button onClick={() => setCount(0)} variant="outline">
+            Reset
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+export const AnchorDemo = ({ targetId, label }) => {
+  const handleClick = () => {
+    const element = document.getElementById(targetId)
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
+  }
+
+  return (
+    <Button onClick={handleClick} variant="outline" className="mx-2">
+      📍 {label}
+    </Button>
+  )
+}
+
+# Test MDX con Componentes React
+
+Este documento combina **componentes React interactivos** con **navegación anchor** para demostrar las capacidades completas del sistema MDX.
+
+## Índice Interactivo
+
+<div className="space-y-2 p-4 border rounded-lg">
+  <h3 className="font-semibold">Navegación Rápida:</h3>
+  <div className="flex flex-wrap gap-2">
+    <AnchorDemo targetId="componentes-basicos" label="Componentes" />
+    <AnchorDemo targetId="navegacion-avanzada" label="Navegación" />
+    <AnchorDemo targetId="integracion-completa" label="Integración" />
+    <AnchorDemo targetId="casos-de-uso" label="Casos de Uso" />
+  </div>
+</div>
+
+---
+
+## Componentes Básicos
+
+Esta sección demuestra componentes React básicos funcionando dentro de MDX con navegación anchor.
+
+<NavigationCounter />
+
+### Alert Informativo
+
+<Alert>
+  <AlertTitle>¡Genial!</AlertTitle>
+  <AlertDescription>
+    Los componentes React se integran perfectamente con la navegación anchor.
+    Puedes usar el <strong>índice de contenidos</strong> para navegar o los botones de arriba.
+  </AlertDescription>
+</Alert>
+
+### Badges de Estado
+
+<div className="flex gap-2 flex-wrap">
+  <Badge>MDX Activo</Badge>
+  <Badge variant="secondary">React Funcional</Badge>
+  <Badge variant="outline">Navegación OK</Badge>
+  <Badge variant="destructive">¡Increíble!</Badge>
+</div>
+
+---
+
+## Navegación Avanzada
+
+Aquí probamos diferentes tipos de navegación y cómo interactúan con los componentes React.
+
+### Enlaces Internos en Componentes
+
+<Card>
+  <CardHeader>
+    <CardTitle>Centro de Navegación</CardTitle>
+    <CardDescription>
+      Usa estos enlaces para probar la navegación anchor desde dentro de componentes React
+    </CardDescription>
+  </CardHeader>
+  <CardContent className="space-y-3">
+    <div className="space-y-2">
+      <p><strong>Navegación estándar:</strong></p>
+      <div className="space-x-2">
+        <a href="#componentes-basicos" className="text-blue-600 hover:underline">
+          → Componentes Básicos
+        </a>
+        <a href="#integracion-completa" className="text-blue-600 hover:underline">
+          → Integración Completa
+        </a>
+        <a href="#casos-de-uso" className="text-blue-600 hover:underline">
+          → Casos de Uso
+        </a>
+      </div>
+    </div>
+
+    <div className="space-y-2">
+      <p><strong>Navegación con botones:</strong></p>
+      <div className="space-x-2">
+        <AnchorDemo targetId="componentes-basicos" label="Ir a Componentes" />
+        <AnchorDemo targetId="casos-de-uso" label="Ver Casos de Uso" />
+      </div>
+    </div>
+  </CardContent>
+</Card>
+
+### Código y Navegación
+
+```javascript
+// Ejemplo de función de navegación
+function navigateToSection(sectionId) {
+  const element = document.getElementById(sectionId);
+  if (element) {
+    element.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  }
+}
+
+// Usar la función
+navigateToSection('integracion-completa');
+```
+
+---
+
+## Integración Completa
+
+Esta sección demuestra la integración completa entre **Markdown**, **React** y **navegación anchor**.
+
+### Componente Interactivo con Estado
+
+export const FeatureToggle = () => {
+  const [features, setFeatures] = useState({
+    markdown: true,
+    react: true,
+    navigation: true,
+    theming: false
+  })
+
+  const toggleFeature = (feature) => {
+    setFeatures(prev => ({
+      ...prev,
+      [feature]: !prev[feature]
+    }))
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Control de Características</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-4">
+          {Object.entries(features).map(([feature, enabled]) => (
+            <div key={feature} className="flex items-center justify-between p-2 border rounded">
+              <span className="capitalize">{feature}</span>
+              <Button
+                size="sm"
+                variant={enabled ? "default" : "outline"}
+                onClick={() => toggleFeature(feature)}
+              >
+                {enabled ? "✅ ON" : "❌ OFF"}
+              </Button>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+<FeatureToggle />
+
+### Lista de Características
+
+1. **Markdown nativo**: Todo el formato estándar funciona
+2. **Componentes React**: Totalmente interactivos
+3. **Navegación anchor**: Con scroll suave y offset
+4. **Estado compartido**: Entre componentes
+5. **Temas**: Dark/Light mode
+
+---
+
+## Casos de Uso
+
+### Documentación Interactiva
+
+> **Caso de uso principal**: Crear documentación que sea tanto informativa como interactiva.
+
+### Tutoriales Paso a Paso
+
+1. **Paso 1**: [Configurar componentes](#componentes-basicos) ✅
+2. **Paso 2**: [Implementar navegación](#navegacion-avanzada) ✅
+3. **Paso 3**: [Integrar todo](#integracion-completa) ✅
+4. **Paso 4**: [Probar casos de uso](#casos-de-uso) ← **Estás aquí**
+
+### Demo Final
+
+<Alert>
+  <AlertTitle>🎉 ¡Prueba Completada!</AlertTitle>
+  <AlertDescription>
+    Has navegado exitosamente por un documento MDX complejo que combina:
+    <br />
+    ✅ Componentes React interactivos
+    <br />
+    ✅ Navegación anchor funcional
+    <br />
+    ✅ Contenido Markdown estructurado
+    <br />
+    ✅ Enlaces internos y externos
+  </AlertDescription>
+</Alert>
+
+### Navegación de Retorno
+
+<div className="mt-6 p-4 border rounded-lg bg-gray-50 dark:bg-gray-900">
+  <h4 className="font-semibold mb-3">🧭 Navegación Rápida de Retorno</h4>
+  <div className="grid grid-cols-2 gap-2">
+    <AnchorDemo targetId="componentes-basicos" label="🔧 Componentes" />
+    <AnchorDemo targetId="navegacion-avanzada" label="🧭 Navegación" />
+    <AnchorDemo targetId="integracion-completa" label="🔗 Integración" />
+    <Button
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      variant="outline"
+      className="col-span-2"
+    >
+      ⬆️ Volver al Inicio
+    </Button>
+  </div>
+</div>
+
+---
+
+**¡Excelente!** Si has llegado hasta aquí y probado los diferentes métodos de navegación, has verificado que el sistema funciona perfectamente. 🚀

@@ -1,0 +1,707 @@
+import { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+
+export const InteractiveCounter = () => {
+  const [count, setCount] = useState(0)
+
+  return (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle>Contador Interactivo</CardTitle>
+        <CardDescription>Un componente React embebido en MDX</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="text-center">
+          <span className="text-4xl font-bold">{count}</span>
+        </div>
+        <div className="flex gap-2 justify-center">
+          <Button onClick={() => setCount(count - 1)} variant="outline">-</Button>
+          <Button onClick={() => setCount(0)} variant="secondary">Reset</Button>
+          <Button onClick={() => setCount(count + 1)}>+</Button>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+export const ColorPalette = () => {
+  const colors = [
+    { name: 'Primary', class: 'bg-primary text-primary-foreground' },
+    { name: 'Secondary', class: 'bg-secondary text-secondary-foreground' },
+    { name: 'Accent', class: 'bg-accent text-accent-foreground' },
+    { name: 'Muted', class: 'bg-muted text-muted-foreground' },
+    { name: 'Card', class: 'bg-card text-card-foreground border' },
+  ]
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {colors.map((color) => (
+        <div key={color.name} className={`p-4 rounded-lg ${color.class}`}>
+          <h4 className="font-semibold">{color.name}</h4>
+          <p className="text-sm opacity-80">Ejemplo de color del tema</p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export const AnimatedBox = () => {
+  const [isAnimated, setIsAnimated] = useState(false)
+
+  return (
+    <div className="text-center space-y-4">
+      <div
+        className={`w-20 h-20 bg-primary mx-auto rounded-lg transition-all duration-500 ${
+          isAnimated ? 'rotate-45 scale-110' : ''
+        }`}
+      />
+      <Button onClick={() => setIsAnimated(!isAnimated)}>
+        {isAnimated ? 'Detener' : 'Animar'}
+      </Button>
+    </div>
+  )
+}
+
+export const DataFetcher = () => {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  const fetchData = async () => {
+    setLoading(true)
+    try {
+      // Simular llamada a API
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      setData({
+        timestamp: new Date().toLocaleString(),
+        random: Math.floor(Math.random() * 1000),
+        status: 'success'
+      })
+    } catch (error) {
+      setData({ error: 'Error al cargar datos' })
+    }
+    setLoading(false)
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Simulador de API</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Button onClick={fetchData} disabled={loading}>
+          {loading ? 'Cargando...' : 'Obtener Datos'}
+        </Button>
+        {data && (
+          <div className="bg-muted p-4 rounded-lg">
+            <pre className="text-sm">{JSON.stringify(data, null, 2)}</pre>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+export const ThemeDemo = () => {
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <Alert>
+          <AlertTitle>Información</AlertTitle>
+          <AlertDescription>
+            Este es un alert informativo que se adapta al tema actual.
+          </AlertDescription>
+        </Alert>
+        <div className="space-y-2">
+          <Badge>Default</Badge>
+          <Badge variant="secondary">Secondary</Badge>
+          <Badge variant="destructive">Destructive</Badge>
+          <Badge variant="outline">Outline</Badge>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+# Prueba Exhaustiva de MDX
+
+Esta es una prueba completa de todas las capacidades de **MDX**, que combina Markdown tradicional con componentes React interactivos.
+
+## Tabla de Contenidos
+
+1. [Markdown Tradicional](#markdown-tradicional)
+2. [Componentes React](#componentes-react)
+3. [Elementos Combinados](#elementos-combinados)
+4. [Casos Avanzados](#casos-avanzados)
+
+---
+
+## Markdown Tradicional
+
+Todo el Markdown estándar funciona perfectamente en MDX:
+
+### Texto y Formateo
+
+**Texto en negrita**, *texto en cursiva*, ***ambos***, ~~tachado~~, y `código inline`.
+
+> Esta es una cita que puede contener **formateo** y `código`.
+
+### Listas
+
+1. **Elementos ordenados**
+   - Subelemento no ordenado
+   - Otro subelemento con `código`
+     1. Sub-subelemento ordenado
+     2. Con [enlaces](https://example.com)
+2. **Segundo elemento**
+
+   Con párrafo adicional que contiene más información.
+
+3. **Tercer elemento**
+
+### Listas de Tareas
+
+- [x] Implementar componentes React
+- [x] Probar markdown tradicional
+- [ ] Añadir más interactividad
+- [ ] Optimizar rendimiento
+
+### Código
+
+Código JavaScript:
+
+```javascript
+function saludar(nombre) {
+  console.log(`Hola, ${nombre}!`);
+  return `Saludo para ${nombre}`;
+}
+
+// Este código se renderiza con syntax highlighting
+const resultado = saludar('MDX');
+```
+
+Código Python:
+
+```python
+def calcular_fibonacci(n):
+    if n <= 1:
+        return n
+    return calcular_fibonacci(n-1) + calcular_fibonacci(n-2)
+
+# Ejemplo de uso
+for i in range(10):
+    print(f"F({i}) = {calcular_fibonacci(i)}")
+```
+
+### Tablas
+
+| Característica | Markdown | MDX | React |
+|----------------|----------|-----|-------|
+| Texto plano | ✅ | ✅ | ✅ |
+| Formateo | ✅ | ✅ | ✅ |
+| Componentes | ❌ | ✅ | ✅ |
+| Interactividad | ❌ | ✅ | ✅ |
+
+### Matemáticas
+
+MDX también soporta matemáticas si KaTeX está habilitado:
+
+Inline: $E = mc^2$
+
+Bloque:
+$$
+\int_{0}^{\infty} e^{-x^2} dx = \frac{\sqrt{\pi}}{2}
+$$
+
+---
+
+## Componentes React
+
+Aquí es donde MDX realmente brilla - podemos usar componentes React directamente:
+
+### Contador Interactivo
+
+<InteractiveCounter />
+
+### Paleta de Colores del Tema
+
+<ColorPalette />
+
+### Animación Simple
+
+<AnimatedBox />
+
+### Simulador de Carga de Datos
+
+<DataFetcher />
+
+### Demostración de Tema
+
+<ThemeDemo />
+
+---
+
+## Elementos Combinados
+
+Podemos combinar Markdown con React de formas muy interesantes:
+
+### Lista con Componentes
+
+1. **Elemento normal** - Solo texto
+2. **Elemento con componente**:
+
+   <Alert>
+     <AlertTitle>¡Atención!</AlertTitle>
+     <AlertDescription>
+       Este alert está embebido dentro de una lista de Markdown.
+     </AlertDescription>
+   </Alert>
+
+3. **Elemento con código y componente**:
+
+   ```jsx
+   <Button onClick={() => alert('¡Hola!')}>
+     Haz clic aquí
+   </Button>
+   ```
+
+   <Button onClick={() => alert('¡Funciona!')}>
+     Prueba el botón real
+   </Button>
+
+### Citas con Componentes
+
+> Esta es una cita tradicional de Markdown.
+>
+> <Card className="mt-4">
+>   <CardHeader>
+>     <CardTitle>Componente en Cita</CardTitle>
+>   </CardHeader>
+>   <CardContent>
+>     <p>Este es un componente React dentro de una cita de Markdown.</p>
+>   </CardContent>
+> </Card>
+
+### Tablas con Componentes
+
+| Elemento | Descripción | Ejemplo |
+|----------|-------------|---------|
+| Badge | Etiqueta pequeña | <Badge>Ejemplo</Badge> |
+| Button | Botón interactivo | <Button size="sm">Click</Button> |
+| Alert | Mensaje de alerta | Ver abajo ⬇️ |
+
+<Alert className="mt-4">
+  <AlertTitle>Componente después de tabla</AlertTitle>
+  <AlertDescription>
+    Los componentes pueden ir en cualquier lugar del documento.
+  </AlertDescription>
+</Alert>
+
+---
+
+## Casos Avanzados
+
+### Componente con Props Complejas
+
+export const ComplexComponent = ({ title, items, showCount = true }) => {
+  const [selectedItem, setSelectedItem] = useState(null)
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        {showCount && (
+          <CardDescription>Total de elementos: {items.length}</CardDescription>
+        )}
+      </CardHeader>
+      <CardContent>
+        <div className="grid gap-2">
+          {items.map((item, index) => (
+            <Button
+              key={index}
+              variant={selectedItem === index ? "default" : "outline"}
+              onClick={() => setSelectedItem(index)}
+              className="justify-start"
+            >
+              {item}
+            </Button>
+          ))}
+        </div>
+        {selectedItem !== null && (
+          <div className="mt-4 p-4 bg-muted rounded-lg">
+            <strong>Seleccionado:</strong> {items[selectedItem]}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+<ComplexComponent
+  title="Lista Interactiva"
+  items={["Opción 1", "Opción 2", "Opción 3", "Opción 4"]}
+  showCount={true}
+/>
+
+### Código Embebido con Componentes
+
+Puedes definir componentes inline y usarlos inmediatamente:
+
+export const InlineCounter = () => {
+  const [value, setValue] = useState(0)
+  return (
+    <div className="inline-flex items-center gap-2 bg-muted px-3 py-1 rounded-full">
+      <button onClick={() => setValue(v => v - 1)} className="text-lg">-</button>
+      <span className="font-mono font-bold min-w-[2ch] text-center">{value}</span>
+      <button onClick={() => setValue(v => v + 1)} className="text-lg">+</button>
+    </div>
+  )
+}
+
+Este párrafo contiene un contador inline <InlineCounter /> que funciona perfectamente dentro del texto normal.
+
+### Condicionales y Estado Complejo
+
+export const ConditionalContent = () => {
+  const [mode, setMode] = useState('info')
+
+  const modes = {
+    info: { title: 'Información', variant: 'default', content: 'Este es contenido informativo.' },
+    warning: { title: 'Advertencia', variant: 'destructive', content: 'Ten cuidado con esta acción.' },
+    success: { title: 'Éxito', variant: 'default', content: '¡Operación completada!' }
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        {Object.keys(modes).map(m => (
+          <Button
+            key={m}
+            variant={mode === m ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setMode(m)}
+          >
+            {modes[m].title}
+          </Button>
+        ))}
+      </div>
+      <Alert>
+        <AlertTitle>{modes[mode].title}</AlertTitle>
+        <AlertDescription>{modes[mode].content}</AlertDescription>
+      </Alert>
+    </div>
+  )
+}
+
+<ConditionalContent />
+
+### HTML Mezclado con React
+
+También podemos usar HTML tradicional junto con componentes React:
+
+<div style={{ border: '2px dashed #ccc', padding: '16px', borderRadius: '8px' }}>
+  <h4>Contenedor HTML</h4>
+  <p>Este es HTML tradicional, pero dentro podemos usar React:</p>
+
+  <Button className="mt-2">Botón React dentro de HTML</Button>
+
+  <details className="mt-4">
+    <summary>HTML Details con React dentro</summary>
+    <div className="mt-2">
+      <Badge>React Badge</Badge> dentro de un elemento HTML details.
+    </div>
+  </details>
+</div>
+
+### Fragmentos de Código con Resultados en Vivo
+
+Aquí tienes el código de un botón:
+
+```jsx
+<Button onClick={() => alert('¡Hola MDX!')}>
+  Botón de Ejemplo
+</Button>
+```
+
+Y aquí está el resultado en vivo:
+
+<Button onClick={() => alert('¡Hola MDX!')}>
+  Botón de Ejemplo
+</Button>
+
+### Efectos y Hooks Avanzados
+
+export const AdvancedExample = () => {
+  const [time, setTime] = useState(new Date())
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    const timer = setInterval(() => {
+      setTime(new Date())
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
+
+  if (!mounted) {
+    return <div>Cargando reloj...</div>
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Reloj en Tiempo Real</CardTitle>
+        <CardDescription>Actualizado usando useEffect</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-mono text-center">
+          {time.toLocaleTimeString()}
+        </div>
+        <div className="text-sm text-muted-foreground text-center mt-2">
+          {time.toLocaleDateString()}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+<AdvancedExample />
+
+---
+
+## Elementos de Formulario Interactivos
+
+export const ContactForm = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  })
+  const [submitted, setSubmitted] = useState(false)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setSubmitted(true)
+    setTimeout(() => setSubmitted(false), 3000)
+  }
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Formulario de Contacto</CardTitle>
+        <CardDescription>Ejemplo de formulario interactivo en MDX</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {submitted ? (
+          <Alert>
+            <AlertTitle>¡Formulario enviado!</AlertTitle>
+            <AlertDescription>
+              Gracias por tu mensaje, {formData.name}.
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Nombre</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border rounded-md bg-background"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border rounded-md bg-background"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Mensaje</label>
+              <textarea
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                required
+                rows={4}
+                className="w-full px-3 py-2 border rounded-md bg-background"
+              />
+            </div>
+            <Button type="submit">Enviar Mensaje</Button>
+          </form>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+<ContactForm />
+
+---
+
+## Visualización de Datos
+
+export const SimpleChart = ({ data }) => {
+  const max = Math.max(...data.map(d => d.value))
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Gráfico Simple</CardTitle>
+        <CardDescription>Visualización de datos básica</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          {data.map((item, index) => (
+            <div key={index} className="flex items-center gap-3">
+              <div className="w-16 text-sm font-medium">{item.label}</div>
+              <div className="flex-1 bg-muted rounded-full h-6 relative">
+                <div
+                  className="bg-primary h-full rounded-full transition-all duration-500"
+                  style={{ width: `${(item.value / max) * 100}%` }}
+                />
+                <span className="absolute inset-0 flex items-center justify-center text-xs font-medium">
+                  {item.value}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+<SimpleChart data={[
+  { label: 'React', value: 95 },
+  { label: 'TypeScript', value: 88 },
+  { label: 'MDX', value: 92 },
+  { label: 'Tailwind', value: 90 }
+]} />
+
+---
+
+## Casos Edge y Combinaciones Complejas
+
+### Listas con Componentes Anidados
+
+1. **Primer elemento** con texto normal
+
+   <Alert>
+     <AlertTitle>Alert en lista</AlertTitle>
+     <AlertDescription>Este alert está dentro de un elemento de lista.</AlertDescription>
+   </Alert>
+
+   - Subelemento normal
+   - Subelemento con componente: <Badge>Etiqueta</Badge>
+   - Subelemento con **formateo** y `código`
+
+2. **Segundo elemento** con código:
+
+   ```jsx
+   const ComponenteEnLista = () => {
+     return <div>Código dentro de lista</div>
+   }
+   ```
+
+   Y aquí el componente real:
+
+   <div className="bg-muted p-2 rounded">Componente dentro de lista</div>
+
+3. **Tercer elemento** con tabla:
+
+   | Col 1 | Col 2 | Col 3 |
+   |-------|-------|-------|
+   | A | B | <Badge>C</Badge> |
+   | D | E | F |
+
+### Citas con Todo Tipo de Contenido
+
+> **Cita compleja** que contiene:
+>
+> - Lista dentro de cita
+> - `Código inline`
+> - [Enlaces](https://example.com)
+>
+> ```javascript
+> // Código dentro de cita
+> console.log('Hola desde la cita');
+> ```
+>
+> <Button size="sm" className="mt-2">Botón en cita</Button>
+>
+> > Cita anidada con componente:
+> >
+> > <Badge variant="outline">Badge anidado</Badge>
+
+### Markdown en Props de Componentes
+
+export const MarkdownProp = ({ children, title }) => (
+  <Card>
+    <CardHeader>
+      <CardTitle>{title}</CardTitle>
+    </CardHeader>
+    <CardContent className="prose prose-sm max-w-none">
+      {children}
+    </CardContent>
+  </Card>
+)
+
+<MarkdownProp title="Contenido Markdown como Children">
+
+Este contenido está siendo pasado como **children** al componente, pero mantiene todo el formateo de Markdown:
+
+- Lista elemento 1
+- Lista elemento 2 con `código`
+- Lista elemento 3
+
+```javascript
+console.log('Código dentro de children');
+```
+
+Y un párrafo final con *énfasis* y **negrita**.
+
+</MarkdownProp>
+
+---
+
+## Fin de la Prueba MDX
+
+Este documento demuestra todas las capacidades de MDX:
+
+✅ **Markdown completo** - Todo el markdown estándar funciona
+✅ **Componentes React** - Interactividad completa
+✅ **Estado y efectos** - useState, useEffect, etc.
+✅ **Props y composición** - Componentes complejos
+✅ **HTML embebido** - Mezclado con React
+✅ **Casos edge** - Combinaciones complejas
+✅ **Formularios** - Interactividad real
+✅ **Visualizaciones** - Gráficos y datos
+✅ **Temas** - Completamente theme-aware
+
+<Card className="mt-8">
+  <CardContent className="text-center py-8">
+    <h3 className="text-2xl font-bold mb-4">¡MDX es Increíble! 🚀</h3>
+    <p className="text-muted-foreground mb-4">
+      Combina la simplicidad de Markdown con el poder de React
+    </p>
+    <Button>¡Pruébalo tú mismo!</Button>
+  </CardContent>
+</Card>
