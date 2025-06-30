@@ -164,7 +164,7 @@ export function Layout() {
                 <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
 
                 {/* Main Content */}
-                <main className="flex-1 overflow-auto">
+                <main className="flex-1 overflow-auto p-6">
                     <Outlet />
                 </main>
             </div>

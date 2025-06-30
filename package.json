@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "concurrently \"npm run server\" \"vite\"",
         "dev:watch": "concurrently \"npm run server\" \"node scripts/devWithWatcher.js\"",
-        "server": "tsx server/index.ts",
+        "server": "tsx server/main.ts",
         "client": "vite",
         "watch:content": "node scripts/contentWatcher.js",
         "generate:index": "node scripts/generateIndex.js",

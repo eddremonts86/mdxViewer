@@ -1,3 +1,6 @@
+import { DocumentTypeStats } from "@/components/DocumentTypeStats";
+import { PopularFolders } from "@/components/PopularFolders";
+import { RecentDocuments } from "@/components/RecentDocuments";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,6 +10,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import { useSiteStatistics } from "@/hooks/useSiteStatistics";
 import {
     ArrowUpRight,
     BarChart3,
@@ -14,12 +18,14 @@ import {
     Calendar,
     Eye,
     FileText,
+    Folder,
     TrendingUp,
-    Users,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function HomePage() {
+    const statistics = useSiteStatistics();
+
     return (
         <div className="space-y-8">
             {/* Header Section */}
@@ -35,7 +41,7 @@ export function HomePage() {
                 <div className="flex items-center space-x-2">
                     <Badge variant="outline" className="text-xs">
                         <Calendar className="mr-1 h-3 w-3" />
-                        Last 7 days
+                        Live Data
                     </Badge>
                 </div>
             </div>
@@ -50,228 +56,166 @@ export function HomePage() {
                         <FileText className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">24</div>
-                        <p className="text-muted-foreground text-xs">
-                            <span className="text-emerald-600 dark:text-emerald-400">
-                                +3
-                            </span>{" "}
-                            from last month
-                        </p>
+                        {statistics.loading ? (
+                            <div className="animate-pulse">
+                                <div className="bg-muted mb-1 h-8 w-16 rounded"></div>
+                                <div className="bg-muted h-4 w-24 rounded"></div>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="text-2xl font-bold">
+                                    {statistics.totalDocuments}
+                                </div>
+                                <p className="text-muted-foreground text-xs">
+                                    {statistics.documentsByType.md} MD +{" "}
+                                    {statistics.documentsByType.mdx} MDX
+                                </p>
+                            </>
+                        )}
                     </CardContent>
                 </Card>
 
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Page Views
+                            Folders
+                        </CardTitle>
+                        <Folder className="text-muted-foreground h-4 w-4" />
+                    </CardHeader>
+                    <CardContent>
+                        {statistics.loading ? (
+                            <div className="animate-pulse">
+                                <div className="bg-muted mb-1 h-8 w-12 rounded"></div>
+                                <div className="bg-muted h-4 w-20 rounded"></div>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="text-2xl font-bold">
+                                    {statistics.totalFolders}
+                                </div>
+                                <p className="text-muted-foreground text-xs">
+                                    Content categories
+                                </p>
+                            </>
+                        )}
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            MDX Files
                         </CardTitle>
                         <Eye className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">1,429</div>
-                        <p className="text-muted-foreground text-xs">
-                            <span className="text-emerald-600 dark:text-emerald-400">
-                                +12.5%
-                            </span>{" "}
-                            from last week
-                        </p>
+                        {statistics.loading ? (
+                            <div className="animate-pulse">
+                                <div className="bg-muted mb-1 h-8 w-12 rounded"></div>
+                                <div className="bg-muted h-4 w-16 rounded"></div>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="text-2xl font-bold text-green-600">
+                                    {statistics.documentsByType.mdx}
+                                </div>
+                                <p className="text-muted-foreground text-xs">
+                                    Interactive docs
+                                </p>
+                            </>
+                        )}
                     </CardContent>
                 </Card>
 
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Active Users
-                        </CardTitle>
-                        <Users className="text-muted-foreground h-4 w-4" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">87</div>
-                        <p className="text-muted-foreground text-xs">
-                            <span className="text-emerald-600 dark:text-emerald-400">
-                                +8.2%
-                            </span>{" "}
-                            from yesterday
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Growth Rate
+                            Popular Folder
                         </CardTitle>
                         <TrendingUp className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">+24%</div>
-                        <p className="text-muted-foreground text-xs">
-                            <span className="text-emerald-600 dark:text-emerald-400">
-                                +4.1%
-                            </span>{" "}
-                            from last period
-                        </p>
+                        {statistics.loading ? (
+                            <div className="animate-pulse">
+                                <div className="bg-muted mb-1 h-8 w-20 rounded"></div>
+                                <div className="bg-muted h-4 w-16 rounded"></div>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="text-2xl font-bold capitalize">
+                                    {statistics.popularFolders[0]?.name ||
+                                        "N/A"}
+                                </div>
+                                <p className="text-muted-foreground text-xs">
+                                    {statistics.popularFolders[0]?.count || 0}{" "}
+                                    documents
+                                </p>
+                            </>
+                        )}
                     </CardContent>
                 </Card>
             </div>
 
             {/* Charts and Activity Section */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                {/* Analytics Chart */}
-                <Card className="lg:col-span-4">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <BarChart3 className="h-5 w-5" />
-                            Document Statistics
-                        </CardTitle>
-                        <CardDescription>
-                            Document views and interactions over time
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="pb-4">
-                        <div className="border-muted-foreground/25 flex h-[200px] items-center justify-center rounded-lg border-2 border-dashed">
-                            <div className="text-center">
-                                <BarChart3 className="text-muted-foreground/50 mx-auto mb-2 h-12 w-12" />
-                                <p className="text-muted-foreground">
-                                    Chart placeholder
-                                </p>
-                                <p className="text-muted-foreground text-xs">
-                                    Analytics data would appear here
-                                </p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                {/* Document Type Distribution */}
+                <div className="lg:col-span-3">
+                    <DocumentTypeStats
+                        documentsByType={statistics.documentsByType}
+                        loading={statistics.loading}
+                    />
+                </div>
 
-                {/* Recent Activity */}
-                <Card className="lg:col-span-3">
-                    <CardHeader>
-                        <CardTitle>Recent Activity</CardTitle>
-                        <CardDescription>
-                            Latest document updates and views
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <div className="flex items-center space-x-4">
-                                <div className="bg-primary h-2 w-2 rounded-full"></div>
-                                <div className="flex-1 space-y-1">
-                                    <p className="text-sm leading-none font-medium">
-                                        Introduction.md updated
-                                    </p>
-                                    <p className="text-muted-foreground text-xs">
-                                        2 minutes ago
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center space-x-4">
-                                <div className="h-2 w-2 rounded-full bg-emerald-500"></div>
-                                <div className="flex-1 space-y-1">
-                                    <p className="text-sm leading-none font-medium">
-                                        New user registered
-                                    </p>
-                                    <p className="text-muted-foreground text-xs">
-                                        5 minutes ago
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center space-x-4">
-                                <div className="bg-primary h-2 w-2 rounded-full"></div>
-                                <div className="flex-1 space-y-1">
-                                    <p className="text-sm leading-none font-medium">
-                                        Components showcase viewed
-                                    </p>
-                                    <p className="text-muted-foreground text-xs">
-                                        12 minutes ago
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center space-x-4">
-                                <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
-                                <div className="flex-1 space-y-1">
-                                    <p className="text-sm leading-none font-medium">
-                                        API documentation updated
-                                    </p>
-                                    <p className="text-muted-foreground text-xs">
-                                        1 hour ago
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                {/* Popular Folders */}
+                <div className="lg:col-span-4">
+                    <PopularFolders
+                        popularFolders={statistics.popularFolders}
+                        loading={statistics.loading}
+                    />
+                </div>
             </div>
 
-            {/* Quick Actions */}
+            {/* Recent Activity and Quick Actions */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {/* Recent Documents */}
+                <div className="lg:col-span-1">
+                    <RecentDocuments
+                        recentDocuments={statistics.recentDocuments}
+                        loading={statistics.loading}
+                    />
+                </div>
+
+                {/* Quick Actions */}
                 <Card className="relative overflow-hidden">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <BookOpen className="h-5 w-5" />
-                            Documentation
+                            Browse Documentation
                         </CardTitle>
                         <CardDescription>
-                            Access your complete documentation library
+                            Explore guides, examples, and API references
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-2">
-                            <Button
-                                variant="ghost"
-                                className="w-full justify-between"
-                                asChild
-                            >
-                                <Link to="/docs/introduction">
-                                    Introduction
-                                    <ArrowUpRight className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                className="w-full justify-between"
-                                asChild
-                            >
-                                <Link to="/docs/getting-started">
-                                    Getting Started
-                                    <ArrowUpRight className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="relative overflow-hidden">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <FileText className="h-5 w-5" />
-                            Examples
-                        </CardTitle>
-                        <CardDescription>
-                            Explore interactive demos and showcases
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-2">
-                            <Button
-                                variant="ghost"
-                                className="w-full justify-between"
-                                asChild
-                            >
-                                <Link to="/examples/interactive-demo">
-                                    Interactive Demo
-                                    <ArrowUpRight className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                className="w-full justify-between"
-                                asChild
-                            >
-                                <Link to="/examples/components-showcase">
-                                    Components Showcase
-                                    <ArrowUpRight className="h-4 w-4" />
-                                </Link>
-                            </Button>
+                            <Link to="/docs">
+                                <Button
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                >
+                                    <ArrowUpRight className="mr-2 h-4 w-4" />
+                                    Documentation
+                                </Button>
+                            </Link>
+                            <Link to="/examples">
+                                <Button
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                >
+                                    <ArrowUpRight className="mr-2 h-4 w-4" />
+                                    Examples
+                                </Button>
+                            </Link>
                         </div>
                     </CardContent>
                 </Card>
@@ -280,38 +224,38 @@ export function HomePage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <BarChart3 className="h-5 w-5" />
-                            API Reference
+                            Site Analytics
                         </CardTitle>
                         <CardDescription>
-                            Complete API documentation and guides
+                            View detailed statistics and usage data
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-2">
-                            <Button
-                                variant="ghost"
-                                className="w-full justify-between"
-                                asChild
-                            >
-                                <Link to="/api/reference">
-                                    API Reference
-                                    <ArrowUpRight className="h-4 w-4" />
-                                </Link>
+                        <Link to="/statistics">
+                            <Button className="w-full">
+                                <TrendingUp className="mr-2 h-4 w-4" />
+                                View Analytics
                             </Button>
-                            <Button
-                                variant="ghost"
-                                className="w-full justify-between"
-                                asChild
-                            >
-                                <Link to="/guides/setup">
-                                    Setup Guide
-                                    <ArrowUpRight className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                        </div>
+                        </Link>
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Error State */}
+            {statistics.error && (
+                <Card className="border-destructive">
+                    <CardHeader>
+                        <CardTitle className="text-destructive">
+                            Error Loading Statistics
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground text-sm">
+                            {statistics.error}
+                        </p>
+                    </CardContent>
+                </Card>
+            )}
         </div>
     );
 }
