@@ -14,13 +14,15 @@ const generatePreview = async (
     content: string
 ): Promise<string | null> => {
     try {
-        const fileName = path.basename(filePath, path.extname(filePath));
-        const previewFileName = `${fileName}-preview.png`;
+        // Create a simple preview URL based on the file path
+        const previewFileName = filePath.replace(/\.(md|mdx)$/, ".png");
         const previewUrl = `/api/previews/${encodeURIComponent(previewFileName)}`;
-        console.log(`📸 Preview generated for: ${filePath} -> ${previewUrl}`);
+        console.log(
+            `📸 Preview URL generated for: ${filePath} -> ${previewUrl}`
+        );
         return previewUrl;
     } catch (error) {
-        console.error("Failed to generate preview:", error);
+        console.error("Failed to generate preview URL:", error);
         return null;
     }
 };

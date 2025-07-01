@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Preview Test</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                background: #f5f5f5;
+            }
+            .preview-card {
+                background: white;
+                border-radius: 8px;
+                padding: 16px;
+                margin: 16px 0;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                max-width: 450px;
+            }
+            .preview-image {
+                width: 400px;
+                height: 240px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                margin-bottom: 12px;
+            }
+            .preview-title {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 8px;
+            }
+            .preview-description {
+                color: #666;
+                font-size: 14px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>MDX Viewer - Preview Test</h1>
+        <p>Testing document preview functionality with local SVG files:</p>
+
+        <div class="preview-card">
+            <div class="preview-title">Getting Started</div>
+            <img
+                src="../public/previews/docs/getting-started.svg"
+                alt="Getting Started Preview"
+                class="preview-image"
+            />
+            <div class="preview-description">
+                MD file in docs folder - Shows SVG preview
+            </div>
+        </div>
+
+        <div class="preview-card">
+            <div class="preview-title">Introduction</div>
+            <img
+                src="../public/previews/docs/introduction.svg"
+                alt="Introduction Preview"
+                class="preview-image"
+            />
+            <div class="preview-description">
+                MD file in docs folder - Shows SVG preview
+            </div>
+        </div>
+
+        <div class="preview-card">
+            <div class="preview-title">Component Best Practices</div>
+            <img
+                src="../public/previews/docs/component-best-practices.svg"
+                alt="Component Best Practices Preview"
+                class="preview-image"
+            />
+            <div class="preview-description">
+                MDX file in docs folder - Shows SVG preview with green badge
+            </div>
+        </div>
+
+        <div class="preview-card">
+            <div class="preview-title">API Endpoint Test</div>
+            <img
+                src="/api/previews/docs/getting-started.png"
+                alt="API Preview"
+                class="preview-image"
+            />
+            <div class="preview-description">
+                Testing the /api/previews endpoint (requires server)
+            </div>
+        </div>
+
+        <script>
+            // Add error handling for images
+            document.querySelectorAll("img").forEach(img => {
+                img.onerror = function () {
+                    this.style.background = "#f0f0f0";
+                    this.style.border = "2px dashed #ccc";
+                    this.alt = "Preview not available - " + this.alt;
+                };
+            });
+        </script>
+    </body>
+</html>

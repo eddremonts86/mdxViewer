@@ -35,6 +35,9 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: SERVER_CONFIG.JSON_LIMIT }));
 
+// Serve static files from public directory
+app.use("/public", express.static(path.join(__dirname, "..", "public")));
+
 // Configure multer for file uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
