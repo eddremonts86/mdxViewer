@@ -14,7 +14,7 @@ const PREVIEWS_DIR = path.join(__dirname, "..", "public", "previews");
 // Import the preview generator
 let generatePreviewImage;
 try {
-    const previewGen = require("../server/utils/previewGenerator.ts");
+    const previewGen = require("../../server/utils/previewGenerator.ts");
     generatePreviewImage = previewGen.generatePreviewImage;
 } catch (error) {
     console.warn(

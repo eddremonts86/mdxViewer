@@ -2,7 +2,7 @@ import { Layout } from "@/components/globals/Layout";
 import { DocumentPage } from "@/pages/DocumentPage";
 import { DocumentsListPage } from "@/pages/DocumentsListPage";
 import { HomePage } from "@/pages/HomePage";
-import { PreviewTestPage } from "@/pages/PreviewTestPage";
+
 import { StatisticsPage } from "@/pages/StatisticsPage";
 import { createBrowserRouter } from "react-router-dom";
 
@@ -44,10 +44,6 @@ export const router = createBrowserRouter([
             {
                 path: "/docs",
                 element: <DocumentsListPage />,
-            },
-            {
-                path: "/preview-test",
-                element: <PreviewTestPage />,
             },
             {
                 path: "/document/*",
