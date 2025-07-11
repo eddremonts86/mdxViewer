@@ -64,9 +64,20 @@ class FileAPI {
     static async getFileContent(
         filePath: string
     ): Promise<{ path: string; content: string }> {
+        // Convert path to kebab-case to match the file system structure
+        const kebabCasePath = filePath
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9._/-]/g, "")
+            .replace(/_+/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/\/+/g, "/")
+            .replace(/^-+/, "")
+            .replace(/-+$/, "");
+
         const response = await fetch(
             `${API_BASE_URL}/api/files/content?path=${encodeURIComponent(
-                filePath
+                kebabCasePath
             )}`
         );
 

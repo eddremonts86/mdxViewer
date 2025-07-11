@@ -10,14 +10,32 @@ import { SERVER_CONFIG } from "../constants/index.js";
 import { ApiResponse } from "../types/index.js";
 
 /**
- * Sanitize filename to be URL-safe
+ * Sanitize filename to be URL-safe and match kebab-case convention
  */
 function sanitizeFilename(filename: string): string {
     return filename
-        .replace(/\s+/g, "_") // Replace spaces with underscores
-        .replace(/[^a-zA-Z0-9._-]/g, "") // Remove special characters except dots, underscores, and hyphens
-        .replace(/_+/g, "_") // Replace multiple underscores with single
-        .replace(/(^_+)|(_+$)/g, ""); // Remove leading/trailing underscores
+        .toLowerCase() // Convert to lowercase for kebab-case
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/[^a-z0-9._-]/g, "") // Remove special characters except dots, hyphens, and underscores
+        .replace(/_+/g, "-") // Replace underscores with hyphens
+        .replace(/-+/g, "-") // Replace multiple hyphens with single
+        .replace(/^-+/, "")
+        .replace(/-+$/, ""); // Remove leading/trailing hyphens
+}
+
+/**
+ * Sanitize folder path to be URL-safe and match kebab-case convention
+ */
+function sanitizeFolderPath(folderPath: string): string {
+    return folderPath
+        .toLowerCase() // Convert to lowercase for kebab-case
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/[^a-z0-9._/-]/g, "") // Keep forward slashes for paths
+        .replace(/_+/g, "-") // Replace underscores with hyphens
+        .replace(/-+/g, "-") // Replace multiple hyphens with single
+        .replace(/\/+/g, "/") // Replace multiple slashes with single
+        .replace(/^-+/, "")
+        .replace(/-+$/, ""); // Remove leading/trailing hyphens
 }
 
 /**
@@ -98,7 +116,7 @@ export const getPreview = async (req: Request, res: Response) => {
 
             // Also sanitize the source base path
             const sanitizedBasePath = sourceBasePath
-                ? sanitizeFilename(sourceBasePath)
+                ? sanitizeFolderPath(sourceBasePath)
                 : "";
 
             const svgPreviewPath = path.join(

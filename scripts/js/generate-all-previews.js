@@ -11,8 +11,37 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const CONTENT_DIR = path.join(__dirname, "..", "public", "content");
-const PREVIEWS_DIR = path.join(__dirname, "..", "public", "previews");
+const CONTENT_DIR = path.join(__dirname, "..", "..", "public", "content");
+const PREVIEWS_DIR = path.join(__dirname, "..", "..", "public", "previews");
+
+/**
+ * Sanitize filename to be URL-safe and match kebab-case convention
+ */
+function sanitizeFilename(filename) {
+    return filename
+        .toLowerCase() // Convert to lowercase for kebab-case
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/[^a-z0-9._-]/g, "") // Remove special characters except dots, hyphens, and underscores
+        .replace(/_+/g, "-") // Replace underscores with hyphens
+        .replace(/-+/g, "-") // Replace multiple hyphens with single
+        .replace(/^-+/, "")
+        .replace(/-+$/, ""); // Remove leading/trailing hyphens
+}
+
+/**
+ * Sanitize folder path to be URL-safe and match kebab-case convention
+ */
+function sanitizeFolderPath(folderPath) {
+    return folderPath
+        .toLowerCase() // Convert to lowercase for kebab-case
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/[^a-z0-9._/-]/g, "") // Keep forward slashes for paths
+        .replace(/_+/g, "-") // Replace underscores with hyphens
+        .replace(/-+/g, "-") // Replace multiple hyphens with single
+        .replace(/\/+/g, "/") // Replace multiple slashes with single
+        .replace(/^-+/, "")
+        .replace(/-+$/, ""); // Remove leading/trailing hyphens
+}
 
 // Get all markdown files recursively
 async function getAllMarkdownFiles(dir, basePath = "") {
@@ -117,16 +146,26 @@ async function generatePreview(file) {
             .replace(/[-_]/g, " ");
         const type = file.name.endsWith(".mdx") ? "mdx" : "md";
 
-        // Ensure preview directory exists
-        const previewDir = path.join(PREVIEWS_DIR, file.folder);
+        // Sanitize folder path to match kebab-case structure
+        const sanitizedFolderPath =
+            file.folder === "root" ? "" : sanitizeFolderPath(file.folder);
+
+        // Ensure preview directory exists with correct nested structure
+        const previewDir = sanitizedFolderPath
+            ? path.join(PREVIEWS_DIR, sanitizedFolderPath)
+            : PREVIEWS_DIR;
+
         await fs.mkdir(previewDir, { recursive: true });
+
+        // Sanitize filename
+        const sanitizedFilename = sanitizeFilename(
+            file.name.replace(/\.(md|mdx)$/, "")
+        );
+        const svgFilename = `${sanitizedFilename}.svg`;
 
         // Generate SVG
         const svgContent = createSVGPreview(title, type, file.folder, content);
-        const svgPath = path.join(
-            previewDir,
-            file.name.replace(/\.(md|mdx)$/, ".svg")
-        );
+        const svgPath = path.join(previewDir, svgFilename);
 
         await fs.writeFile(svgPath, svgContent);
         console.log(`✅ Generated: ${svgPath}`);

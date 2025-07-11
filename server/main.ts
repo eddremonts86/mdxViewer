@@ -106,14 +106,69 @@ app.delete("/api/files", (req, res) => {
 app.post("/api/files/move", (req, res) => {
     moveFiles(req, res);
 });
-app.get("/api/previews/:filename", (req, res) => {
+// Handle preview paths with support for up to 10 levels of nesting
+// Start with the deepest paths first to ensure proper matching
+app.get(
+    "/api/previews/:l1/:l2/:l3/:l4/:l5/:l6/:l7/:l8/:l9/:l10",
+    (req, res) => {
+        const { l1, l2, l3, l4, l5, l6, l7, l8, l9, l10 } = req.params;
+        (req.params as any).filename =
+            `${l1}/${l2}/${l3}/${l4}/${l5}/${l6}/${l7}/${l8}/${l9}/${l10}`;
+        getPreview(req, res);
+    }
+);
+
+app.get("/api/previews/:l1/:l2/:l3/:l4/:l5/:l6/:l7/:l8/:l9", (req, res) => {
+    const { l1, l2, l3, l4, l5, l6, l7, l8, l9 } = req.params;
+    (req.params as any).filename =
+        `${l1}/${l2}/${l3}/${l4}/${l5}/${l6}/${l7}/${l8}/${l9}`;
     getPreview(req, res);
 });
 
-// Handle nested paths separately
-app.get("/api/previews/:folder/:filename", (req, res) => {
-    const { folder, filename } = req.params;
-    (req.params as any).filename = `${folder}/${filename}`;
+app.get("/api/previews/:l1/:l2/:l3/:l4/:l5/:l6/:l7/:l8", (req, res) => {
+    const { l1, l2, l3, l4, l5, l6, l7, l8 } = req.params;
+    (req.params as any).filename =
+        `${l1}/${l2}/${l3}/${l4}/${l5}/${l6}/${l7}/${l8}`;
+    getPreview(req, res);
+});
+
+app.get("/api/previews/:l1/:l2/:l3/:l4/:l5/:l6/:l7", (req, res) => {
+    const { l1, l2, l3, l4, l5, l6, l7 } = req.params;
+    (req.params as any).filename = `${l1}/${l2}/${l3}/${l4}/${l5}/${l6}/${l7}`;
+    getPreview(req, res);
+});
+
+app.get("/api/previews/:l1/:l2/:l3/:l4/:l5/:l6", (req, res) => {
+    const { l1, l2, l3, l4, l5, l6 } = req.params;
+    (req.params as any).filename = `${l1}/${l2}/${l3}/${l4}/${l5}/${l6}`;
+    getPreview(req, res);
+});
+
+app.get("/api/previews/:l1/:l2/:l3/:l4/:l5", (req, res) => {
+    const { l1, l2, l3, l4, l5 } = req.params;
+    (req.params as any).filename = `${l1}/${l2}/${l3}/${l4}/${l5}`;
+    getPreview(req, res);
+});
+
+app.get("/api/previews/:l1/:l2/:l3/:l4", (req, res) => {
+    const { l1, l2, l3, l4 } = req.params;
+    (req.params as any).filename = `${l1}/${l2}/${l3}/${l4}`;
+    getPreview(req, res);
+});
+
+app.get("/api/previews/:l1/:l2/:l3", (req, res) => {
+    const { l1, l2, l3 } = req.params;
+    (req.params as any).filename = `${l1}/${l2}/${l3}`;
+    getPreview(req, res);
+});
+
+app.get("/api/previews/:l1/:l2", (req, res) => {
+    const { l1, l2 } = req.params;
+    (req.params as any).filename = `${l1}/${l2}`;
+    getPreview(req, res);
+});
+
+app.get("/api/previews/:l1", (req, res) => {
     getPreview(req, res);
 });
 

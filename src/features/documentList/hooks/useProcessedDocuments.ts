@@ -2,14 +2,32 @@ import { useMemo } from "react";
 import type { DocumentCardProps } from "../types";
 
 /**
- * Sanitize filename to be URL-safe
+ * Sanitize filename to be URL-safe and match kebab-case convention
  */
 function sanitizeFilename(filename: string): string {
     return filename
-        .replace(/\s+/g, "_") // Replace spaces with underscores
-        .replace(/[^a-zA-Z0-9._-]/g, "") // Remove special characters except dots, underscores, and hyphens
-        .replace(/_+/g, "_") // Replace multiple underscores with single
-        .replace(/(^_+)|(_+$)/g, ""); // Remove leading/trailing underscores
+        .toLowerCase() // Convert to lowercase for kebab-case
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/[^a-z0-9._-]/g, "") // Remove special characters except dots, hyphens, and underscores
+        .replace(/_+/g, "-") // Replace underscores with hyphens
+        .replace(/-+/g, "-") // Replace multiple hyphens with single
+        .replace(/^-+/, "")
+        .replace(/-+$/, ""); // Remove leading/trailing hyphens
+}
+
+/**
+ * Sanitize folder path to be URL-safe and match kebab-case convention
+ */
+function sanitizeFolderPath(folderPath: string): string {
+    return folderPath
+        .toLowerCase() // Convert to lowercase for kebab-case
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/[^a-z0-9._/-]/g, "") // Keep forward slashes for paths
+        .replace(/_+/g, "-") // Replace underscores with hyphens
+        .replace(/-+/g, "-") // Replace multiple hyphens with single
+        .replace(/\/+/g, "/") // Replace multiple slashes with single
+        .replace(/^-+/, "")
+        .replace(/-+$/, ""); // Remove leading/trailing hyphens
 }
 
 /**
@@ -17,11 +35,23 @@ function sanitizeFilename(filename: string): string {
  */
 function createPreviewUrl(filePath: string): string {
     const pathParts = filePath.split("/");
-    const sanitizedParts = pathParts.map((part: string) =>
-        sanitizeFilename(part)
-    );
-    const sanitizedPath = sanitizedParts.join("/");
-    return `/api/previews/${sanitizedPath.replace(/\.(md|mdx)$/, ".png")}`;
+
+    // Separate folder path from filename
+    const folderParts = pathParts.slice(0, -1);
+    const filename = pathParts[pathParts.length - 1];
+
+    // Sanitize folder path (concatenated, lowercase)
+    const sanitizedFolderPath = sanitizeFolderPath(folderParts.join("/"));
+
+    // Sanitize filename (uppercase with underscores)
+    const sanitizedFilename = sanitizeFilename(filename);
+
+    // Build final path
+    const finalPath = sanitizedFolderPath
+        ? `${sanitizedFolderPath}/${sanitizedFilename}`
+        : sanitizedFilename;
+
+    return `/api/previews/${finalPath.replace(/\.(md|mdx)$/i, ".png")}`;
 }
 
 export function useProcessedDocuments(files: any[]) {
