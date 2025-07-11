@@ -110,6 +110,13 @@ app.get("/api/previews/:filename", (req, res) => {
     getPreview(req, res);
 });
 
+// Handle nested paths separately
+app.get("/api/previews/:folder/:filename", (req, res) => {
+    const { folder, filename } = req.params;
+    (req.params as any).filename = `${folder}/${filename}`;
+    getPreview(req, res);
+});
+
 // Start server
 app.listen(SERVER_CONFIG.PORT, () => {
     console.log(

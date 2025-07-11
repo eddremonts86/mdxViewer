@@ -10,6 +10,17 @@ import { SERVER_CONFIG } from "../constants/index.js";
 import { ApiResponse } from "../types/index.js";
 
 /**
+ * Sanitize filename to be URL-safe
+ */
+function sanitizeFilename(filename: string): string {
+    return filename
+        .replace(/\s+/g, "_") // Replace spaces with underscores
+        .replace(/[^a-zA-Z0-9._-]/g, "") // Remove special characters except dots, underscores, and hyphens
+        .replace(/_+/g, "_") // Replace multiple underscores with single
+        .replace(/(^_+)|(_+$)/g, ""); // Remove leading/trailing underscores
+}
+
+/**
  * Serve preview images - generate if not exists
  * GET /api/previews/:filename
  */
@@ -65,7 +76,37 @@ export const getPreview = async (req: Request, res: Response) => {
             return res.send(stream);
         } catch {
             // PNG doesn't exist, try SVG preview
-            const svgPreviewPath = previewPath.replace(/\.png$/, ".svg");
+            // For SVG, we need to remove both .md/.mdx and .png extensions
+            // and sanitize the filename to match our safe naming convention
+            let svgFilename = actualFilename;
+
+            // Remove the .png extension first
+            if (svgFilename.endsWith(".md.png")) {
+                svgFilename = svgFilename.replace(/\.md\.png$/, ".md");
+            } else if (svgFilename.endsWith(".mdx.png")) {
+                svgFilename = svgFilename.replace(/\.mdx\.png$/, ".mdx");
+            } else {
+                svgFilename = svgFilename.replace(/\.png$/, "");
+            }
+
+            // Sanitize the filename to match our safe naming convention
+            const sanitizedFilename = sanitizeFilename(svgFilename);
+            const finalSvgName = sanitizedFilename.replace(
+                /\.(md|mdx)$/,
+                ".svg"
+            );
+
+            // Also sanitize the source base path
+            const sanitizedBasePath = sourceBasePath
+                ? sanitizeFilename(sourceBasePath)
+                : "";
+
+            const svgPreviewPath = path.join(
+                path.dirname(SERVER_CONFIG.CONTENT_PATH),
+                "previews",
+                sanitizedBasePath,
+                finalSvgName
+            );
 
             try {
                 await fs.access(svgPreviewPath);
