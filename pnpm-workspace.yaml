@@ -1,0 +1,5 @@
+ignoredBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - canvas
+  - core-js
+  - esbuild
