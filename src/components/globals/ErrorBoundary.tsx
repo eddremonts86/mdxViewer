@@ -1,3 +1,8 @@
+import type { ErrorInfo, ReactNode } from "react";
+import { Component } from "react";
+
+import { AlertTriangle, Home, RefreshCw } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -6,9 +11,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { AlertTriangle, Home, RefreshCw } from "lucide-react";
-import type { ErrorInfo, ReactNode } from "react";
-import { Component } from "react";
 
 interface ErrorBoundaryProps {
     children: ReactNode;
@@ -118,35 +120,35 @@ export class ErrorBoundary extends Component<
                             {(this.props.showDetails ||
                                 process.env.NODE_ENV === "development") &&
                                 this.state.error && (
-                                    <details className="mt-6">
-                                        <summary className="text-muted-foreground hover:text-foreground cursor-pointer text-sm font-medium">
+                                <details className="mt-6">
+                                    <summary className="text-muted-foreground hover:text-foreground cursor-pointer text-sm font-medium">
                                             View error details (for developers)
-                                        </summary>
-                                        <div className="mt-4 space-y-4">
+                                    </summary>
+                                    <div className="mt-4 space-y-4">
+                                        <div>
+                                            <h4 className="mb-2 text-sm font-medium">
+                                                    Error:
+                                            </h4>
+                                            <pre className="bg-muted overflow-auto rounded p-3 text-xs">
+                                                {this.state.error.toString()}
+                                            </pre>
+                                        </div>
+                                        {this.state.errorInfo && (
                                             <div>
                                                 <h4 className="mb-2 text-sm font-medium">
-                                                    Error:
+                                                        Stack Trace:
                                                 </h4>
                                                 <pre className="bg-muted overflow-auto rounded p-3 text-xs">
-                                                    {this.state.error.toString()}
+                                                    {
+                                                        this.state.errorInfo
+                                                            .componentStack
+                                                    }
                                                 </pre>
                                             </div>
-                                            {this.state.errorInfo && (
-                                                <div>
-                                                    <h4 className="mb-2 text-sm font-medium">
-                                                        Stack Trace:
-                                                    </h4>
-                                                    <pre className="bg-muted overflow-auto rounded p-3 text-xs">
-                                                        {
-                                                            this.state.errorInfo
-                                                                .componentStack
-                                                        }
-                                                    </pre>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </details>
-                                )}
+                                        )}
+                                    </div>
+                                </details>
+                            )}
 
                             {/* Help Text */}
                             <div className="text-muted-foreground text-center text-sm">

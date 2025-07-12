@@ -18,7 +18,7 @@ try {
     generatePreviewImage = previewGen.generatePreviewImage;
 } catch (error) {
     console.warn(
-        "Canvas-based preview generator not available, using fallback"
+        "Canvas-based preview generator not available, using fallback",
     );
     generatePreviewImage = null;
 }
@@ -53,10 +53,10 @@ async function getMarkdownFiles(dir, basePath = "") {
             files.push({
                 name: entry.name,
                 path: fullPath,
-                relativePath: relativePath,
+                relativePath,
                 previewPath: path.join(
                     PREVIEWS_DIR,
-                    relativePath.replace(/\.(md|mdx)$/, ".png")
+                    relativePath.replace(/\.(md|mdx)$/, ".png"),
                 ),
             });
         }
@@ -68,7 +68,7 @@ async function getMarkdownFiles(dir, basePath = "") {
 // Create SVG preview as fallback
 function createSVGPreview(title, type, folder, content) {
     const truncatedContent =
-        content.length > 200 ? content.substring(0, 200) + "..." : content;
+        content.length > 200 ? `${content.substring(0, 200)  }...` : content;
     const lines = truncatedContent.split("\n").slice(0, 6);
 
     const svgContent = `<svg width="400" height="240" xmlns="http://www.w3.org/2000/svg">
@@ -79,11 +79,11 @@ function createSVGPreview(title, type, folder, content) {
         <text x="20" y="100" font-family="Arial, sans-serif" font-size="14" fill="#666666">📁 ${folder}</text>
         <text x="20" y="120" font-family="Arial, sans-serif" font-size="14" fill="#666666">Type: ${type === "mdx" ? "MDX Interactive" : "Markdown"}</text>
         ${lines
-            .map(
-                (line, i) =>
-                    `<text x="20" y="${140 + i * 16}" font-family="Arial, sans-serif" font-size="12" fill="#333333">${line.trim().substring(0, 50)}</text>`
-            )
-            .join("")}
+        .map(
+            (line, i) =>
+                `<text x="20" y="${140 + i * 16}" font-family="Arial, sans-serif" font-size="12" fill="#333333">${line.trim().substring(0, 50)}</text>`,
+        )
+        .join("")}
     </svg>`;
 
     return svgContent;
@@ -114,21 +114,21 @@ async function generatePreview(file) {
                     content,
                     title,
                     type,
-                    folder
+                    folder,
                 );
                 await fs.writeFile(file.previewPath, buffer);
                 console.log(`✓ Generated PNG: ${file.previewPath}`);
             } catch (canvasError) {
                 console.warn(
                     `Canvas failed for ${file.relativePath}, using SVG fallback:`,
-                    canvasError.message
+                    canvasError.message,
                 );
                 // Fallback to SVG
                 const svgContent = createSVGPreview(
                     title,
                     type,
                     folder,
-                    content
+                    content,
                 );
                 const svgPath = file.previewPath.replace(/\.png$/, ".svg");
                 await fs.writeFile(svgPath, svgContent);
@@ -144,7 +144,7 @@ async function generatePreview(file) {
     } catch (error) {
         console.error(
             `✗ Failed to generate preview for ${file.relativePath}:`,
-            error.message
+            error.message,
         );
     }
 }
@@ -172,7 +172,7 @@ async function main() {
         }
 
         console.log(
-            `✅ Preview generation complete! Generated ${files.length} previews`
+            `✅ Preview generation complete! Generated ${files.length} previews`,
         );
     } catch (error) {
         console.error("❌ Preview generation failed:", error);

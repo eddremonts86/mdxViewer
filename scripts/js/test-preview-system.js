@@ -38,7 +38,7 @@ async function testPreviewSystem() {
                 allFiles.push({
                     name: entry.name,
                     path: fullPath,
-                    relativePath: relativePath,
+                    relativePath,
                     folder: basePath || "root",
                 });
             }
@@ -61,35 +61,35 @@ async function testPreviewSystem() {
             await fs.access(previewPath);
             previewsFound++;
             console.log(
-                `✅ ${file.relativePath} -> ${file.folder}/${previewName}`
+                `✅ ${file.relativePath} -> ${file.folder}/${previewName}`,
             );
         } catch {
             previewsMissing++;
             console.log(
-                `❌ ${file.relativePath} -> MISSING ${file.folder}/${previewName}`
+                `❌ ${file.relativePath} -> MISSING ${file.folder}/${previewName}`,
             );
         }
     }
 
-    console.log(`\n📊 Summary:`);
+    console.log("\n📊 Summary:");
     console.log(`   📄 Total markdown files: ${allFiles.length}`);
     console.log(`   ✅ Previews found: ${previewsFound}`);
     console.log(`   ❌ Previews missing: ${previewsMissing}`);
 
     if (previewsMissing === 0) {
         console.log(
-            `\n🎉 All previews are available! The system is working correctly.`
+            "\n🎉 All previews are available! The system is working correctly.",
         );
 
         // Test URL generation
-        console.log(`\n🔗 Sample preview URLs:`);
+        console.log("\n🔗 Sample preview URLs:");
         allFiles.slice(0, 5).forEach(file => {
             const previewUrl = `/api/previews/${file.relativePath.replace(/\.(md|mdx)$/, ".png")}`;
             console.log(`   ${file.relativePath} -> ${previewUrl}`);
         });
     } else {
         console.log(
-            `\n⚠️  Some previews are missing. Run 'npm run generate:all-previews' to fix this.`
+            "\n⚠️  Some previews are missing. Run 'npm run generate:all-previews' to fix this.",
         );
     }
 }

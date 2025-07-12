@@ -1,7 +1,7 @@
 import { RouterProvider } from "react-router-dom";
 
 import { ErrorBoundary } from "@/components/globals/ErrorBoundary";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import { router } from "@/router";
 
 import "./assets/styles/App.css";

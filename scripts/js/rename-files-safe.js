@@ -42,7 +42,7 @@ async function getAllFiles(dir, basePath = "") {
                     type: "directory",
                     name: entry.name,
                     path: fullPath,
-                    relativePath: relativePath,
+                    relativePath,
                     parent: dir,
                 });
 
@@ -54,7 +54,7 @@ async function getAllFiles(dir, basePath = "") {
                     type: "file",
                     name: entry.name,
                     path: fullPath,
-                    relativePath: relativePath,
+                    relativePath,
                     parent: dir,
                 });
             }
@@ -82,7 +82,7 @@ async function renameItem(item) {
         try {
             await fs.access(newPath);
             console.log(
-                `⚠️  Target already exists, skipping: ${item.name} -> ${sanitizedName}`
+                `⚠️  Target already exists, skipping: ${item.name} -> ${sanitizedName}`,
             );
             return {
                 renamed: false,
@@ -154,7 +154,7 @@ async function processDirectory(dirPath, dirName) {
 async function main() {
     console.log("🚀 Starting file rename process...");
     console.log(
-        "This will rename files to use URL-safe names (spaces -> underscores)"
+        "This will rename files to use URL-safe names (spaces -> underscores)",
     );
 
     let totalProcessed = 0;
@@ -173,16 +173,16 @@ async function main() {
     totalRenamed += previewResults.renamed;
     totalErrors += previewResults.errors;
 
-    console.log(`\n🎉 File rename complete!`);
+    console.log("\n🎉 File rename complete!");
     console.log(`📄 Total items processed: ${totalProcessed}`);
     console.log(`✅ Successfully renamed: ${totalRenamed}`);
     console.log(`❌ Errors: ${totalErrors}`);
 
     if (totalRenamed > 0) {
-        console.log(`\n⚠️  Important: After renaming files, you should:`);
-        console.log(`1. Regenerate previews: npm run generate:previews`);
-        console.log(`2. Update any hardcoded file references in your code`);
-        console.log(`3. Check that the frontend still works correctly`);
+        console.log("\n⚠️  Important: After renaming files, you should:");
+        console.log("1. Regenerate previews: npm run generate:previews");
+        console.log("2. Update any hardcoded file references in your code");
+        console.log("3. Check that the frontend still works correctly");
     }
 }
 

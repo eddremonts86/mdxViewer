@@ -1,9 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
 import App from "./App";
 
 // Import fonts
@@ -15,9 +12,11 @@ import "@fontsource/jetbrains-mono/400.css";
 import "@fontsource/jetbrains-mono/500.css";
 import "@fontsource/jetbrains-mono/600.css";
 import "./assets/styles/index.css";
-
 // Import View Transitions CSS
 import "./assets/styles/view-transitions.css";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -35,5 +34,5 @@ createRoot(document.getElementById("root")!).render(
             <App />
             <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
-    </StrictMode>
+    </StrictMode>,
 );

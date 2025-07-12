@@ -21,7 +21,7 @@ function toKebabCase(str) {
 
 function normalizeFilename(filename) {
     // Remove double extensions like .md.md or .mdx.mdx
-    let normalized = filename.replace(/\.(md|mdx)\.(md|mdx)$/, ".$1");
+    const normalized = filename.replace(/\.(md|mdx)\.(md|mdx)$/, ".$1");
 
     // Get file extension
     const ext = path.extname(normalized);
@@ -52,14 +52,14 @@ function walkDirectory(dir) {
                 // Check if target file already exists
                 if (fs.existsSync(newPath)) {
                     console.log(
-                        `  WARNING: Target file already exists, skipping: ${newPath}`
+                        `  WARNING: Target file already exists, skipping: ${newPath}`,
                     );
                     continue;
                 }
 
                 try {
                     fs.renameSync(fullPath, newPath);
-                    console.log(`  ✓ Success`);
+                    console.log("  ✓ Success");
                 } catch (error) {
                     console.log(`  ✗ Error: ${error.message}`);
                 }

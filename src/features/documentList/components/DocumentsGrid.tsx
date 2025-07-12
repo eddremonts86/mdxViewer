@@ -1,5 +1,7 @@
-import { Badge } from "@/components/ui/badge";
 import { BookOpen } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+
 import type { DocumentsByFolder } from "../types";
 import { DocumentCard } from "./DocumentCard";
 

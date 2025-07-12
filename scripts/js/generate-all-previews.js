@@ -59,7 +59,7 @@ async function getAllMarkdownFiles(dir, basePath = "") {
             if (entry.isDirectory()) {
                 const subFiles = await getAllMarkdownFiles(
                     fullPath,
-                    relativePath
+                    relativePath,
                 );
                 files.push(...subFiles);
             } else if (
@@ -69,7 +69,7 @@ async function getAllMarkdownFiles(dir, basePath = "") {
                 files.push({
                     name: entry.name,
                     path: fullPath,
-                    relativePath: relativePath,
+                    relativePath,
                     folder: basePath || "root",
                 });
             }
@@ -104,7 +104,7 @@ function createSVGPreview(title, type, folder, content) {
             line
                 .trim()
                 .substring(0, 50)
-                .replace(/[<>&"']/g, "")
+                .replace(/[<>&"']/g, ""),
         );
 
     const badgeColor = type === "mdx" ? "#10b981" : "#3b82f6";
@@ -125,11 +125,11 @@ function createSVGPreview(title, type, folder, content) {
         <text x="20" y="95" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">📁 ${folder}</text>
         <text x="20" y="115" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Type: ${type === "mdx" ? "MDX Interactive" : "Markdown Document"}</text>
         ${lines
-            .map(
-                (line, i) =>
-                    `<text x="20" y="${140 + i * 16}" font-family="Arial, sans-serif" font-size="11" fill="#374151">${line}</text>`
-            )
-            .join("")}
+        .map(
+            (line, i) =>
+                `<text x="20" y="${140 + i * 16}" font-family="Arial, sans-serif" font-size="11" fill="#374151">${line}</text>`,
+        )
+        .join("")}
         <rect x="0" y="0" width="400" height="240" fill="none" stroke="#e5e7eb" stroke-width="1"/>
     </svg>`;
 }
@@ -159,7 +159,7 @@ async function generatePreview(file) {
 
         // Sanitize filename
         const sanitizedFilename = sanitizeFilename(
-            file.name.replace(/\.(md|mdx)$/, "")
+            file.name.replace(/\.(md|mdx)$/, ""),
         );
         const svgFilename = `${sanitizedFilename}.svg`;
 
@@ -174,7 +174,7 @@ async function generatePreview(file) {
     } catch (error) {
         console.error(
             `❌ Failed to generate preview for ${file.relativePath}:`,
-            error.message
+            error.message,
         );
         return false;
     }
@@ -211,7 +211,7 @@ async function main() {
         // Generate previews for each folder
         for (const [folder, folderFiles] of Object.entries(filesByFolder)) {
             console.log(
-                `\n📂 Processing folder: ${folder} (${folderFiles.length} files)`
+                `\n📂 Processing folder: ${folder} (${folderFiles.length} files)`,
             );
 
             for (const file of folderFiles) {
@@ -224,7 +224,7 @@ async function main() {
             }
         }
 
-        console.log(`\n🎉 Preview generation complete!`);
+        console.log("\n🎉 Preview generation complete!");
         console.log(`✅ Successfully generated: ${successCount} previews`);
         console.log(`❌ Failed: ${errorCount} previews`);
     } catch (error) {

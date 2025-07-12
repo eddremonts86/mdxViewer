@@ -62,7 +62,7 @@ class FileAPI {
      * Get file content
      */
     static async getFileContent(
-        filePath: string
+        filePath: string,
     ): Promise<{ path: string; content: string }> {
         // Convert path to kebab-case to match the file system structure
         const kebabCasePath = filePath
@@ -77,13 +77,13 @@ class FileAPI {
 
         const response = await fetch(
             `${API_BASE_URL}/api/files/content?path=${encodeURIComponent(
-                kebabCasePath
-            )}`
+                kebabCasePath,
+            )}`,
         );
 
         if (!response.ok) {
             throw new Error(
-                `Failed to fetch file content: ${response.statusText}`
+                `Failed to fetch file content: ${response.statusText}`,
             );
         }
 
@@ -101,7 +101,7 @@ class FileAPI {
      * Create a new file
      */
     static async createFile(
-        params: CreateFileRequest
+        params: CreateFileRequest,
     ): Promise<{ path: string; name: string }> {
         const response = await fetch(`${API_BASE_URL}/api/files/create`, {
             method: "POST",
@@ -115,7 +115,7 @@ class FileAPI {
             const errorResult: ApiResponse = await response.json();
             throw new Error(
                 errorResult.error ||
-                    `Failed to create file: ${response.statusText}`
+                    `Failed to create file: ${response.statusText}`,
             );
         }
 
@@ -133,7 +133,7 @@ class FileAPI {
      * Create a new folder
      */
     static async createFolder(
-        params: CreateFolderRequest
+        params: CreateFolderRequest,
     ): Promise<{ path: string; name: string }> {
         const response = await fetch(`${API_BASE_URL}/api/folders/create`, {
             method: "POST",
@@ -147,7 +147,7 @@ class FileAPI {
             const errorResult: ApiResponse = await response.json();
             throw new Error(
                 errorResult.error ||
-                    `Failed to create folder: ${response.statusText}`
+                    `Failed to create folder: ${response.statusText}`,
             );
         }
 
@@ -165,7 +165,7 @@ class FileAPI {
      * Delete files/folders
      */
     static async deleteItems(
-        paths: string[]
+        paths: string[],
     ): Promise<{ deleted: Array<{ path: string; type: "file" | "folder" }> }> {
         const response = await fetch(`${API_BASE_URL}/api/files`, {
             method: "DELETE",
@@ -179,7 +179,7 @@ class FileAPI {
             const errorResult: ApiResponse = await response.json();
             throw new Error(
                 errorResult.error ||
-                    `Failed to delete items: ${response.statusText}`
+                    `Failed to delete items: ${response.statusText}`,
             );
         }
 
@@ -199,8 +199,8 @@ class FileAPI {
      */
     static async uploadFiles(
         files: File[],
-        targetPath: string = "",
-        createFolders: boolean = true
+        targetPath = "",
+        createFolders = true,
     ): Promise<any> {
         const formData = new FormData();
 
@@ -220,7 +220,7 @@ class FileAPI {
             const errorResult: ApiResponse = await response.json();
             throw new Error(
                 errorResult.error ||
-                    `Failed to upload files: ${response.statusText}`
+                    `Failed to upload files: ${response.statusText}`,
             );
         }
 
@@ -252,7 +252,7 @@ class FileAPI {
             const errorResult: ApiResponse = await response.json();
             throw new Error(
                 errorResult.error ||
-                    `Failed to move item: ${response.statusText}`
+                    `Failed to move item: ${response.statusText}`,
             );
         }
 

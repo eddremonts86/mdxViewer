@@ -1,15 +1,6 @@
+import { TIME_INTERVALS } from "@/const/constants";
 import type { Document, FileNode } from "@/types";
-
-// Define proper metadata type instead of using 'any'
-interface FileMetadata {
-    title?: string;
-    description?: string;
-    author?: string;
-    date?: string;
-    tags?: string[];
-    category?: string;
-    [key: string]: string | string[] | number | boolean | undefined;
-}
+import { logError, logOperation, logSuccess } from "@/utils/logger";
 
 /**
  * API for managing dynamic file system
@@ -33,13 +24,15 @@ export class FileSystemAPI {
             );
             this.contentFiles = module.CONTENT_FILES ?? [];
             this.lastModified = timestamp;
-            console.log(
-                `📋 Índice actualizado: ${this.contentFiles.length} archivos`
-            );
+            // Index updated successfully
             return this.contentFiles;
         } catch (error) {
-            console.error("Error cargando índice de contenido:", error);
-            return this.contentFiles; // Devolver caché si falla
+            // Log error and return cached files
+            logError(
+                "Failed to load content index",
+                error instanceof Error ? error : new Error(String(error)),
+            );
+            return this.contentFiles;
         }
     }
 
@@ -49,7 +42,10 @@ export class FileSystemAPI {
     private static async getContentFiles(): Promise<string[]> {
         // Si no hay archivos cargados o han pasado más de 5 segundos, recargar
         const now = Date.now();
-        if (this.contentFiles.length === 0 || now - this.lastModified > 5000) {
+        if (
+            this.contentFiles.length === 0 ||
+            now - this.lastModified > TIME_INTERVALS.STATISTICS_REFRESH
+        ) {
             await this.loadContentIndex();
         }
         return this.contentFiles;
@@ -59,19 +55,19 @@ export class FileSystemAPI {
      * Obtiene la estructura de archivos dinámicamente
      */
     static async getFileStructure(): Promise<FileNode[]> {
-        console.log("🔍 FileSystemAPI: Loading file structure...");
         try {
+            logOperation("FileSystemAPI: Loading file structure");
             const knownPaths = await this.getContentFiles();
-            console.log("📋 Known paths:", knownPaths);
+            logOperation("Known paths loaded", { count: knownPaths.length });
             const existingFiles = await this.discoverFiles();
-            console.log("📁 FileSystemAPI: Found files:", existingFiles);
+            logOperation("Files discovered", { count: existingFiles.length });
             const structure = this.buildFileTree(existingFiles);
-            console.log("🌳 FileSystemAPI: Built tree:", structure);
+            logSuccess("File tree built", { nodes: structure.length });
             return structure;
         } catch (error) {
-            console.error(
-                "❌ FileSystemAPI: Error loading file structure:",
-                error
+            logError(
+                "FileSystemAPI: Error loading file structure",
+                error instanceof Error ? error : new Error(String(error)),
             );
             return [];
         }
@@ -81,27 +77,30 @@ export class FileSystemAPI {
      * Descubre qué archivos existen realmente probando cada uno
      */
     private static async discoverFiles(): Promise<string[]> {
-        const existingFiles: string[] = [];
         const knownPaths = await this.getContentFiles();
+        const existingFiles: string[] = [];
 
-        // Probar archivos conocidos
         for (const filePath of knownPaths) {
+            const fullUrl = `${this.baseUrl}/${filePath}`;
             try {
-                const response = await fetch(`${this.baseUrl}/${filePath}`, {
-                    method: "HEAD",
-                });
+                const response = await fetch(fullUrl, { method: "HEAD" });
                 if (response.ok) {
+                    logOperation(`Found file: ${filePath}`);
                     existingFiles.push(filePath);
-                    console.log(`✓ Found file: ${filePath}`);
                 } else {
-                    console.log(`✗ Missing file: ${filePath}`);
+                    logOperation(`Missing file: ${filePath}`);
                 }
             } catch (error) {
-                console.log(`✗ Error checking file ${filePath}:`, error);
+                logError(
+                    `Error checking file ${filePath}`,
+                    error instanceof Error ? error : new Error(String(error)),
+                );
             }
         }
 
-        console.log(`Total files discovered: ${existingFiles.length}`);
+        logOperation("File discovery completed", {
+            total: existingFiles.length,
+        });
         return existingFiles;
     }
 
@@ -110,45 +109,65 @@ export class FileSystemAPI {
      */
     private static buildFileTree(filePaths: string[]): FileNode[] {
         const folderMap = new Map<string, FileNode>();
-        const rootFolders: FileNode[] = [];
+        const rootNodes: FileNode[] = [];
 
-        filePaths.forEach(filePath => {
+        for (const filePath of filePaths) {
             const parts = filePath.split("/");
-            const fileName = parts.pop()!;
-            const folderName = parts[0];
-            const extension = fileName.split(".").pop() as "md" | "mdx";
+            const [folderName] = parts;
+            let currentPath = "";
 
-            // Create or find folder
+            // Crear o encontrar el nodo raíz
             if (!folderMap.has(folderName)) {
-                const folder: FileNode = {
+                const folderNode: FileNode = {
                     name: folderName,
-                    path: `/${folderName}`,
                     type: "folder",
+                    path: folderName,
                     children: [],
                 };
-                folderMap.set(folderName, folder);
-                rootFolders.push(folder);
+                folderMap.set(folderName, folderNode);
+                rootNodes.push(folderNode);
             }
 
-            // Agregar archivo a la carpeta
-            const folder = folderMap.get(folderName)!;
-            folder.children!.push({
-                name: fileName,
-                path: `/${filePath.replace(/\.(md|mdx)$/, "")}`,
-                type: "file",
-                extension,
-            });
-        });
+            const rootFolder = folderMap.get(folderName)!;
+            let currentNode = rootFolder;
 
-        // Sort everything alphabetically
-        rootFolders.forEach(folder => {
-            if (folder.children) {
-                folder.children.sort((a, b) => a.name.localeCompare(b.name));
+            // Crear estructura anidada
+            for (let i = 1; i < parts.length; i++) {
+                currentPath = parts.slice(0, i + 1).join("/");
+                const part = parts[i];
+
+                if (i === parts.length - 1) {
+                    // Es un archivo
+                    const fileNode: FileNode = {
+                        name: part,
+                        type: "file",
+                        path: currentPath,
+                    };
+                    currentNode.children = currentNode.children ?? [];
+                    currentNode.children.push(fileNode);
+                } else {
+                    // Es una carpeta intermedia
+                    let subFolder = currentNode.children?.find(
+                        child => child.name === part && child.type === "folder",
+                    );
+
+                    if (!subFolder) {
+                        subFolder = {
+                            name: part,
+                            type: "folder",
+                            path: currentPath,
+                            children: [],
+                        };
+                        currentNode.children = currentNode.children ?? [];
+                        currentNode.children.push(subFolder);
+                    }
+
+                    currentNode = subFolder;
+                }
             }
-        });
-        rootFolders.sort((a, b) => a.name.localeCompare(b.name));
+        }
 
-        return rootFolders;
+        return rootNodes;
     }
 
     /**
@@ -156,221 +175,203 @@ export class FileSystemAPI {
      */
     static async getFileContent(path: string): Promise<Document | null> {
         try {
-            // Convertir path a filepath
-            const filePath = await this.pathToFilePath(path);
-            if (!filePath) return null;
+            const fullUrl = `${this.baseUrl}/${path}`;
+            const response = await fetch(fullUrl);
 
-            const response = await fetch(`${this.baseUrl}/${filePath}`);
             if (!response.ok) {
-                throw new Error(`File not found: ${filePath}`);
+                throw new Error(
+                    `HTTP ${response.status}: ${response.statusText}`,
+                );
             }
 
             const content = await response.text();
-            const { frontmatter, body } = this.parseFrontmatter(content);
-            const fileType = filePath.endsWith(".mdx") ? "mdx" : "md";
+
+            // Extraer título del contenido
+            const title = this.extractTitleFromContent(content) ?? path;
 
             return {
-                title:
-                    frontmatter.title ??
-                    this.extractTitleFromContent(body) ??
-                    path.split("/").pop() ??
-                    "Untitled",
-                content: body,
-                type: fileType,
+                title,
+                content,
                 path,
-                frontmatter,
+                type: path.endsWith(".mdx") ? "mdx" : "md",
             };
         } catch (error) {
-            console.error(`Error loading file ${path}:`, error);
+            logError(
+                `Error reading file: ${path}`,
+                error instanceof Error ? error : new Error(String(error)),
+            );
             return null;
         }
-    }
-
-    /**
-     * Convierte un path de ruta a filepath
-     */
-    private static async pathToFilePath(path: string): Promise<string | null> {
-        // Remover leading slash
-        const cleanPath = path.startsWith("/") ? path.slice(1) : path;
-
-        // Buscar en archivos conocidos
-        const knownPaths = await this.getContentFiles();
-        for (const filePath of knownPaths) {
-            const pathWithoutExtension = filePath.replace(/\.(md|mdx)$/, "");
-            if (pathWithoutExtension === cleanPath) {
-                return filePath;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Parse frontmatter de un archivo markdown/mdx
-     */
-    private static parseFrontmatter(content: string): {
-        frontmatter: Record<string, string>;
-        body: string;
-    } {
-        const frontmatterRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
-        const match = content.match(frontmatterRegex);
-
-        if (!match) {
-            return { frontmatter: {}, body: content };
-        }
-
-        const frontmatterText = match[1];
-        const body = match[2];
-        const frontmatter: Record<string, string> = {};
-
-        // Parse YAML simple
-        frontmatterText.split("\n").forEach(line => {
-            const colonIndex = line.indexOf(":");
-            if (colonIndex > 0) {
-                const key = line.slice(0, colonIndex).trim();
-                const value = line
-                    .slice(colonIndex + 1)
-                    .trim()
-                    .replace(/^["']|["']$/g, "");
-                frontmatter[key] = value;
-            }
-        });
-
-        return { frontmatter, body };
     }
 
     /**
      * Extrae el título del contenido markdown
      */
     private static extractTitleFromContent(content: string): string | null {
-        const titleMatch = content.match(/^#\s+(.+)$/m);
-        return titleMatch ? titleMatch[1].trim() : null;
+        const titleRegex = /^#\s+(.+)$/m;
+        const titleResult = titleRegex.exec(content);
+        return titleResult ? titleResult[1] : null;
     }
 
     /**
      * Extrae índice de contenido del markdown
      */
     static extractTableOfContents(
-        content: string
+        content: string,
     ): Array<{ level: number; title: string; id: string }> {
+        const headings: Array<{ level: number; title: string; id: string }> =
+            [];
         const headingRegex = /^(#{1,6})\s+(.+)$/gm;
-        const toc: Array<{ level: number; title: string; id: string }> = [];
         let match;
 
         while ((match = headingRegex.exec(content)) !== null) {
-            const level = match[1].length;
-            const title = match[2].trim();
+            const [, hashes, title] = match;
+            const level = hashes.length;
             const id = title
                 .toLowerCase()
                 .replace(/[^\w\s-]/g, "")
-                .replace(/\s+/g, "-")
-                .replace(/-+/g, "-")
-                .trim();
+                .replace(/\s+/g, "-");
 
-            toc.push({ level, title, id });
+            headings.push({ level, title, id });
         }
 
-        return toc;
+        return headings;
     }
 
     /**
      * Create a new file using the file manager
      */
     static async createFile(params: {
-        path: string;
         name: string;
+        type: string;
+        path: string;
         content?: string;
-        type: "md" | "mdx";
-        metadata?: FileMetadata;
-    }): Promise<{ success: boolean; error?: string }> {
+    }) {
         try {
-            // This would normally make an API call to the server
-            // For now, we'll return success and let the file watcher handle the update
-            console.log("📝 Creating file:", params);
+            logOperation("Creating file", params);
+            const response = await fetch("/api/files/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(params),
+            });
 
-            // In a real implementation, this would call the backend API
-            // const result = await FileManagerAPI.createFile(params);
+            if (!response.ok) {
+                throw new Error(
+                    `HTTP ${response.status}: ${response.statusText}`,
+                );
+            }
 
-            return { success: true };
+            const result = await response.json();
+            logSuccess("File created successfully", { name: params.name });
+            return result;
         } catch (error) {
-            console.error("Error creating file:", error);
-            return {
-                success: false,
-                error: error instanceof Error ? error.message : "Unknown error",
-            };
+            logError(
+                "Failed to create file",
+                error instanceof Error ? error : new Error(String(error)),
+                params,
+            );
+            throw error;
         }
     }
 
     /**
      * Create a new folder using the file manager
      */
-    static async createFolder(params: {
-        path: string;
-        name: string;
-    }): Promise<{ success: boolean; error?: string }> {
+    static async createFolder(params: { name: string; path: string }) {
         try {
-            console.log("📁 Creating folder:", params);
+            logOperation("Creating folder", params);
+            const response = await fetch("/api/folders/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(params),
+            });
 
-            // In a real implementation, this would call the backend API
-            // const result = await FileManagerAPI.createFolder(params);
+            if (!response.ok) {
+                throw new Error(
+                    `HTTP ${response.status}: ${response.statusText}`,
+                );
+            }
 
-            return { success: true };
+            const result = await response.json();
+            logSuccess("Folder created successfully", { name: params.name });
+            return result;
         } catch (error) {
-            console.error("Error creating folder:", error);
-            return {
-                success: false,
-                error: error instanceof Error ? error.message : "Unknown error",
-            };
+            logError(
+                "Failed to create folder",
+                error instanceof Error ? error : new Error(String(error)),
+                params,
+            );
+            throw error;
         }
     }
 
     /**
-     * Delete an item (file or folder)
+     * Delete a file or folder using the file manager
      */
-    static async deleteItem(params: {
-        path: string;
-        isFolder: boolean;
-    }): Promise<{ success: boolean; error?: string }> {
+    static async deleteItem(params: { path: string }) {
         try {
-            console.log("🗑️ Deleting item:", params);
+            logOperation("Deleting item", params);
+            const response = await fetch("/api/files", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ paths: [params.path] }),
+            });
 
-            // In a real implementation, this would call the backend API
-            // const result = await FileManagerAPI.deleteItem(params);
+            if (!response.ok) {
+                throw new Error(
+                    `HTTP ${response.status}: ${response.statusText}`,
+                );
+            }
 
-            return { success: true };
+            const result = await response.json();
+            logSuccess("Item deleted successfully", { path: params.path });
+            return result;
         } catch (error) {
-            console.error("Error deleting item:", error);
-            return {
-                success: false,
-                error: error instanceof Error ? error.message : "Unknown error",
-            };
+            logError(
+                "Failed to delete item",
+                error instanceof Error ? error : new Error(String(error)),
+                params,
+            );
+            throw error;
         }
     }
 
     /**
-     * Batch delete multiple items
+     * Delete multiple files/folders using the file manager
      */
-    static async batchDelete(paths: string[]): Promise<{
-        success: boolean;
-        errors?: string[];
-        processed: number;
-    }> {
+    static async batchDelete(paths: string[]) {
         try {
-            console.log("🗑️ Batch deleting items:", paths);
+            logOperation("Batch deleting items", { count: paths.length });
+            const response = await fetch("/api/files", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ paths }),
+            });
 
-            // In a real implementation, this would call the backend API
-            // const result = await FileManagerAPI.batchDelete({ paths });
+            if (!response.ok) {
+                throw new Error(
+                    `HTTP ${response.status}: ${response.statusText}`,
+                );
+            }
 
-            return { success: true, processed: paths.length };
+            const result = await response.json();
+            logSuccess("Batch delete completed", { count: paths.length });
+            return result;
         } catch (error) {
-            console.error("Error batch deleting items:", error);
-            return {
-                success: false,
-                errors: [
-                    error instanceof Error ? error.message : "Unknown error",
-                ],
-                processed: 0,
-            };
+            logError(
+                "Failed to batch delete items",
+                error instanceof Error ? error : new Error(String(error)),
+                { paths },
+            );
+            throw error;
         }
     }
 }

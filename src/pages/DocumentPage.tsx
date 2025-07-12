@@ -1,9 +1,10 @@
+import { useNavigate, useParams } from "react-router-dom";
+
 import { DocumentViewer } from "@/components/globals/DocumentViewer";
-import { NavigationBreadcrumb } from "@/components/NavigationBreadcrumb";
+import { NavigationBreadcrumb } from "@/components/navigation/NavigationBreadcrumb";
 import { useFileContent } from "@/hooks/api/useFiles";
 import type { Document } from "@/types";
 import { transitionToRoute } from "@/utils/viewTransitions";
-import { useNavigate, useParams } from "react-router-dom";
 
 // Type for breadcrumb items
 type BreadcrumbItemType = "folder" | "file" | "root";
@@ -141,7 +142,7 @@ export function DocumentPage() {
     }
 
     // Extract content from the file data
-    const content = fileData.content;
+    const { content } = fileData;
 
     // Create document object from file content
     const document: Document = {
@@ -151,7 +152,7 @@ export function DocumentPage() {
                 .pop()
                 ?.replace(/\.(md|mdx)$/, "") ?? "Untitled",
         path: filePath ?? "",
-        content: content,
+        content,
         type: filePath?.endsWith(".mdx") ? "mdx" : "md",
     };
 

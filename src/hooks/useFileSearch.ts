@@ -1,5 +1,6 @@
-import type { FileNode } from "@/types";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
+import type { FileNode } from "@/types";
 
 // Utility function to count matching files in the tree
 const countMatchingFiles = (nodes: FileNode[], searchTerm: string): number => {
@@ -54,14 +55,16 @@ export const useFileSearch = (fileStructure: FileNode[]) => {
     const [isTyping, setIsTyping] = useState<boolean>(false);
 
     // Filter file structure based on search term
-    const filteredFileStructure = useMemo(() => {
-        return filterFileTree(fileStructure, searchTerm);
-    }, [fileStructure, searchTerm]);
+    const filteredFileStructure = useMemo(
+        () => filterFileTree(fileStructure, searchTerm),
+        [fileStructure, searchTerm],
+    );
 
     // Count matching files
-    const matchingFilesCount = useMemo(() => {
-        return countMatchingFiles(fileStructure, searchTerm);
-    }, [fileStructure, searchTerm]);
+    const matchingFilesCount = useMemo(
+        () => countMatchingFiles(fileStructure, searchTerm),
+        [fileStructure, searchTerm],
+    );
 
     // Handle typing indicator with debounce
     useEffect(() => {
@@ -69,18 +72,17 @@ export const useFileSearch = (fileStructure: FileNode[]) => {
             setIsTyping(true);
             const timeoutId = setTimeout(() => setIsTyping(false), 300);
             return () => clearTimeout(timeoutId);
-        } else {
-            setIsTyping(false);
         }
+        setIsTyping(false);
     }, [searchTerm]);
 
     // Handle search input change
     const handleSearchChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            const value = e.target.value;
+            const { value } = e.target;
             setSearchTerm(value);
         },
-        []
+        [],
     );
 
     // Clear search

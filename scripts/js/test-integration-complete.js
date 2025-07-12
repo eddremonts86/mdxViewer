@@ -35,7 +35,7 @@ console.log("   - Graceful fallbacks for missing previews");
 console.log("   - Better loading states");
 console.log("   - Debug logging for troubleshooting");
 
-console.log("\n" + "=".repeat(50));
+console.log(`\n${  "=".repeat(50)}`);
 console.log("🎉 INTEGRATION COMPLETE!");
 console.log("=".repeat(50));
 
@@ -43,7 +43,7 @@ console.log("\n🌐 Test URLs:");
 console.log("📄 Documents Page: http://localhost:5174/documents");
 console.log("🧪 Preview Test: http://localhost:5174/preview-test");
 console.log(
-    "🔍 Sample Preview: http://localhost:5174/api/previews/docs/introduction.png"
+    "🔍 Sample Preview: http://localhost:5174/api/previews/docs/introduction.png",
 );
 
 console.log("\n✨ FEATURES NOW ACTIVE:");

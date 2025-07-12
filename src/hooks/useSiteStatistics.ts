@@ -62,7 +62,7 @@ export function useSiteStatistics(): SiteStatistics {
 
                 if (!response.ok) {
                     throw new Error(
-                        `API Error: ${response.status} ${response.statusText}`
+                        `API Error: ${response.status} ${response.statusText}`,
                     );
                 }
 
@@ -70,7 +70,7 @@ export function useSiteStatistics(): SiteStatistics {
 
                 if (!apiResponse.success) {
                     throw new Error(
-                        apiResponse.error ?? "Failed to fetch statistics"
+                        apiResponse.error ?? "Failed to fetch statistics",
                     );
                 }
 

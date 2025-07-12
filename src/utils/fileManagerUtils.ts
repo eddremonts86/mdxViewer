@@ -176,12 +176,12 @@ export class FileManagerUtils {
         const baseName = filename.replace(/\.[^/.]+$/, "");
 
         switch (ext) {
-            case "md":
-                return `# ${baseName}\n\nStart writing your markdown content here.\n`;
-            case "mdx":
-                return `---\ntitle: "${baseName}"\ndescription: "Description for this MDX file"\n---\n\n# ${baseName}\n\nStart writing your MDX content here.\n\n<div className="note">\n  This is an example MDX component.\n</div>\n`;
-            default:
-                return "";
+        case "md":
+            return `# ${baseName}\n\nStart writing your markdown content here.\n`;
+        case "mdx":
+            return `---\ntitle: "${baseName}"\ndescription: "Description for this MDX file"\n---\n\n# ${baseName}\n\nStart writing your MDX content here.\n\n<div className="note">\n  This is an example MDX component.\n</div>\n`;
+        default:
+            return "";
         }
     }
 
@@ -191,7 +191,7 @@ export class FileManagerUtils {
     static createFileOperation(
         type: "create" | "delete",
         path: string,
-        metadata?: Partial<FileMetadata>
+        metadata?: Partial<FileMetadata>,
     ): FileOperation {
         return {
             id: this.generateOperationId(),
@@ -208,7 +208,7 @@ export class FileManagerUtils {
      */
     static createFolderOperation(
         type: "create" | "delete",
-        path: string
+        path: string,
     ): FileOperation {
         return {
             id: this.generateOperationId(),
@@ -225,7 +225,7 @@ export class FileManagerUtils {
      */
     static createBatchOperation(
         operations: FileOperation[],
-        description?: string
+        description?: string,
     ): BatchOperation {
         return {
             id: this.generateBatchId(),
@@ -241,12 +241,12 @@ export class FileManagerUtils {
      */
     static async simulateCreateFile(
         path: string,
-        content: string = ""
+        content = "",
     ): Promise<{ success: boolean; error?: string }> {
         try {
             await new Promise(resolve => setTimeout(resolve, 100));
             console.log(`[Simulated] Creating file: ${path}`, {
-                content: content.substring(0, 100) + "...",
+                content: `${content.substring(0, 100)}...`,
             });
             return { success: true };
         } catch (error) {
@@ -261,7 +261,7 @@ export class FileManagerUtils {
      * Simulate folder creation (for development)
      */
     static async simulateCreateFolder(
-        path: string
+        path: string,
     ): Promise<{ success: boolean; error?: string }> {
         try {
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -279,7 +279,7 @@ export class FileManagerUtils {
      * Simulate file deletion (for development)
      */
     static async simulateDeleteFile(
-        path: string
+        path: string,
     ): Promise<{ success: boolean; error?: string }> {
         try {
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -297,7 +297,7 @@ export class FileManagerUtils {
      * Simulate folder deletion (for development)
      */
     static async simulateDeleteFolder(
-        path: string
+        path: string,
     ): Promise<{ success: boolean; error?: string }> {
         try {
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -315,7 +315,7 @@ export class FileManagerUtils {
      * Execute a single file operation
      */
     static async executeFileOperation(
-        operation: FileOperation
+        operation: FileOperation,
     ): Promise<FileOperation> {
         const updatedOperation = {
             ...operation,
@@ -363,7 +363,7 @@ export class FileManagerUtils {
             completed: number;
             total: number;
             currentOperation?: FileOperation;
-        }) => void
+        }) => void,
     ): Promise<BatchOperation> {
         const updatedBatch = { ...batch, status: "in-progress" as const };
         const results: FileOperation[] = [];
@@ -401,7 +401,7 @@ export class FileManagerUtils {
      */
     static async createFileReal(
         filePath: string,
-        content: string = ""
+        content = "",
     ): Promise<{ success: boolean; error?: string }> {
         try {
             // Parse the file path to extract name, type, and directory
@@ -424,7 +424,7 @@ export class FileManagerUtils {
                         path: directory === "." ? "" : directory,
                         content,
                     }),
-                }
+                },
             );
 
             if (!response.ok) {
@@ -447,7 +447,7 @@ export class FileManagerUtils {
      * Real folder creation using File System Access API or server API
      */
     static async createFolderReal(
-        folderPath: string
+        folderPath: string,
     ): Promise<{ success: boolean; error?: string }> {
         try {
             // Parse the folder path to extract name and directory
@@ -466,7 +466,7 @@ export class FileManagerUtils {
                         name: folderName,
                         path: directory === "." ? "" : directory,
                     }),
-                }
+                },
             );
 
             if (!response.ok) {
@@ -489,7 +489,7 @@ export class FileManagerUtils {
      * Real file deletion using File System Access API or server API
      */
     static async deleteFileReal(
-        path: string
+        path: string,
     ): Promise<{ success: boolean; error?: string }> {
         try {
             const response = await fetch(
@@ -502,7 +502,7 @@ export class FileManagerUtils {
                     body: JSON.stringify({
                         paths: [path],
                     }),
-                }
+                },
             );
 
             if (!response.ok) {
@@ -525,7 +525,7 @@ export class FileManagerUtils {
      * Real folder deletion using File System Access API or server API
      */
     static async deleteFolderReal(
-        path: string
+        path: string,
     ): Promise<{ success: boolean; error?: string }> {
         try {
             const response = await fetch(
@@ -538,7 +538,7 @@ export class FileManagerUtils {
                     body: JSON.stringify({
                         paths: [path],
                     }),
-                }
+                },
             );
 
             if (!response.ok) {

@@ -1,0 +1,45 @@
+/* FileTreeNode styles */
+.file-tree-node {
+    --tree-indent-multiplier: 1.5;
+    --tree-indent-base: 0.5;
+}
+
+.file-tree-node[data-level="1"] {
+    padding-left: calc(1 * var(--tree-indent-multiplier) + var(--tree-indent-base)) rem;
+}
+
+.file-tree-node[data-level="2"] {
+    padding-left: calc(2 * var(--tree-indent-multiplier) + var(--tree-indent-base)) rem;
+}
+
+.file-tree-node[data-level="3"] {
+    padding-left: calc(3 * var(--tree-indent-multiplier) + var(--tree-indent-base)) rem;
+}
+
+.file-tree-node[data-level="4"] {
+    padding-left: calc(4 * var(--tree-indent-multiplier) + var(--tree-indent-base)) rem;
+}
+
+.file-tree-node[data-level="5"] {
+    padding-left: calc(5 * var(--tree-indent-multiplier) + var(--tree-indent-base)) rem;
+}
+
+.file-tree-node[data-level="6"] {
+    padding-left: calc(6 * var(--tree-indent-multiplier) + var(--tree-indent-base)) rem;
+}
+
+.file-tree-node[data-level="7"] {
+    padding-left: calc(7 * var(--tree-indent-multiplier) + var(--tree-indent-base)) rem;
+}
+
+.file-tree-node[data-level="8"] {
+    padding-left: calc(8 * var(--tree-indent-multiplier) + var(--tree-indent-base)) rem;
+}
+
+.file-tree-node[data-level="9"] {
+    padding-left: calc(9 * var(--tree-indent-multiplier) + var(--tree-indent-base)) rem;
+}
+
+.file-tree-node[data-level="10"] {
+    padding-left: calc(10 * var(--tree-indent-multiplier) + var(--tree-indent-base)) rem;
+}

@@ -4,6 +4,7 @@
  */
 
 import path from "path";
+
 import { FORMAT_CONFIG, TEXT_REPLACEMENTS } from "../constants/index.js";
 
 /**
@@ -65,7 +66,7 @@ export const formatDate = (dateString: string): string => {
  */
 export const formatMessage = (
     template: string,
-    replacements: Record<string, string | number>
+    replacements: Record<string, string | number>,
 ): string => {
     let formatted = template;
 
@@ -73,7 +74,7 @@ export const formatMessage = (
         const placeholder = `{${key}}`;
         formatted = formatted.replace(
             new RegExp(placeholder, "g"),
-            value.toString()
+            value.toString(),
         );
     });
 

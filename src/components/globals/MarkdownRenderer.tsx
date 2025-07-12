@@ -1,10 +1,3 @@
-import { MDXWrapper } from "@/components/globals/MDXWrapper";
-import { useTheme } from "@/components/theme-provider";
-import type { MarkdownRendererProps } from "@/types";
-import {
-    generateHeadingId as createHeadingId,
-    extractTextFromReactNode as extractText,
-} from "@/utils/headingUtils";
 import React, { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -12,10 +5,19 @@ import {
     oneDark,
     oneLight,
 } from "react-syntax-highlighter/dist/esm/styles/prism";
+
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
+
+import { MDXWrapper } from "@/components/globals/MDXWrapper";
+import { useTheme } from "@/components/theme/theme-provider";
+import type { MarkdownRendererProps } from "@/types";
+import {
+    generateHeadingId as createHeadingId,
+    extractTextFromReactNode as extractText,
+} from "@/utils/headingUtils";
 
 // Import KaTeX CSS for math rendering
 import "katex/dist/katex.min.css";
@@ -326,69 +328,73 @@ export function MarkdownRenderer({ content, type }: MarkdownRendererProps) {
     }, [theme]);
 
     // Create code component with theme support
-    const codeComponent = useMemo(() => {
-        return ({
-            className,
-            children,
-            ...props
-        }: React.ComponentProps<"code">) => {
-            const match = /language-(\w+)/.exec(className ?? "");
-            const inline = !className?.includes("language-");
+    const codeComponent = useMemo(
+        () =>
+            ({
+                className,
+                children,
+                ...props
+            }: React.ComponentProps<"code">) => {
+                const match = /language-(\w+)/.exec(className ?? "");
+                const inline = !className?.includes("language-");
 
-            return !inline && match ? (
-                <div className="group my-6">
-                    <SyntaxHighlighter
-                        style={effectiveTheme === "dark" ? oneDark : oneLight}
-                        language={match[1]}
-                        PreTag="div"
-                        className="border-border overflow-hidden rounded-lg border shadow-sm"
-                        customStyle={{
-                            margin: 0,
-                            padding: "1.25rem",
-                            fontSize: "0.875rem",
-                            lineHeight: "1.6",
-                            fontFamily:
-                                "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', 'Menlo', 'Consolas', monospace",
-                            background:
-                                effectiveTheme === "dark"
-                                    ? "var(--card)"
-                                    : "var(--muted)",
-                            fontWeight: "400",
-                            borderRadius: "0.5rem",
-                            fontFeatureSettings: '"liga" 1, "calt" 1',
-                        }}
-                        codeTagProps={{
-                            style: {
-                                fontFamily:
-                                    "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', 'Menlo', 'Consolas', monospace",
-                                fontWeight: "400",
+                return !inline && match ? (
+                    <div className="group my-6">
+                        <SyntaxHighlighter
+                            style={
+                                effectiveTheme === "dark" ? oneDark : oneLight
+                            }
+                            language={match[1]}
+                            PreTag="div"
+                            className="border-border overflow-hidden rounded-lg border shadow-sm"
+                            customStyle={{
+                                margin: 0,
+                                padding: "1.25rem",
                                 fontSize: "0.875rem",
                                 lineHeight: "1.6",
-                            },
+                                fontFamily:
+                                    "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', 'Menlo', 'Consolas', monospace",
+                                background:
+                                    effectiveTheme === "dark"
+                                        ? "var(--card)"
+                                        : "var(--muted)",
+                                fontWeight: "400",
+                                borderRadius: "0.5rem",
+                                fontFeatureSettings: '"liga" 1, "calt" 1',
+                            }}
+                            codeTagProps={{
+                                style: {
+                                    fontFamily:
+                                        "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', 'Menlo', 'Consolas', monospace",
+                                    fontWeight: "400",
+                                    fontSize: "0.875rem",
+                                    lineHeight: "1.6",
+                                },
+                            }}
+                        >
+                            {String(children).replace(/\n$/, "")}
+                        </SyntaxHighlighter>
+                    </div>
+                ) : (
+                    <code
+                        className={`${
+                            className ?? ""
+                        } bg-muted text-foreground border-border rounded border px-2 py-1 font-mono text-sm`}
+                        style={{
+                            fontFamily:
+                                "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', 'Menlo', 'Consolas', monospace",
+                            fontWeight: "400",
+                            fontSize: "0.875rem",
+                            fontFeatureSettings: '"liga" 1, "calt" 1',
                         }}
+                        {...props}
                     >
-                        {String(children).replace(/\n$/, "")}
-                    </SyntaxHighlighter>
-                </div>
-            ) : (
-                <code
-                    className={`${
-                        className ?? ""
-                    } bg-muted text-foreground border-border rounded border px-2 py-1 font-mono text-sm`}
-                    style={{
-                        fontFamily:
-                            "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', 'Menlo', 'Consolas', monospace",
-                        fontWeight: "400",
-                        fontSize: "0.875rem",
-                        fontFeatureSettings: '"liga" 1, "calt" 1',
-                    }}
-                    {...props}
-                >
-                    {children}
-                </code>
-            );
-        };
-    }, [effectiveTheme]);
+                        {children}
+                    </code>
+                );
+            },
+        [effectiveTheme]
+    );
 
     const renderedContent = useMemo(() => {
         const markdownComponents = createMarkdownComponents();

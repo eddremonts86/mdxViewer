@@ -5,14 +5,14 @@
 
 import { promises as fs } from "fs";
 import path from "path";
-import { FileItem } from "../types/index.js";
+
+import type { FileItem } from "../types/index.js";
 
 /**
  * Get file extension from filename
  */
-export const getFileExtension = (filename: string): string => {
-    return path.extname(filename).slice(1);
-};
+export const getFileExtension = (filename: string): string =>
+    path.extname(filename).slice(1);
 
 /**
  * Ensure directory exists, create if it doesn't
@@ -61,7 +61,7 @@ export const deleteRecursively = async (targetPath: string): Promise<void> => {
  */
 export const moveRecursively = async (
     sourcePath: string,
-    destinationPath: string
+    destinationPath: string,
 ): Promise<void> => {
     try {
         // Try to use rename first (works if on same filesystem)
@@ -69,7 +69,7 @@ export const moveRecursively = async (
     } catch (renameError) {
         // If rename fails, copy and delete
         console.warn(
-            `Rename failed, falling back to copy+delete: ${(renameError as Error).message}`
+            `Rename failed, falling back to copy+delete: ${(renameError as Error).message}`,
         );
 
         try {
@@ -97,7 +97,7 @@ export const moveRecursively = async (
         } catch (copyError) {
             console.error(
                 `Failed to move ${sourcePath} to ${destinationPath}:`,
-                copyError
+                copyError,
             );
             throw copyError;
         }
@@ -108,7 +108,7 @@ export const moveRecursively = async (
  * Get file statistics
  */
 export const getFileStats = async (
-    filePath: string
+    filePath: string,
 ): Promise<Partial<FileItem>> => {
     try {
         const stats = await fs.stat(filePath);

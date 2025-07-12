@@ -1,12 +1,14 @@
-import { ModeToggle } from "@/components/mode-toggle";
-import { NotificationCenter } from "@/components/NotificationCenter";
-import { Sidebar } from "@/components/Sidebar";
+import { useState } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
+
+import { Bell, Menu, Settings } from "lucide-react";
+
+import { Sidebar } from "@/components/navigation/Sidebar";
+import { NotificationCenter } from "@/components/progress/NotificationCenter";
+import { ModeToggle } from "@/components/theme/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { navigationItems } from "@/const";
-import { Bell, Menu, Settings } from "lucide-react";
-import { useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
 
 export function Layout() {
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
@@ -138,12 +140,12 @@ export function Layout() {
                     <div className="absolute top-16 right-6 max-w-md">
                         <NotificationCenter
                             notifications={notifications}
-                            onDismiss={id => {
+                            onDismiss={(id: string) => {
                                 setNotifications(prev =>
                                     prev.filter(n => n.id !== id)
                                 );
                             }}
-                            onMarkAsRead={id => {
+                            onMarkAsRead={(id: string) => {
                                 setNotifications(prev =>
                                     prev.map(n =>
                                         n.id === id ? { ...n, isRead: true } : n

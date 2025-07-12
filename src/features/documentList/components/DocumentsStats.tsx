@@ -1,5 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Calendar, File, FileText } from "lucide-react";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import type { DocumentCardProps } from "../types";
 
 interface DocumentsStatsProps {
@@ -52,7 +54,7 @@ export function DocumentsStats({
                         {Math.round(
                             (documents.filter(d => d.previewUrl).length /
                                 documents.length) *
-                                100
+                                100,
                         ) || 0}
                         % coverage
                     </p>

@@ -43,7 +43,7 @@ console.log("   📝 npm run generate:all-previews");
 console.log("   👁️  npm run watch:previews");
 console.log("   🚀 npm run dev:full");
 
-console.log("\n" + "=".repeat(50));
+console.log(`\n${  "=".repeat(50)}`);
 console.log("🎉 PREVIEW SYSTEM VALIDATION COMPLETE!");
 console.log("=".repeat(50));
 
@@ -54,7 +54,7 @@ console.log("3. Check browser console for any errors");
 console.log("4. Test individual preview URLs like:");
 console.log("   - http://localhost:5174/api/previews/docs/introduction.png");
 console.log(
-    "   - http://localhost:5174/api/previews/examples/interactive-demo.png"
+    "   - http://localhost:5174/api/previews/examples/interactive-demo.png",
 );
 
 console.log("\n✨ The preview system is fully implemented and ready!");

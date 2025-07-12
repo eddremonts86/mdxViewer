@@ -40,7 +40,7 @@ async function getAllMarkdownFiles(dir, basePath = "") {
             if (entry.isDirectory()) {
                 const subFiles = await getAllMarkdownFiles(
                     fullPath,
-                    relativePath
+                    relativePath,
                 );
                 files.push(...subFiles);
             } else if (
@@ -50,7 +50,7 @@ async function getAllMarkdownFiles(dir, basePath = "") {
                 files.push({
                     name: entry.name,
                     path: fullPath,
-                    relativePath: relativePath,
+                    relativePath,
                     folder: basePath || "root",
                 });
             }
@@ -85,7 +85,7 @@ function createSVGPreview(title, type, folder, content) {
             line
                 .trim()
                 .substring(0, 50)
-                .replace(/[<>&"']/g, "")
+                .replace(/[<>&"']/g, ""),
         );
 
     const badgeColor = type === "mdx" ? "#10b981" : "#3b82f6";
@@ -106,11 +106,11 @@ function createSVGPreview(title, type, folder, content) {
         <text x="20" y="95" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">📁 ${folder}</text>
         <text x="20" y="115" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Type: ${type === "mdx" ? "MDX Interactive" : "Markdown Document"}</text>
         ${lines
-            .map(
-                (line, i) =>
-                    `<text x="20" y="${140 + i * 16}" font-family="Arial, sans-serif" font-size="11" fill="#374151">${line}</text>`
-            )
-            .join("")}
+        .map(
+            (line, i) =>
+                `<text x="20" y="${140 + i * 16}" font-family="Arial, sans-serif" font-size="11" fill="#374151">${line}</text>`,
+        )
+        .join("")}
         <rect x="0" y="0" width="400" height="240" fill="none" stroke="#e5e7eb" stroke-width="1"/>
     </svg>`;
 }
@@ -142,11 +142,11 @@ async function generatePreview(file) {
             title,
             type,
             sanitizedFolder,
-            content
+            content,
         );
         const svgPath = path.join(
             previewDir,
-            sanitizedName.replace(/\.(md|mdx)$/, ".svg")
+            sanitizedName.replace(/\.(md|mdx)$/, ".svg"),
         );
 
         await fs.writeFile(svgPath, svgContent);
@@ -155,13 +155,13 @@ async function generatePreview(file) {
         return {
             success: true,
             originalName: file.name,
-            sanitizedName: sanitizedName,
+            sanitizedName,
             previewPath: svgPath,
         };
     } catch (error) {
         console.error(
             `❌ Failed to generate preview for ${file.relativePath}:`,
-            error.message
+            error.message,
         );
         return {
             success: false,
@@ -205,7 +205,7 @@ async function main() {
         // Generate previews for each folder
         for (const [folder, folderFiles] of Object.entries(filesByFolder)) {
             console.log(
-                `\n📂 Processing folder: ${folder} (${folderFiles.length} files)`
+                `\n📂 Processing folder: ${folder} (${folderFiles.length} files)`,
             );
 
             for (const file of folderFiles) {
@@ -214,7 +214,7 @@ async function main() {
                     successCount++;
                     if (result.originalName !== result.sanitizedName) {
                         renamedFiles.push({
-                            folder: folder,
+                            folder,
                             original: result.originalName,
                             sanitized: result.sanitizedName,
                         });
@@ -225,22 +225,22 @@ async function main() {
             }
         }
 
-        console.log(`\n🎉 Preview generation complete!`);
+        console.log("\n🎉 Preview generation complete!");
         console.log(`✅ Successfully generated: ${successCount} previews`);
         console.log(`❌ Failed: ${errorCount} previews`);
 
         if (renamedFiles.length > 0) {
-            console.log(`\n📋 Files with sanitized names:`);
+            console.log("\n📋 Files with sanitized names:");
             renamedFiles.forEach(file => {
                 console.log(
-                    `   ${file.folder}/${file.original} -> ${file.sanitized}`
+                    `   ${file.folder}/${file.original} -> ${file.sanitized}`,
                 );
             });
             console.log(
-                `\n⚠️  Note: Preview names are sanitized but source files remain unchanged.`
+                "\n⚠️  Note: Preview names are sanitized but source files remain unchanged.",
             );
             console.log(
-                `   To rename source files too, run: npm run rename:files`
+                "   To rename source files too, run: npm run rename:files",
             );
         }
     } catch (error) {

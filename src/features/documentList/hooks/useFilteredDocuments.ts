@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+
 import type {
     DocumentCardProps,
     DocumentsByFolder,
@@ -8,25 +9,31 @@ import type {
 export function useFilteredDocuments(
     documents: DocumentCardProps[],
     searchQuery: string,
-    selectedFilter: FilterType
+    selectedFilter: FilterType,
 ) {
     // Filter documents based on search and type
-    const filteredDocuments = useMemo(() => {
-        return documents.filter(doc => {
-            const matchesSearch =
-                searchQuery === "" ||
-                doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                doc.folder.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                doc.description
-                    ?.toLowerCase()
-                    .includes(searchQuery.toLowerCase());
+    const filteredDocuments = useMemo(
+        () =>
+            documents.filter(doc => {
+                const matchesSearch =
+                    searchQuery === "" ||
+                    doc.title
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase()) ||
+                    doc.folder
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase()) ||
+                    doc.description
+                        ?.toLowerCase()
+                        .includes(searchQuery.toLowerCase());
 
-            const matchesFilter =
-                selectedFilter === "all" || doc.type === selectedFilter;
+                const matchesFilter =
+                    selectedFilter === "all" || doc.type === selectedFilter;
 
-            return matchesSearch && matchesFilter;
-        });
-    }, [documents, searchQuery, selectedFilter]);
+                return matchesSearch && matchesFilter;
+            }),
+        [documents, searchQuery, selectedFilter],
+    );
 
     // Group documents by folder
     const documentsByFolder = useMemo(() => {

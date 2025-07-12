@@ -7,8 +7,8 @@
  * @param text - The heading text to convert to an ID
  * @returns A URL-safe ID string
  */
-export const generateHeadingId = (text: string): string => {
-    return text
+export const generateHeadingId = (text: string): string =>
+    text
         .toLowerCase()
         .normalize("NFD") // Normalize Unicode characters (separate base chars from accents)
         .replace(/[\u0300-\u036f]/g, "") // Remove diacritics/accents
@@ -17,7 +17,6 @@ export const generateHeadingId = (text: string): string => {
         .replace(/-+/g, "-") // Replace multiple hyphens with single
         .replace(/(^-+)|(-+$)/g, "") // Remove leading/trailing hyphens
         .trim();
-};
 
 /**
  * Extracts text content from React nodes for ID generation
@@ -56,10 +55,7 @@ export const extractTextFromReactNode = (children: React.ReactNode): string => {
  * @param elementId - The ID of the element to scroll to
  * @param headerOffset - Offset in pixels to account for fixed headers
  */
-export const scrollToHeading = (
-    elementId: string,
-    headerOffset: number = 80
-): void => {
+export const scrollToHeading = (elementId: string, headerOffset = 80): void => {
     const element = document.getElementById(elementId);
     if (element) {
         const elementPosition = element.getBoundingClientRect().top;
@@ -82,7 +78,7 @@ export const scrollToHeading = (
  * @returns Array of heading objects with level, title, and id
  */
 export const parseHeadings = (
-    content: string
+    content: string,
 ): Array<{ level: number; title: string; id: string }> => {
     const headingRegex = /^(#{1,6})\s+(.+)$/gm;
     const headings: Array<{ level: number; title: string; id: string }> = [];

@@ -2,12 +2,13 @@
  * Preview and Health Endpoints
  * Handles file previews and health checks with generation capabilities
  */
-
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { promises as fs } from "fs";
 import path from "path";
-import { SERVER_CONFIG } from "../constants/index.js";
-import { ApiResponse } from "../types/index.js";
+
+import { HTTP_STATUS, SERVER_CONFIG } from "../constants/index.js";
+import type { ApiResponse } from "../types/index.js";
+import { logServerError } from "../utils/logger.js";
 
 /**
  * Sanitize filename to be URL-safe and match kebab-case convention
@@ -47,7 +48,7 @@ export const getPreview = async (req: Request, res: Response) => {
         const { filename } = req.params;
 
         if (!filename) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 error: "Invalid preview filename",
             });
@@ -61,13 +62,13 @@ export const getPreview = async (req: Request, res: Response) => {
         if (isNestedPath) {
             // Split path and filename
             const pathParts = filename.split("/");
-            actualFilename = pathParts.pop() || filename;
+            actualFilename = pathParts.pop() ?? filename;
             sourceBasePath = pathParts.join("/");
         }
 
         // Check if it's a PNG request
         if (!actualFilename.endsWith(".png")) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 error: "Invalid preview filename - must be PNG",
             });
@@ -75,7 +76,7 @@ export const getPreview = async (req: Request, res: Response) => {
 
         const previewsDir = path.join(
             path.dirname(SERVER_CONFIG.CONTENT_PATH),
-            "previews"
+            "previews",
         );
         const previewPath = path.join(previewsDir, filename);
 
@@ -111,7 +112,7 @@ export const getPreview = async (req: Request, res: Response) => {
             const sanitizedFilename = sanitizeFilename(svgFilename);
             const finalSvgName = sanitizedFilename.replace(
                 /\.(md|mdx)$/,
-                ".svg"
+                ".svg",
             );
 
             // Also sanitize the source base path
@@ -123,7 +124,7 @@ export const getPreview = async (req: Request, res: Response) => {
                 path.dirname(SERVER_CONFIG.CONTENT_PATH),
                 "previews",
                 sanitizedBasePath,
-                finalSvgName
+                finalSvgName,
             );
 
             try {
@@ -141,7 +142,7 @@ export const getPreview = async (req: Request, res: Response) => {
                 const sourceFilename = actualFilename.replace(/\.png$/, ".md");
                 const altSourceFilename = actualFilename.replace(
                     /\.png$/,
-                    ".mdx"
+                    ".mdx",
                 );
 
                 let actualSourceFilename;
@@ -160,13 +161,13 @@ export const getPreview = async (req: Request, res: Response) => {
                     try {
                         const sourceFile = path.join(
                             basePath,
-                            altSourceFilename
+                            altSourceFilename,
                         );
                         await fs.access(sourceFile);
                         actualSourceFilename = altSourceFilename;
                     } catch {
                         // Return 404 if source document doesn't exist
-                        return res.status(404).json({
+                        return res.status(HTTP_STATUS.NOT_FOUND).json({
                             success: false,
                             error: "Source document not found",
                         });
@@ -201,8 +202,11 @@ export const getPreview = async (req: Request, res: Response) => {
             }
         }
     } catch (error) {
-        console.error("Error serving preview:", error);
-        res.status(500).json({
+        logServerError(
+            "Error serving preview:",
+            error instanceof Error ? error : new Error(String(error)),
+        );
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error: "Failed to serve preview",
         });
@@ -213,7 +217,7 @@ export const getPreview = async (req: Request, res: Response) => {
  * Health check endpoint
  * GET /api/health
  */
-export const getHealth = (req: Request, res: Response<ApiResponse>) => {
+export const getHealth = (_req: Request, res: Response<ApiResponse>) => {
     res.json({
         success: true,
         data: {

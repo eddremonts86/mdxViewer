@@ -106,51 +106,51 @@ function generateRecommendations(smells: CodeSmell[]): string[] {
             acc[smell.category] = (acc[smell.category] || 0) + 1;
             return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
     );
 
     if (categories["Complexity Issues"] > 10) {
         recommendations.push(
-            "🔴 HIGH PRIORITY: Consider breaking down complex functions into smaller, more focused functions."
+            "🔴 HIGH PRIORITY: Consider breaking down complex functions into smaller, more focused functions.",
         );
         recommendations.push(
-            "💡 Use the Single Responsibility Principle to reduce complexity."
+            "💡 Use the Single Responsibility Principle to reduce complexity.",
         );
     }
 
     if (categories["Length Issues"] > 5) {
         recommendations.push(
-            "🟡 MEDIUM PRIORITY: Split large files and functions to improve readability."
+            "🟡 MEDIUM PRIORITY: Split large files and functions to improve readability.",
         );
         recommendations.push(
-            "💡 Consider extracting utility functions or creating separate modules."
+            "💡 Consider extracting utility functions or creating separate modules.",
         );
     }
 
     if (categories["TypeScript Issues"] > 0) {
         recommendations.push(
-            "🟡 MEDIUM PRIORITY: Improve TypeScript usage for better type safety."
+            "🟡 MEDIUM PRIORITY: Improve TypeScript usage for better type safety.",
         );
         recommendations.push(
-            "💡 Use proper typing instead of 'any', prefer nullish coalescing and optional chaining."
+            "💡 Use proper typing instead of 'any', prefer nullish coalescing and optional chaining.",
         );
     }
 
     if (categories["React Issues"] > 0) {
         recommendations.push(
-            "🟠 IMPORTANT: Fix React hook dependencies to prevent bugs."
+            "🟠 IMPORTANT: Fix React hook dependencies to prevent bugs.",
         );
         recommendations.push(
-            "💡 Ensure all hook dependencies are properly declared."
+            "💡 Ensure all hook dependencies are properly declared.",
         );
     }
 
     if (categories["Maintainability Issues"] > 15) {
         recommendations.push(
-            "🔴 CRITICAL: Focus on code maintainability improvements."
+            "🔴 CRITICAL: Focus on code maintainability improvements.",
         );
         recommendations.push(
-            "💡 Remove unused variables, replace magic numbers with constants."
+            "💡 Remove unused variables, replace magic numbers with constants.",
         );
     }
 
@@ -310,8 +310,8 @@ function generateHTMLReport(report: SmellReport): string {
                 </thead>
                 <tbody>
                     ${report.smells
-                        .map(
-                            smell => `
+        .map(
+            smell => `
                         <tr>
                             <td><code>${smell.file}</code></td>
                             <td>${smell.line}:${smell.column}</td>
@@ -323,9 +323,9 @@ function generateHTMLReport(report: SmellReport): string {
                                 ${smell.fixable ? "✅ Auto-fixable" : "❌ Manual fix required"}
                             </td>
                         </tr>
-                    `
-                        )
-                        .join("")}
+                    `,
+        )
+        .join("")}
                 </tbody>
             </table>
         </div>
@@ -337,8 +337,8 @@ function generateHTMLReport(report: SmellReport): string {
             type: 'doughnut',
             data: {
                 labels: [${Object.keys(report.categories)
-                    .map(c => `"${c}"`)
-                    .join(",")}],
+        .map(c => `"${c}"`)
+        .join(",")}],
                 datasets: [{
                     data: [${Object.values(report.categories).join(",")}],
                     backgroundColor: [
@@ -372,7 +372,7 @@ function main(): void {
             acc[smell.category] = (acc[smell.category] || 0) + 1;
             return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
     );
 
     const report: SmellReport = {
@@ -399,18 +399,18 @@ function main(): void {
     writeFileSync("code-smell-report.html", htmlReport);
     writeFileSync("code-smell-report.json", jsonReport);
 
-    console.log(`✅ Analysis complete!`);
+    console.log("✅ Analysis complete!");
     console.log(
-        `📊 Found ${report.totalSmells} issues in ${report.totalFiles} files`
+        `📊 Found ${report.totalSmells} issues in ${report.totalFiles} files`,
     );
     console.log(`🔴 Errors: ${report.errors}`);
     console.log(`🟡 Warnings: ${report.warnings}`);
-    console.log(`📁 Reports generated:`);
-    console.log(`   - code-smell-report.html (interactive)`);
-    console.log(`   - code-smell-report.json (machine-readable)`);
+    console.log("📁 Reports generated:");
+    console.log("   - code-smell-report.html (interactive)");
+    console.log("   - code-smell-report.json (machine-readable)");
 
     if (report.totalSmells > 0) {
-        console.log(`\n🎯 Top recommendations:`);
+        console.log("\n🎯 Top recommendations:");
         report.recommendations
             .slice(0, 3)
             .forEach(rec => console.log(`   ${rec}`));

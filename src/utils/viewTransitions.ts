@@ -42,7 +42,7 @@ export function prefersReducedMotion(): boolean {
  */
 export async function executeViewTransition(
     callback: () => void | Promise<void>,
-    options: ViewTransitionOptions = {}
+    options: ViewTransitionOptions = {},
 ): Promise<void> {
     const {
         respectReducedMotion = true,
@@ -72,7 +72,7 @@ export async function executeViewTransition(
         if (transitionName) {
             document.documentElement.style.setProperty(
                 "--transition-name",
-                transitionName
+                transitionName,
             );
         }
 
@@ -81,7 +81,7 @@ export async function executeViewTransition(
         if (debug) {
             transition.ready.then(() => console.log("View transition ready"));
             transition.finished.then(() =>
-                console.log("View transition finished")
+                console.log("View transition finished"),
             );
         }
 
@@ -108,7 +108,7 @@ export async function executeViewTransition(
  */
 export async function transitionToRoute(
     navigationCallback: () => void | Promise<void>,
-    options: ViewTransitionOptions = {}
+    options: ViewTransitionOptions = {},
 ): Promise<void> {
     return executeViewTransition(navigationCallback, {
         respectReducedMotion: true,
@@ -127,7 +127,7 @@ export async function transitionToRoute(
  */
 export async function transitionModal(
     callback: () => void | Promise<void>,
-    options: ViewTransitionOptions = {}
+    options: ViewTransitionOptions = {},
 ): Promise<void> {
     return executeViewTransition(callback, {
         respectReducedMotion: true,
@@ -145,7 +145,7 @@ export async function transitionModal(
  */
 export async function transitionTheme(
     callback: () => void | Promise<void>,
-    options: ViewTransitionOptions = {}
+    options: ViewTransitionOptions = {},
 ): Promise<void> {
     return executeViewTransition(callback, {
         respectReducedMotion: false, // Theme transitions are usually acceptable even with reduced motion

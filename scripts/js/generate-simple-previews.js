@@ -37,14 +37,14 @@ async function getMarkdownFiles(dir, basePath = "") {
                 files.push({
                     name: entry.name,
                     path: fullPath,
-                    relativePath: relativePath,
+                    relativePath,
                     previewPath: path.join(
                         PREVIEWS_DIR,
-                        relativePath.replace(/\.(md|mdx)$/, ".png")
+                        relativePath.replace(/\.(md|mdx)$/, ".png"),
                     ),
                     svgPath: path.join(
                         PREVIEWS_DIR,
-                        relativePath.replace(/\.(md|mdx)$/, ".svg")
+                        relativePath.replace(/\.(md|mdx)$/, ".svg"),
                     ),
                 });
             }
@@ -75,11 +75,11 @@ function createSVGPreview(title, type, folder, content) {
         <text x="20" y="100" font-family="Arial, sans-serif" font-size="14" fill="#666666">📁 ${folder}</text>
         <text x="20" y="120" font-family="Arial, sans-serif" font-size="14" fill="#666666">Type: ${type === "mdx" ? "MDX Interactive" : "Markdown"}</text>
         ${lines
-            .map(
-                (line, i) =>
-                    `<text x="20" y="${145 + i * 18}" font-family="Arial, sans-serif" font-size="12" fill="#333333">${line.replace(/[<>&]/g, "")}</text>`
-            )
-            .join("")}
+        .map(
+            (line, i) =>
+                `<text x="20" y="${145 + i * 18}" font-family="Arial, sans-serif" font-size="12" fill="#333333">${line.replace(/[<>&]/g, "")}</text>`,
+        )
+        .join("")}
     </svg>`;
 
     return svgContent;
@@ -111,7 +111,7 @@ async function generatePreview(file) {
     } catch (error) {
         console.error(
             `❌ Failed to generate preview for ${file.relativePath}:`,
-            error.message
+            error.message,
         );
     }
 }
@@ -137,7 +137,7 @@ async function main() {
         }
 
         console.log(
-            `🎉 Preview generation complete! Generated ${files.length} SVG previews`
+            `🎉 Preview generation complete! Generated ${files.length} SVG previews`,
         );
     } catch (error) {
         console.error("💥 Preview generation failed:", error.message);

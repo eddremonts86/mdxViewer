@@ -60,7 +60,7 @@ export async function generateDocumentPreview(
     filePath: string,
     content: string,
     outputPath: string,
-    options: Partial<PreviewOptions> = {}
+    options: Partial<PreviewOptions> = {},
 ): Promise<void> {
     const opts = { ...DEFAULT_OPTIONS, ...options };
 
@@ -136,7 +136,7 @@ export async function generateDocumentPreview(
                 0,
                 opts.height - 40,
                 0,
-                opts.height
+                opts.height,
             );
             gradient.addColorStop(0, "rgba(255,255,255,0)");
             gradient.addColorStop(1, opts.backgroundColor);
@@ -163,7 +163,7 @@ export async function generateDocumentPreview(
 export async function generatePreviewsForDirectory(
     contentDir: string,
     previewDir: string,
-    options: Partial<PreviewOptions> = {}
+    options: Partial<PreviewOptions> = {},
 ): Promise<void> {
     try {
         const files = await fs.readdir(contentDir, { recursive: true });
@@ -180,7 +180,7 @@ export async function generatePreviewsForDirectory(
                 const relativePath = path.relative(contentDir, filePath);
                 const previewPath = path.join(
                     previewDir,
-                    relativePath.replace(/\.(md|mdx)$/, ".png")
+                    relativePath.replace(/\.(md|mdx)$/, ".png"),
                 );
 
                 // Check if preview already exists and is newer than source
@@ -197,7 +197,7 @@ export async function generatePreviewsForDirectory(
                     relativePath,
                     content,
                     previewPath,
-                    options
+                    options,
                 );
                 console.log(`Generated preview: ${previewPath}`);
             }

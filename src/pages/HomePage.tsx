@@ -1,16 +1,5 @@
-import { DocumentTypeStats } from "@/components/DocumentTypeStats";
-import { PopularFolders } from "@/components/PopularFolders";
-import { RecentDocuments } from "@/components/RecentDocuments";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { useSiteStatistics } from "@/hooks/useSiteStatistics";
+import { Link } from "react-router-dom";
+
 import {
     ArrowUpRight,
     BarChart3,
@@ -21,7 +10,20 @@ import {
     Folder,
     TrendingUp,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+
+import { PopularFolders } from "@/components/content/PopularFolders";
+import { RecentDocuments } from "@/components/content/RecentDocuments";
+import { DocumentTypeStats } from "@/components/stats/DocumentTypeStats";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import { useSiteStatistics } from "@/hooks/useSiteStatistics";
 
 export function HomePage() {
     const statistics = useSiteStatistics();

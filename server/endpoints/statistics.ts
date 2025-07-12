@@ -2,32 +2,33 @@
  * Statistics Endpoint
  * Handles site statistics generation
  */
-
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { promises as fs } from "fs";
-import { SERVER_CONFIG } from "../constants/index.js";
-import { ApiResponse } from "../types/index.js";
+
+import { HTTP_STATUS, SERVER_CONFIG } from "../constants/index.js";
+import type { ApiResponse } from "../types/index.js";
 import {
     calculateSiteStatistics,
     scanDirectory,
 } from "../utils/fileOperations.js";
+import { logOperation, logServerError, logSuccess } from "../utils/logger.js";
 
 /**
  * Get site statistics
  * GET /api/statistics
  */
 export const getStatistics = async (
-    req: Request,
-    res: Response<ApiResponse>
+    _req: Request,
+    res: Response<ApiResponse>,
 ) => {
     try {
-        console.log("📊 Generating site statistics...");
+        logOperation("Generating site statistics");
 
         await fs.mkdir(SERVER_CONFIG.CONTENT_PATH, { recursive: true });
         const fileStructure = await scanDirectory(SERVER_CONFIG.CONTENT_PATH);
         const stats = calculateSiteStatistics(fileStructure);
 
-        console.log("📊 Statistics generated:", stats);
+        logSuccess("Statistics generated", { stats });
 
         res.json({
             success: true,
@@ -35,8 +36,11 @@ export const getStatistics = async (
             message: "Statistics generated successfully",
         });
     } catch (error) {
-        console.error("❌ Failed to generate statistics:", error);
-        res.status(500).json({
+        logServerError(
+            "❌ Failed to generate statistics:",
+            error instanceof Error ? error : new Error(String(error)),
+        );
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error:
                 error instanceof Error

@@ -5,13 +5,12 @@
 
 import cors from "cors";
 import express from "express";
-import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
 
 // Import configurations and types
-import { FILE_CONFIG, SERVER_CONFIG } from "./constants/index.js";
-
+import { SERVER_CONFIG } from "./constants/index.js";
+// import { logRequest, logSuccess, serverLogger } from "./utils/logger.js";
 // Import endpoint handlers
 import {
     createFile,
@@ -23,7 +22,6 @@ import {
     getPreview,
     getStatistics,
     moveFiles,
-    uploadFiles,
 } from "./endpoints/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,43 +36,9 @@ app.use(express.json({ limit: SERVER_CONFIG.JSON_LIMIT }));
 // Serve static files from public directory
 app.use("/public", express.static(path.join(__dirname, "..", "public")));
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadPath = req.body.path
-            ? path.join(SERVER_CONFIG.CONTENT_PATH, req.body.path)
-            : SERVER_CONFIG.CONTENT_PATH;
-        cb(null, uploadPath);
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname);
-    },
-});
-
-const upload = multer({
-    storage,
-    fileFilter: (req, file, cb) => {
-        const ext = path.extname(file.originalname).toLowerCase();
-
-        if (
-            (FILE_CONFIG.ALLOWED_MIME_TYPES as readonly string[]).includes(
-                file.mimetype
-            ) ||
-            (FILE_CONFIG.ALLOWED_EXTENSIONS as readonly string[]).includes(ext)
-        ) {
-            cb(null, true);
-        } else {
-            cb(new Error("Only markdown, text files are allowed!"));
-        }
-    },
-    limits: {
-        fileSize: SERVER_CONFIG.FILE_SIZE_LIMIT,
-    },
-});
-
 // Logging middleware
-app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+app.use((req, _res, next) => {
+    console.warn(`${new Date().toISOString()} - ${req.method} ${req.path}`);
     next();
 });
 
@@ -97,103 +61,59 @@ app.post("/api/files/create", (req, res) => {
 app.post("/api/folders/create", (req, res) => {
     createFolder(req, res);
 });
-app.post("/api/files/upload", upload.array("files"), (req, res) => {
-    uploadFiles(req, res);
-});
+// Temporarily disabled: file upload functionality (requires multer)
+// app.post("/api/files/upload", upload.array("files"), (req, res) => {
+//     uploadFiles(req, res);
+// });
 app.delete("/api/files", (req, res) => {
     deleteFiles(req, res);
 });
 app.post("/api/files/move", (req, res) => {
     moveFiles(req, res);
 });
-// Handle preview paths with support for up to 10 levels of nesting
-// Start with the deepest paths first to ensure proper matching
-app.get(
-    "/api/previews/:l1/:l2/:l3/:l4/:l5/:l6/:l7/:l8/:l9/:l10",
-    (req, res) => {
-        const { l1, l2, l3, l4, l5, l6, l7, l8, l9, l10 } = req.params;
-        (req.params as any).filename =
-            `${l1}/${l2}/${l3}/${l4}/${l5}/${l6}/${l7}/${l8}/${l9}/${l10}`;
-        getPreview(req, res);
-    }
-);
+// Handle ALL preview paths - universal solution that works with any nesting level
+// This catches URLs like /api/previews/docs%2Fapi-improvements.png or /api/previews/project-docs%2Ffeatures%2Ffile.png
+app.use("/api/previews", (req, res, _next) => {
+    // Extract the full path after /api/previews/
+    const requestPath = req.url.startsWith("/") ? req.url.slice(1) : req.url;
 
-app.get("/api/previews/:l1/:l2/:l3/:l4/:l5/:l6/:l7/:l8/:l9", (req, res) => {
-    const { l1, l2, l3, l4, l5, l6, l7, l8, l9 } = req.params;
-    (req.params as any).filename =
-        `${l1}/${l2}/${l3}/${l4}/${l5}/${l6}/${l7}/${l8}/${l9}`;
-    getPreview(req, res);
-});
+    // Decode URL encoding (%2F -> /, etc.)
+    const decodedPath = decodeURIComponent(requestPath);
 
-app.get("/api/previews/:l1/:l2/:l3/:l4/:l5/:l6/:l7/:l8", (req, res) => {
-    const { l1, l2, l3, l4, l5, l6, l7, l8 } = req.params;
-    (req.params as any).filename =
-        `${l1}/${l2}/${l3}/${l4}/${l5}/${l6}/${l7}/${l8}`;
-    getPreview(req, res);
-});
+    // Remove query parameters if any
+    const [cleanPath] = decodedPath.split("?");
 
-app.get("/api/previews/:l1/:l2/:l3/:l4/:l5/:l6/:l7", (req, res) => {
-    const { l1, l2, l3, l4, l5, l6, l7 } = req.params;
-    (req.params as any).filename = `${l1}/${l2}/${l3}/${l4}/${l5}/${l6}/${l7}`;
-    getPreview(req, res);
-});
+    console.warn(`🔍 Preview request: ${req.url} -> decoded: ${cleanPath}`);
 
-app.get("/api/previews/:l1/:l2/:l3/:l4/:l5/:l6", (req, res) => {
-    const { l1, l2, l3, l4, l5, l6 } = req.params;
-    (req.params as any).filename = `${l1}/${l2}/${l3}/${l4}/${l5}/${l6}`;
-    getPreview(req, res);
-});
+    // Set the filename parameter for the getPreview handler
+    req.params = { filename: cleanPath };
 
-app.get("/api/previews/:l1/:l2/:l3/:l4/:l5", (req, res) => {
-    const { l1, l2, l3, l4, l5 } = req.params;
-    (req.params as any).filename = `${l1}/${l2}/${l3}/${l4}/${l5}`;
-    getPreview(req, res);
-});
-
-app.get("/api/previews/:l1/:l2/:l3/:l4", (req, res) => {
-    const { l1, l2, l3, l4 } = req.params;
-    (req.params as any).filename = `${l1}/${l2}/${l3}/${l4}`;
-    getPreview(req, res);
-});
-
-app.get("/api/previews/:l1/:l2/:l3", (req, res) => {
-    const { l1, l2, l3 } = req.params;
-    (req.params as any).filename = `${l1}/${l2}/${l3}`;
-    getPreview(req, res);
-});
-
-app.get("/api/previews/:l1/:l2", (req, res) => {
-    const { l1, l2 } = req.params;
-    (req.params as any).filename = `${l1}/${l2}`;
-    getPreview(req, res);
-});
-
-app.get("/api/previews/:l1", (req, res) => {
+    // Call the preview handler
     getPreview(req, res);
 });
 
 // Start server
 app.listen(SERVER_CONFIG.PORT, () => {
-    console.log(
+    console.warn(
         `🚀 MDX Viewer API Server running on http://localhost:${SERVER_CONFIG.PORT}`
     );
-    console.log(`📁 Content directory: ${SERVER_CONFIG.CONTENT_PATH}`);
-    console.log("\n📋 Available endpoints:");
-    console.log("  GET  /api/health           - Health check");
-    console.log("  GET  /api/statistics       - Get file statistics");
-    console.log("  GET  /api/files            - Get file tree");
-    console.log("  GET  /api/files/content    - Get file content");
-    console.log("  POST /api/files/create     - Create new file");
-    console.log("  POST /api/folders/create   - Create new folder");
-    console.log("  POST /api/files/upload     - Upload files");
-    console.log("  DELETE /api/files          - Delete files/folders");
-    console.log("  POST /api/files/move       - Move files/folders");
-    console.log("  GET  /api/previews/:filename - File preview");
+    console.warn(`📁 Content directory: ${SERVER_CONFIG.CONTENT_PATH}`);
+    console.warn("\n📋 Available endpoints:");
+    console.warn("  GET  /api/health           - Health check");
+    console.warn("  GET  /api/statistics       - Get file statistics");
+    console.warn("  GET  /api/files            - Get file tree");
+    console.warn("  GET  /api/files/content    - Get file content");
+    console.warn("  POST /api/files/create     - Create new file");
+    console.warn("  POST /api/folders/create   - Create new folder");
+    console.warn("  POST /api/files/upload     - Upload files");
+    console.warn("  DELETE /api/files          - Delete files/folders");
+    console.warn("  POST /api/files/move       - Move files/folders");
+    console.warn("  GET  /api/previews/:filename - File preview");
 });
 
 // Handle graceful shutdown
 process.on("SIGINT", () => {
-    console.log("\n👋 Shutting down MDX Viewer API Server...");
+    console.warn("\n👋 Shutting down MDX Viewer API Server...");
     process.exit(0);
 });
 

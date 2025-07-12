@@ -4,13 +4,14 @@
  */
 
 import path from "path";
+
 import { ERRORS, FILE_CONFIG, SERVER_CONFIG } from "../constants/index.js";
 
 /**
  * Validate file name format and characters
  */
 export const validateFileName = (
-    name: string
+    name: string,
 ): { isValid: boolean; error?: string } => {
     if (!name) {
         return { isValid: false, error: ERRORS.FILE_NAME_REQUIRED };
@@ -21,7 +22,7 @@ export const validateFileName = (
             isValid: false,
             error: ERRORS.FILE_NAME_TOO_LONG.replace(
                 "{max}",
-                FILE_CONFIG.MAX_FILENAME_LENGTH.toString()
+                FILE_CONFIG.MAX_FILENAME_LENGTH.toString(),
             ),
         };
     }
@@ -37,7 +38,7 @@ export const validateFileName = (
  * Validate path and check for directory traversal attacks
  */
 export const validatePath = (
-    pathStr: string
+    pathStr: string,
 ): { isValid: boolean; error?: string } => {
     if (pathStr === null || pathStr === undefined) {
         return { isValid: true }; // Empty/null path is valid (root)
@@ -71,7 +72,7 @@ export const validatePath = (
  */
 export const validateFolderDepth = (
     pathStr: string,
-    isCreatingFolder: boolean = false
+    isCreatingFolder = false,
 ): { isValid: boolean; error?: string; depth: number } => {
     const currentDepth = pathStr
         ? pathStr.split("/").filter(segment => segment.length > 0).length
@@ -83,7 +84,7 @@ export const validateFolderDepth = (
             isValid: false,
             error: ERRORS.MAX_DEPTH_EXCEEDED.replace(
                 "{limit}",
-                SERVER_CONFIG.MAX_FOLDER_DEPTH.toString()
+                SERVER_CONFIG.MAX_FOLDER_DEPTH.toString(),
             ).replace("{depth}", finalDepth.toString()),
             depth: finalDepth,
         };

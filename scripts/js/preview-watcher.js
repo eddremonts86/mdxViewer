@@ -7,6 +7,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+
 import { generatePreview } from "./generate-all-previews.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -48,7 +49,7 @@ async function generatePreviewForFile(filePath) {
         const file = {
             name: fileName,
             path: filePath,
-            relativePath: relativePath,
+            relativePath,
             folder: normalizedFolder,
         };
 
@@ -90,11 +91,11 @@ function watchDirectory(dir) {
                             // Optionally remove preview file
                             const previewPath = path.join(
                                 PREVIEWS_DIR,
-                                filename.replace(/\.(md|mdx)$/, ".svg")
+                                filename.replace(/\.(md|mdx)$/, ".svg"),
                             );
                             fs.unlink(previewPath, () => {
                                 console.log(
-                                    `🗑️  Preview deleted: ${previewPath}`
+                                    `🗑️  Preview deleted: ${previewPath}`,
                                 );
                             });
                         }
@@ -114,7 +115,7 @@ watchDirectory(CONTENT_DIR);
 
 console.log("\n🎯 Preview watcher is running!");
 console.log(
-    "📝 Create or edit any .md or .mdx file to see automatic preview generation"
+    "📝 Create or edit any .md or .mdx file to see automatic preview generation",
 );
 console.log("🛑 Press Ctrl+C to stop\n");
 

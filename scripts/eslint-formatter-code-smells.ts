@@ -75,12 +75,12 @@ function getSeverityDisplay(severity: number): {
     label: string;
 } {
     switch (severity) {
-        case 2:
-            return { emoji: "🚨", color: colors.red, label: "ERROR" };
-        case 1:
-            return { emoji: "⚠️", color: colors.yellow, label: "WARNING" };
-        default:
-            return { emoji: "ℹ️", color: colors.blue, label: "INFO" };
+    case 2:
+        return { emoji: "🚨", color: colors.red, label: "ERROR" };
+    case 1:
+        return { emoji: "⚠️", color: colors.yellow, label: "WARNING" };
+    default:
+        return { emoji: "ℹ️", color: colors.blue, label: "INFO" };
     }
 }
 
@@ -161,12 +161,12 @@ function buildTotals(results: LintResult[]) {
 
 function generateSummaryHeader(): string {
     return (
-        "\n" +
-        "=".repeat(60) +
-        "\n" +
-        `${colors.bright}📊 CODE SMELL SUMMARY${colors.reset}\n` +
-        "=".repeat(60) +
-        "\n"
+        `\n${
+            "=".repeat(60)
+        }\n` +
+        `${colors.bright}📊 CODE SMELL SUMMARY${colors.reset}\n${
+            "=".repeat(60)
+        }\n`
     );
 }
 
@@ -174,7 +174,7 @@ function generateTotalsSection(
     totalErrors: number,
     totalWarnings: number,
     fixableErrors: number,
-    fixableWarnings: number
+    fixableWarnings: number,
 ): string {
     let section = "";
 
@@ -198,7 +198,7 @@ function generateTotalsSection(
 }
 
 function generateCategoriesSection(
-    categoryCount: Record<string, number>
+    categoryCount: Record<string, number>,
 ): string {
     if (Object.keys(categoryCount).length === 0) return "";
 
@@ -208,7 +208,7 @@ function generateCategoriesSection(
         .forEach(([category, count]) => {
             const categoryInfo =
                 Object.values(smellCategories).find(
-                    c => c.label === category
+                    c => c.label === category,
                 ) || smellCategories.default;
             section += `   ${categoryInfo.emoji} ${categoryInfo.color}${category}${colors.reset}: ${count}\n`;
         });
@@ -221,7 +221,7 @@ function generateRecommendationsSection(
     totalWarnings: number,
     fixableErrors: number,
     fixableWarnings: number,
-    categoryCount: Record<string, number>
+    categoryCount: Record<string, number>,
 ): string {
     if (totalErrors === 0 && totalWarnings === 0) return "";
 
@@ -256,7 +256,7 @@ function formatSummary(results: LintResult[]): string {
         totalErrors,
         totalWarnings,
         fixableErrors,
-        fixableWarnings
+        fixableWarnings,
     );
     summary += generateCategoriesSection(categoryCount);
     summary += generateRecommendationsSection(
@@ -264,9 +264,9 @@ function formatSummary(results: LintResult[]): string {
         totalWarnings,
         fixableErrors,
         fixableWarnings,
-        categoryCount
+        categoryCount,
     );
-    summary += "=".repeat(60) + "\n";
+    summary += `${"=".repeat(60)  }\n`;
 
     return summary;
 }
@@ -283,7 +283,7 @@ export default function codeSmellFormatter(results: LintResult[]): string {
         if (result.messages.length > 0) {
             hasMessages = true;
             result.messages.forEach(message => {
-                output += formatMessage(message, result.filePath) + "\n\n";
+                output += `${formatMessage(message, result.filePath)  }\n\n`;
             });
         }
     });

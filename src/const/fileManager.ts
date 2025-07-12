@@ -3,6 +3,8 @@
  * Constants for file management operations
  */
 
+import { FILE_LIMITS, PERCENTAGE } from "./constants";
+
 // File types
 export const FILE_TYPES = {
     MARKDOWN: "md",
@@ -91,7 +93,8 @@ export const MESSAGES = {
 
 // File manager limits
 export const LIMITS = {
-    MAX_BATCH_SIZE: 100,
-    MAX_FILE_SIZE: 1024 * 1024 * 5, // 5MB
+    MAX_BATCH_SIZE: PERCENTAGE.FULL,
+    MAX_FILE_SIZE:
+        FILE_LIMITS.FILE_SIZE_BYTES_TO_MB * FILE_LIMITS.MAX_FILE_SIZE_MB, // 5MB
     OPERATION_TIMEOUT: 30000, // 30 seconds
 } as const;

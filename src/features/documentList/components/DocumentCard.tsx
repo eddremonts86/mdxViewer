@@ -1,3 +1,8 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+
+import { Clock, ExternalLink, File, FileText } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,19 +12,16 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Clock, ExternalLink, File, FileText } from "lucide-react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+
 import type { DocumentCardProps } from "../types";
 
 // Simple date formatter
-const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
+const formatDate = (date: Date) =>
+    date.toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
         day: "numeric",
     });
-};
 
 export function DocumentCard({
     title,
@@ -61,7 +63,7 @@ export function DocumentCard({
                             }`}
                             onError={() => {
                                 console.log(
-                                    `Preview failed to load: ${title} - ${previewUrl}`
+                                    `Preview failed to load: ${title} - ${previewUrl}`,
                                 );
                                 setImageError(true);
                                 setIsLoading(false);

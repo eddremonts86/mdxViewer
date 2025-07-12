@@ -5,20 +5,53 @@
 
 import { promises as fs } from "fs";
 import path from "path";
+
 import { SERVER_CONFIG } from "../constants/index.js";
-import { FileItem } from "../types/index.js";
+import type { FileItem } from "../types/index.js";
 import { formatDate, formatFileName, formatFileSize } from "./formatting.js";
+
+// Types for directory entries
+interface DirectoryEntry {
+    name: string;
+    isDirectory(): boolean;
+    isFile(): boolean;
+}
+
+// Types for site statistics
+interface SiteStatistics {
+    totalDocuments: number;
+    totalFolders: number;
+    documentsByType: {
+        md: number;
+        mdx: number;
+    };
+    documentsByFolder: Array<{
+        folder: string;
+        count: number;
+    }>;
+    recentDocuments: Array<{
+        name: string;
+        path: string;
+        type: "md" | "mdx";
+        folder: string;
+    }>;
+    popularFolders: Array<{
+        folder: string;
+        count: number;
+        path: string;
+    }>;
+}
 
 const generatePreview = async (
     filePath: string,
-    content: string
+    _content: string,
 ): Promise<string | null> => {
     try {
         // Create a simple preview URL based on the file path
         const previewFileName = filePath.replace(/\.(md|mdx)$/, ".png");
         const previewUrl = `/api/previews/${encodeURIComponent(previewFileName)}`;
         console.log(
-            `📸 Preview URL generated for: ${filePath} -> ${previewUrl}`
+            `📸 Preview URL generated for: ${filePath} -> ${previewUrl}`,
         );
         return previewUrl;
     } catch (error) {
@@ -45,10 +78,10 @@ const getFileStats = async (filePath: string): Promise<Partial<FileItem>> => {
 };
 
 const processDirectoryEntry = async (
-    entry: any,
+    entry: DirectoryEntry,
     dirPath: string,
     relativePath: string,
-    currentDepth: number
+    currentDepth: number,
 ): Promise<FileItem> => {
     const fullPath = path.join(dirPath, entry.name);
     const itemRelativePath = path
@@ -59,10 +92,10 @@ const processDirectoryEntry = async (
         const children =
             currentDepth < SERVER_CONFIG.MAX_FOLDER_DEPTH
                 ? await scanDirectory(
-                      fullPath,
-                      itemRelativePath,
-                      currentDepth + 1
-                  )
+                    fullPath,
+                    itemRelativePath,
+                    currentDepth + 1,
+                )
                 : [];
 
         return {
@@ -73,46 +106,45 @@ const processDirectoryEntry = async (
             depth: currentDepth,
             children,
         };
-    } else {
-        const ext = path.extname(entry.name);
-        const stats = await getFileStats(fullPath);
-
-        let previewUrl: string | null = null;
-        if (ext === ".md" || ext === ".mdx") {
-            try {
-                const content = await fs.readFile(fullPath, "utf-8");
-                previewUrl = await generatePreview(itemRelativePath, content);
-            } catch (error) {
-                console.error(
-                    `Failed to read file for preview: ${fullPath}`,
-                    error
-                );
-            }
-        }
-
-        return {
-            name: formatFileName(entry.name),
-            originalName: entry.name,
-            path: itemRelativePath,
-            type: "file",
-            extension: ext,
-            depth: currentDepth,
-            previewUrl,
-            ...stats,
-        };
     }
+    const ext = path.extname(entry.name);
+    const stats = await getFileStats(fullPath);
+
+    let previewUrl: string | null = null;
+    if (ext === ".md" || ext === ".mdx") {
+        try {
+            const content = await fs.readFile(fullPath, "utf-8");
+            previewUrl = await generatePreview(itemRelativePath, content);
+        } catch (error) {
+            console.error(
+                `Failed to read file for preview: ${fullPath}`,
+                error,
+            );
+        }
+    }
+
+    return {
+        name: formatFileName(entry.name),
+        originalName: entry.name,
+        path: itemRelativePath,
+        type: "file",
+        extension: ext,
+        depth: currentDepth,
+        previewUrl,
+        ...stats,
+    };
 };
 
 export const scanDirectory = async (
     dirPath: string,
-    relativePath: string = "",
-    currentDepth: number = 0
+    relativePath = "",
+    currentDepth = 0,
 ): Promise<FileItem[]> => {
     const items: FileItem[] = [];
 
     if (currentDepth > SERVER_CONFIG.MAX_FOLDER_DEPTH) {
         console.warn(
-            `Maximum folder depth (${SERVER_CONFIG.MAX_FOLDER_DEPTH}) exceeded at path: ${relativePath}`
+            `Maximum folder depth (${SERVER_CONFIG.MAX_FOLDER_DEPTH}) exceeded at path: ${relativePath}`,
         );
         return items;
     }
@@ -130,7 +162,7 @@ export const scanDirectory = async (
                     entry,
                     dirPath,
                     relativePath,
-                    currentDepth
+                    currentDepth,
                 );
                 items.push(item);
             } catch (error) {
@@ -149,7 +181,9 @@ export const scanDirectory = async (
     });
 };
 
-export const calculateSiteStatistics = (fileStructure: FileItem[]): any => {
+export const calculateSiteStatistics = (
+    fileStructure: FileItem[],
+): SiteStatistics => {
     let totalDocuments = 0;
     let totalFolders = 0;
     const documentsByType = { md: 0, mdx: 0 };
@@ -161,7 +195,7 @@ export const calculateSiteStatistics = (fileStructure: FileItem[]): any => {
         folder: string;
     }> = [];
 
-    function processItems(items: FileItem[], folderName: string = "root") {
+    function processItems(items: FileItem[], folderName = "root") {
         items.forEach(item => {
             if (item.type === "folder") {
                 totalFolders++;
@@ -191,7 +225,7 @@ export const calculateSiteStatistics = (fileStructure: FileItem[]): any => {
     // Group files by folder
     const folderCounts = new Map<string, number>();
     recentDocuments.forEach(({ folder }) => {
-        folderCounts.set(folder, (folderCounts.get(folder) || 0) + 1);
+        folderCounts.set(folder, (folderCounts.get(folder) ?? 0) + 1);
     });
 
     folderCounts.forEach((count, folder) => {
@@ -199,10 +233,10 @@ export const calculateSiteStatistics = (fileStructure: FileItem[]): any => {
     });
 
     const sortedFolders = [...documentsByFolder].sort(
-        (a, b) => b.count - a.count
+        (a, b) => b.count - a.count,
     );
     const popularFolders = sortedFolders.slice(0, 5).map(item => ({
-        name: item.folder,
+        folder: item.folder,
         count: item.count,
         path: `/${item.folder}`,
     }));

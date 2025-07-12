@@ -113,7 +113,7 @@ export const addFileToStructure = (
     structure: FileNode[],
     folderPath: string,
     fileName: string,
-    fileExtension: string
+    fileExtension: string,
 ): FileNode[] => {
     const pathParts = folderPath.split("/").filter(part => part);
     const filePath = `/${folderPath}/${fileName.replace(/\.(md|mdx)$/, "")}`;
@@ -131,20 +131,20 @@ export const addFileToStructure = (
     // Encontrar la carpeta objetivo
     const targetFolder = updatedStructure.find(
         (folder: FileNode) =>
-            folder.name === pathParts[0] && folder.type === "folder"
+            folder.name === pathParts[0] && folder.type === "folder",
     );
 
     if (targetFolder?.children) {
         // Verificar si el archivo ya existe
         const fileExists = targetFolder.children.some(
-            (child: FileNode) => child.name === fileName
+            (child: FileNode) => child.name === fileName,
         );
 
         if (!fileExists) {
             targetFolder.children.push(newFile);
             // Sort files alphabetically
             targetFolder.children.sort((a: FileNode, b: FileNode) =>
-                a.name.localeCompare(b.name)
+                a.name.localeCompare(b.name),
             );
         }
     }

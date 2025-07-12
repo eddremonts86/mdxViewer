@@ -2,12 +2,13 @@
  * File Management Endpoints
  * Handles file creation, uploading, deletion, and moving
  */
-
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { promises as fs } from "fs";
 import path from "path";
-import { SERVER_CONFIG } from "../constants/index.js";
-import { ApiResponse } from "../types/index.js";
+
+import { HTTP_STATUS, SERVER_CONFIG } from "../constants/index.js";
+import type { ApiResponse } from "../types/index.js";
+import { logOperation, logServerError } from "../utils/logger.js";
 import { validateFileName, validateFolderDepth } from "../utils/validation.js";
 
 /**
@@ -18,10 +19,10 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
     try {
         const { name, type, path: relativePath, content } = req.body;
 
-        console.log("📝 Creating file:", { name, type, relativePath });
+        logOperation("📝 Creating file:", { name, type, relativePath });
 
         if (!name || !type || typeof relativePath !== "string") {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 error: "Missing required fields: name, type, path",
             });
@@ -29,7 +30,7 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
 
         const validation = validateFileName(name);
         if (!validation.isValid) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 error: validation.error,
             });
@@ -37,7 +38,7 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
 
         const depthValidation = validateFolderDepth(relativePath);
         if (!depthValidation.isValid) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 error: depthValidation.error,
             });
@@ -47,7 +48,7 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
         const fullPath = path.join(
             SERVER_CONFIG.CONTENT_PATH,
             relativePath,
-            fileName
+            fileName,
         );
         const fileRelativePath = path
             .join(relativePath, fileName)
@@ -56,7 +57,7 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
         // Check if file already exists
         try {
             await fs.access(fullPath);
-            return res.status(409).json({
+            return res.status(HTTP_STATUS.CONFLICT).json({
                 success: false,
                 error: `File already exists: ${fileName}`,
             });
@@ -72,12 +73,12 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
 
         // Default content
         const fileContent =
-            content || `# ${name}\n\nThis is a new ${type} document.\n`;
+            content ?? `# ${name}\n\nThis is a new ${type} document.\n`;
 
         // Write file
         await fs.writeFile(fullPath, fileContent, "utf8");
 
-        console.log(`✅ File created: ${fileRelativePath}`);
+        logOperation(`✅ File created: ${fileRelativePath}`);
 
         res.json({
             success: true,
@@ -88,8 +89,11 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
             message: `File ${fileName} created successfully`,
         });
     } catch (error) {
-        console.error("❌ Failed to create file:", error);
-        res.status(500).json({
+        logServerError(
+            "❌ Failed to create file:",
+            error instanceof Error ? error : new Error(String(error)),
+        );
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error:
                 error instanceof Error
@@ -105,15 +109,15 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
  */
 export const createFolder = async (
     req: Request,
-    res: Response<ApiResponse>
+    res: Response<ApiResponse>,
 ) => {
     try {
         const { name, path: relativePath } = req.body;
 
-        console.log("📁 Creating folder:", { name, relativePath });
+        logOperation("📁 Creating folder:", { name, relativePath });
 
         if (!name || typeof relativePath !== "string") {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 error: "Missing required fields: name, path",
             });
@@ -121,7 +125,7 @@ export const createFolder = async (
 
         const validation = validateFileName(name);
         if (!validation.isValid) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 error: validation.error,
             });
@@ -129,7 +133,7 @@ export const createFolder = async (
 
         const depthValidation = validateFolderDepth(relativePath, true);
         if (!depthValidation.isValid) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 error: depthValidation.error,
             });
@@ -138,7 +142,7 @@ export const createFolder = async (
         const fullPath = path.join(
             SERVER_CONFIG.CONTENT_PATH,
             relativePath,
-            name
+            name,
         );
         const folderRelativePath = path
             .join(relativePath, name)
@@ -148,7 +152,7 @@ export const createFolder = async (
         try {
             const stats = await fs.stat(fullPath);
             if (stats.isDirectory()) {
-                return res.status(409).json({
+                return res.status(HTTP_STATUS.CONFLICT).json({
                     success: false,
                     error: `Folder already exists: ${name}`,
                 });
@@ -162,7 +166,7 @@ export const createFolder = async (
         // Create the folder
         await fs.mkdir(fullPath, { recursive: true });
 
-        console.log(`✅ Folder created: ${folderRelativePath}`);
+        logOperation(`✅ Folder created: ${folderRelativePath}`);
 
         res.json({
             success: true,
@@ -173,8 +177,11 @@ export const createFolder = async (
             message: `Folder ${name} created successfully`,
         });
     } catch (error) {
-        console.error("❌ Failed to create folder:", error);
-        res.status(500).json({
+        logServerError(
+            "❌ Failed to create folder:",
+            error instanceof Error ? error : new Error(String(error)),
+        );
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error:
                 error instanceof Error
@@ -191,17 +198,17 @@ export const createFolder = async (
 export const uploadFiles = async (req: Request, res: Response<ApiResponse>) => {
     try {
         const files = req.files as Express.Multer.File[];
-        const targetPath = req.body.path || "";
+        const targetPath = req.body.path ?? "";
         const createFolders = req.body.createFolders === "true";
 
-        console.log("📤 Uploading files:", {
+        logOperation("📤 Uploading files:", {
             count: files?.length || 0,
             targetPath,
             createFolders,
         });
 
         if (!files || files.length === 0) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 error: "No files provided",
             });
@@ -221,7 +228,7 @@ export const uploadFiles = async (req: Request, res: Response<ApiResponse>) => {
 
         const fullTargetPath = path.join(
             SERVER_CONFIG.CONTENT_PATH,
-            targetPath
+            targetPath,
         );
         if (createFolders) {
             await fs.mkdir(fullTargetPath, { recursive: true });
@@ -239,7 +246,7 @@ export const uploadFiles = async (req: Request, res: Response<ApiResponse>) => {
                     size: file.size,
                 });
 
-                console.log(`✅ File uploaded: ${filePath}`);
+                logOperation(`✅ File uploaded: ${filePath}`);
             } catch (error) {
                 const errorMessage =
                     error instanceof Error ? error.message : "Unknown error";
@@ -247,9 +254,9 @@ export const uploadFiles = async (req: Request, res: Response<ApiResponse>) => {
                     filename: file.originalname,
                     error: errorMessage,
                 });
-                console.error(
+                logServerError(
                     `❌ Failed to process file ${file.originalname}:`,
-                    error
+                    error instanceof Error ? error : new Error(String(error)),
                 );
             }
         }
@@ -266,8 +273,11 @@ export const uploadFiles = async (req: Request, res: Response<ApiResponse>) => {
             message: `Uploaded ${results.length}/${files.length} files successfully`,
         });
     } catch (error) {
-        console.error("❌ Failed to upload files:", error);
-        res.status(500).json({
+        logServerError(
+            "❌ Failed to upload files:",
+            error instanceof Error ? error : new Error(String(error)),
+        );
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error:
                 error instanceof Error
@@ -285,10 +295,10 @@ export const deleteFiles = async (req: Request, res: Response<ApiResponse>) => {
     try {
         const { paths } = req.body;
 
-        console.log("🗑️ Deleting items:", { paths });
+        logOperation("🗑️ Deleting items:", { paths });
 
         if (!Array.isArray(paths) || paths.length === 0) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 error: "Paths array is required",
             });
@@ -308,16 +318,16 @@ export const deleteFiles = async (req: Request, res: Response<ApiResponse>) => {
             try {
                 const fullPath = path.join(
                     SERVER_CONFIG.CONTENT_PATH,
-                    itemPath
+                    itemPath,
                 );
                 const stats = await fs.stat(fullPath);
 
                 if (stats.isDirectory()) {
                     await fs.rm(fullPath, { recursive: true, force: true });
-                    console.log(`✅ Folder deleted: ${itemPath}`);
+                    logOperation(`✅ Folder deleted: ${itemPath}`);
                 } else {
                     await fs.unlink(fullPath);
-                    console.log(`✅ File deleted: ${itemPath}`);
+                    logOperation(`✅ File deleted: ${itemPath}`);
                 }
 
                 results.push({
@@ -331,7 +341,10 @@ export const deleteFiles = async (req: Request, res: Response<ApiResponse>) => {
                     path: itemPath,
                     error: errorMessage,
                 });
-                console.error(`❌ Failed to delete ${itemPath}:`, error);
+                logServerError(
+                    `❌ Failed to delete ${itemPath}:`,
+                    error instanceof Error ? error : new Error(String(error)),
+                );
             }
         }
 
@@ -347,8 +360,11 @@ export const deleteFiles = async (req: Request, res: Response<ApiResponse>) => {
             message: `Deleted ${results.length}/${paths.length} items successfully`,
         });
     } catch (error) {
-        console.error("❌ Failed to delete items:", error);
-        res.status(500).json({
+        logServerError(
+            "❌ Failed to delete items:",
+            error instanceof Error ? error : new Error(String(error)),
+        );
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error:
                 error instanceof Error
@@ -366,10 +382,10 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
     try {
         const { sourcePath, targetPath } = req.body;
 
-        console.log("🔄 Moving item:", { sourcePath, targetPath });
+        logOperation("🔄 Moving item:", { sourcePath, targetPath });
 
         if (!sourcePath || typeof targetPath !== "string") {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 error: "Missing required fields: sourcePath, targetPath",
             });
@@ -377,13 +393,13 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
 
         const sourceFullPath = path.join(
             SERVER_CONFIG.CONTENT_PATH,
-            sourcePath
+            sourcePath,
         );
         const sourceFileName = path.basename(sourcePath);
         const targetFullPath = path.join(
             SERVER_CONFIG.CONTENT_PATH,
             targetPath,
-            sourceFileName
+            sourceFileName,
         );
         const targetRelativePath = path
             .join(targetPath, sourceFileName)
@@ -393,8 +409,11 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
         try {
             await fs.access(sourceFullPath);
         } catch (error) {
-            console.error("❌ Source file/folder not found:", error);
-            return res.status(404).json({
+            logServerError(
+                "❌ Source file/folder not found:",
+                error instanceof Error ? error : new Error(String(error)),
+            );
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
                 success: false,
                 error: `Source file/folder not found: ${sourcePath}`,
             });
@@ -405,14 +424,17 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
         try {
             const targetStats = await fs.stat(targetDir);
             if (!targetStats.isDirectory()) {
-                return res.status(400).json({
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({
                     success: false,
                     error: `Target is not a directory: ${targetPath}`,
                 });
             }
         } catch (error) {
-            console.error("❌ Target directory not found:", error);
-            return res.status(404).json({
+            logServerError(
+                "❌ Target directory not found:",
+                error instanceof Error ? error : new Error(String(error)),
+            );
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
                 success: false,
                 error: `Target directory not found: ${targetPath}`,
             });
@@ -421,7 +443,7 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
         // Check folder depth
         const depthValidation = validateFolderDepth(targetRelativePath);
         if (!depthValidation.isValid) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 error: depthValidation.error,
             });
@@ -430,7 +452,7 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
         // Check if item already exists at target
         try {
             await fs.access(targetFullPath);
-            return res.status(409).json({
+            return res.status(HTTP_STATUS.CONFLICT).json({
                 success: false,
                 error: `Item already exists at target location: ${sourceFileName}`,
             });
@@ -442,7 +464,7 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
 
         // Check for moving folder into itself
         if (targetPath.startsWith(sourcePath)) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 error: "Cannot move a folder into itself or its subfolder",
             });
@@ -451,7 +473,7 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
         // Move the item
         await fs.rename(sourceFullPath, targetFullPath);
 
-        console.log(`✅ Item moved: ${sourcePath} → ${targetRelativePath}`);
+        logOperation(`✅ Item moved: ${sourcePath} → ${targetRelativePath}`);
 
         res.json({
             success: true,
@@ -463,8 +485,11 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
             message: `${sourceFileName} moved successfully`,
         });
     } catch (error) {
-        console.error("❌ Failed to move item:", error);
-        res.status(500).json({
+        logServerError(
+            "❌ Failed to move item:",
+            error instanceof Error ? error : new Error(String(error)),
+        );
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error:
                 error instanceof Error ? error.message : "Failed to move item",

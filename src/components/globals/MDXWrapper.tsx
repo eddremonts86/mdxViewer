@@ -8,20 +8,21 @@ import type {
     DemoProps,
     InfoCardProps,
 } from "@/types";
+
 import { MDXProvider } from "@mdx-js/react";
 
 // Custom Alert component for MDX
 const CustomAlert = ({ type = "info", children }: AlertProps) => {
     const getAlertStyles = (alertType: string) => {
         switch (alertType) {
-            case "warning":
-                return "border-yellow-500 bg-yellow-50/50 dark:bg-yellow-950/50";
-            case "error":
-                return "border-destructive bg-destructive/10";
-            case "success":
-                return "border-green-500 bg-green-50/50 dark:bg-green-950/50";
-            default:
-                return "border-primary bg-primary/10";
+        case "warning":
+            return "border-yellow-500 bg-yellow-50/50 dark:bg-yellow-950/50";
+        case "error":
+            return "border-destructive bg-destructive/10";
+        case "success":
+            return "border-green-500 bg-green-50/50 dark:bg-green-950/50";
+        default:
+            return "border-primary bg-primary/10";
         }
     };
 
@@ -46,34 +47,34 @@ const CustomInfoCard = ({ title, children }: InfoCardProps) => (
 const CustomCallout = ({ type = "note", children }: CalloutProps) => {
     const getCalloutStyles = (calloutType: string) => {
         switch (calloutType) {
-            case "tip":
-                return "border-green-500 bg-green-50/50 dark:bg-green-950/50";
-            case "warning":
-                return "border-yellow-500 bg-yellow-50/50 dark:bg-yellow-950/50";
-            case "important":
-                return "border-destructive bg-destructive/10";
-            default:
-                return "border-primary bg-primary/10";
+        case "tip":
+            return "border-green-500 bg-green-50/50 dark:bg-green-950/50";
+        case "warning":
+            return "border-yellow-500 bg-yellow-50/50 dark:bg-yellow-950/50";
+        case "important":
+            return "border-destructive bg-destructive/10";
+        default:
+            return "border-primary bg-primary/10";
         }
     };
 
     const getCalloutIcon = (calloutType: string) => {
         switch (calloutType) {
-            case "tip":
-                return "💡";
-            case "warning":
-                return "⚠️";
-            case "important":
-                return "🔥";
-            default:
-                return "📝";
+        case "tip":
+            return "💡";
+        case "warning":
+            return "⚠️";
+        case "important":
+            return "🔥";
+        default:
+            return "📝";
         }
     };
 
     return (
         <div
             className={`my-4 rounded-r-md border-l-4 p-4 ${getCalloutStyles(
-                type
+                type,
             )}`}
         >
             <div className="flex items-start">

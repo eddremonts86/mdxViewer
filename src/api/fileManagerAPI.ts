@@ -3,6 +3,9 @@
  * Backend operations for file and folder management
  */
 
+import { promises as fs } from "fs";
+import path from "path";
+
 import type {
     BatchOperationResult,
     CreateFileParams,
@@ -13,8 +16,6 @@ import type {
     OperationResult,
 } from "@/types/fileManager";
 import { FileManagerUtils } from "@/utils/fileManagerUtils";
-import { promises as fs } from "fs";
-import path from "path";
 
 export class FileManagerAPI {
     private static readonly contentPath =
@@ -24,7 +25,7 @@ export class FileManagerAPI {
      * Create a new file
      */
     static async createFile(
-        params: CreateFileParams
+        params: CreateFileParams,
     ): Promise<OperationResult> {
         const operation: FileOperation = {
             id: FileManagerUtils.generateOperationId(),
@@ -66,7 +67,7 @@ export class FileManagerAPI {
             const content =
                 params.content ||
                 FileManagerUtils.getDefaultContent(
-                    `${params.name}.${params.type}`
+                    `${params.name}.${params.type}`,
                 );
 
             // Write file
@@ -100,7 +101,7 @@ export class FileManagerAPI {
      * Create a new folder
      */
     static async createFolder(
-        params: CreateFolderParams
+        params: CreateFolderParams,
     ): Promise<OperationResult> {
         const operation: FileOperation = {
             id: FileManagerUtils.generateOperationId(),
@@ -122,7 +123,7 @@ export class FileManagerAPI {
             const fullPath = path.join(
                 this.contentPath,
                 params.path,
-                params.name
+                params.name,
             );
             const relativePath = path.join(params.path, params.name);
 
@@ -170,7 +171,7 @@ export class FileManagerAPI {
      * Delete a file or folder
      */
     static async deleteItem(
-        params: DeleteItemParams
+        params: DeleteItemParams,
     ): Promise<OperationResult> {
         const operation: FileOperation = {
             id: FileManagerUtils.generateOperationId(),
@@ -202,7 +203,7 @@ export class FileManagerAPI {
             console.log(
                 `✅ ${params.isFolder ? "Folder" : "File"} deleted: ${
                     params.path
-                }`
+                }`,
             );
 
             return {
@@ -219,7 +220,7 @@ export class FileManagerAPI {
                 `❌ Failed to delete ${params.isFolder ? "folder" : "file"}: ${
                     params.path
                 }`,
-                error
+                error,
             );
 
             return {
@@ -235,7 +236,7 @@ export class FileManagerAPI {
      * Batch delete multiple items
      */
     static async batchDelete(
-        params: DeleteFileParams
+        params: DeleteFileParams,
     ): Promise<BatchOperationResult> {
         const results: OperationResult[] = [];
         const errors: string[] = [];
@@ -292,7 +293,7 @@ export class FileManagerAPI {
         const totalCount = results.length;
 
         console.log(
-            `✅ Batch delete completed: ${successCount}/${totalCount} successful`
+            `✅ Batch delete completed: ${successCount}/${totalCount} successful`,
         );
 
         return {

@@ -1,7 +1,9 @@
-import { PreviewSystemStatus } from "@/components/PreviewSystemStatus";
+import { useState } from "react";
+
+import { PreviewSystemStatus } from "@/components/progress/PreviewSystemStatus";
 import { useFiles } from "@/hooks/api/useFiles";
 import { useSiteStatistics } from "@/hooks/useSiteStatistics";
-import { useState } from "react";
+
 import {
     DocumentsGrid,
     DocumentsHeader,
@@ -24,7 +26,7 @@ export function DocumentsListPage() {
     const stats = useSiteStatistics();
 
     // Process documents from API data
-    const documents = useProcessedDocuments(files || []);
+    const documents = useProcessedDocuments(files ?? []);
 
     // Filter and group documents
     const { filteredDocuments, documentsByFolder } = useFilteredDocuments(

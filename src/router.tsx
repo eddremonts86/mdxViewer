@@ -1,10 +1,10 @@
+import { createBrowserRouter } from "react-router-dom";
+
 import { Layout } from "@/components/globals/Layout";
 import { DocumentPage } from "@/pages/DocumentPage";
 import { DocumentsListPage } from "@/pages/DocumentsListPage";
 import { HomePage } from "@/pages/HomePage";
-
 import { StatisticsPage } from "@/pages/StatisticsPage";
-import { createBrowserRouter } from "react-router-dom";
 
 export const router = createBrowserRouter([
     {

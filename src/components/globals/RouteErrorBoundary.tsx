@@ -1,3 +1,7 @@
+import { useNavigate, useRouteError } from "react-router-dom";
+
+import { AlertCircle, ArrowLeft, Home } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -6,8 +10,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { AlertCircle, ArrowLeft, Home } from "lucide-react";
-import { useNavigate, useRouteError } from "react-router-dom";
 
 interface RouteError {
     status?: number;
@@ -35,17 +37,17 @@ export function RouteErrorBoundary() {
     if (error?.status) {
         errorStatus = error.status.toString();
         switch (error.status) {
-            case 404:
-                errorMessage = "La página que buscas no existe";
-                break;
-            case 403:
-                errorMessage = "No tienes permisos para acceder a esta página";
-                break;
-            case 500:
-                errorMessage = "Error interno del servidor";
-                break;
-            default:
-                errorMessage = error.statusText ?? errorMessage;
+        case 404:
+            errorMessage = "La página que buscas no existe";
+            break;
+        case 403:
+            errorMessage = "No tienes permisos para acceder a esta página";
+            break;
+        case 500:
+            errorMessage = "Error interno del servidor";
+            break;
+        default:
+            errorMessage = error.statusText ?? errorMessage;
         }
     } else if (error?.message) {
         errorMessage = error.message;

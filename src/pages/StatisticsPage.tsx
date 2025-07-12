@@ -1,11 +1,3 @@
-import { Badge } from "@/components/ui/badge";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
 import {
     BarChart3,
     Calendar,
@@ -14,6 +6,15 @@ import {
     TrendingUp,
     Users,
 } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 
 export function StatisticsPage() {
     return (

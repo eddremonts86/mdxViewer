@@ -9,13 +9,67 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Server configuration constants
+const DEFAULT_PORT = 3001;
+const MAX_PORT_NUMBER = 65535;
+const DEFAULT_MAX_FOLDER_DEPTH = 10;
+const MAX_FOLDER_DEPTH_LIMIT = 20;
+const BYTES_PER_KILOBYTE = 1024;
+
+// Environment validation
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : DEFAULT_PORT;
+const MAX_FOLDER_DEPTH = process.env.MAX_FOLDER_DEPTH
+    ? parseInt(process.env.MAX_FOLDER_DEPTH, 10)
+    : DEFAULT_MAX_FOLDER_DEPTH;
+const FILE_SIZE_LIMIT_MB = process.env.FILE_SIZE_LIMIT_MB
+    ? parseInt(process.env.FILE_SIZE_LIMIT_MB, 10)
+    : DEFAULT_MAX_FOLDER_DEPTH;
+
+// Validate environment values
+if (isNaN(PORT) || PORT < 1 || PORT > MAX_PORT_NUMBER) {
+    throw new Error(
+        `Invalid PORT value: ${process.env.PORT}. Must be a number between 1 and ${MAX_PORT_NUMBER}.`,
+    );
+}
+
+if (
+    isNaN(MAX_FOLDER_DEPTH) ||
+    MAX_FOLDER_DEPTH < 1 ||
+    MAX_FOLDER_DEPTH > MAX_FOLDER_DEPTH_LIMIT
+) {
+    throw new Error(
+        `Invalid MAX_FOLDER_DEPTH value: ${process.env.MAX_FOLDER_DEPTH}. Must be a number between 1 and ${MAX_FOLDER_DEPTH_LIMIT}.`,
+    );
+}
+
+if (
+    isNaN(FILE_SIZE_LIMIT_MB) ||
+    FILE_SIZE_LIMIT_MB < 1 ||
+    FILE_SIZE_LIMIT_MB > 100
+) {
+    throw new Error(
+        `Invalid FILE_SIZE_LIMIT_MB value: ${process.env.FILE_SIZE_LIMIT_MB}. Must be a number between 1 and 100.`,
+    );
+}
+
 // Server Configuration
 export const SERVER_CONFIG = {
-    PORT: 3001,
+    PORT,
     CONTENT_PATH: path.join(__dirname, "../../public/content"),
-    MAX_FOLDER_DEPTH: 10,
-    FILE_SIZE_LIMIT: 10 * 1024 * 1024, // 10MB
+    MAX_FOLDER_DEPTH,
+    FILE_SIZE_LIMIT:
+        FILE_SIZE_LIMIT_MB * BYTES_PER_KILOBYTE * BYTES_PER_KILOBYTE, // Convert MB to bytes
     JSON_LIMIT: "50mb",
+} as const;
+
+// HTTP Status Codes
+export const HTTP_STATUS = {
+    OK: 200,
+    BAD_REQUEST: 400,
+    FORBIDDEN: 403,
+    NOT_FOUND: 404,
+    CONFLICT: 409,
+    INTERNAL_SERVER_ERROR: 500,
 } as const;
 
 // File Configuration

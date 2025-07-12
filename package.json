@@ -7,7 +7,7 @@
         "dev": "concurrently \"npm run server\" \"vite\"",
         "dev:watch": "concurrently \"npm run server\" \"node scripts/devWithWatcher.js\"",
         "dev:full": "concurrently \"npm run server\" \"vite\" \"npm run watch:previews\"",
-        "server": "tsx server/main.ts",
+        "server": "tsx server/clean-server.ts",
         "client": "vite",
         "watch:content": "node scripts/contentWatcher.js",
         "watch:previews": "node scripts/preview-watcher.js",

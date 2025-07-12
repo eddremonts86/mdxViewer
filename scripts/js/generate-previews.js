@@ -41,10 +41,10 @@ async function getMarkdownFiles(dir, basePath = "") {
             files.push({
                 name: entry.name,
                 path: fullPath,
-                relativePath: relativePath,
+                relativePath,
                 previewPath: path.join(
                     PREVIEWS_DIR,
-                    relativePath.replace(/\.(md|mdx)$/, ".png")
+                    relativePath.replace(/\.(md|mdx)$/, ".png"),
                 ),
             });
         }
@@ -59,7 +59,7 @@ function createSimplePNG() {
     // Created programmatically, but for now we'll use a simple approach
     return Buffer.from(
         "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
-        "base64"
+        "base64",
     );
 }
 
@@ -81,7 +81,7 @@ async function generatePreview(file) {
     } catch (error) {
         console.error(
             `✗ Failed to generate preview for ${file.relativePath}:`,
-            error.message
+            error.message,
         );
     }
 }
@@ -90,7 +90,7 @@ async function generatePreview(file) {
 async function main() {
     console.log("🚀 Starting preview generation...");
     console.log(
-        "Note: This will generate simple PNG placeholders. For full previews, install puppeteer."
+        "Note: This will generate simple PNG placeholders. For full previews, install puppeteer.",
     );
 
     try {
@@ -112,10 +112,10 @@ async function main() {
         }
 
         console.log(
-            `✅ Preview generation complete! Generated ${files.length} placeholder previews`
+            `✅ Preview generation complete! Generated ${files.length} placeholder previews`,
         );
         console.log(
-            "💡 To generate proper previews, install puppeteer: npm install puppeteer"
+            "💡 To generate proper previews, install puppeteer: npm install puppeteer",
         );
     } catch (error) {
         console.error("❌ Preview generation failed:", error);
