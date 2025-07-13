@@ -59,8 +59,7 @@ export const scrollToHeading = (elementId: string, headerOffset = 80): void => {
     const element = document.getElementById(elementId);
     if (element) {
         const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition =
-            elementPosition + window.pageYOffset - headerOffset;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
         window.scrollTo({
             top: offsetPosition,
@@ -77,9 +76,7 @@ export const scrollToHeading = (elementId: string, headerOffset = 80): void => {
  * @param content - Markdown content string
  * @returns Array of heading objects with level, title, and id
  */
-export const parseHeadings = (
-    content: string,
-): Array<{ level: number; title: string; id: string }> => {
+export const parseHeadings = (content: string): Array<{ level: number; title: string; id: string }> => {
     const headingRegex = /^(#{1,6})\s+(.+)$/gm;
     const headings: Array<{ level: number; title: string; id: string }> = [];
 

@@ -22,13 +22,7 @@ import { SearchInput } from "@/components/search/SearchInput";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -36,13 +30,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-    useCreateFolder,
-    useDeleteFiles,
-    useFiles,
-    useMoveItem,
-    useUploadFiles,
-} from "@/hooks/api/useFiles";
+import { useCreateFolder, useDeleteFiles, useFiles, useMoveItem, useUploadFiles } from "@/hooks/api/useFiles";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -56,9 +44,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
     const [isSelectionModeActive, setIsSelectionModeActive] = useState(false);
-    const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
-        new Set()
-    );
+    const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
     const { toast } = useToast();
     const navigate = useNavigate();
 
@@ -73,11 +59,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     const [dragOverFolder, setDragOverFolder] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [draggedItemName, setDraggedItemName] = useState<string>("");
-    const [dragAutoExpandTimer, setDragAutoExpandTimer] =
-        useState<NodeJS.Timeout | null>(null);
-    const [animatingFolders, setAnimatingFolders] = useState<Set<string>>(
-        new Set()
-    );
+    const [dragAutoExpandTimer, setDragAutoExpandTimer] = useState<NodeJS.Timeout | null>(null);
+    const [animatingFolders, setAnimatingFolders] = useState<Set<string>>(new Set());
 
     // Move dialog states
     const [showMoveDialog, setShowMoveDialog] = useState(false);
@@ -85,10 +68,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     const [moveItemName, setMoveItemName] = useState<string>("");
 
     // Dialog states
-    const [showCreateDocumentDialog, setShowCreateDocumentDialog] =
-        useState(false);
-    const [createDocumentParentPath, setCreateDocumentParentPath] =
-        useState("");
+    const [showCreateDocumentDialog, setShowCreateDocumentDialog] = useState(false);
+    const [createDocumentParentPath, setCreateDocumentParentPath] = useState("");
 
     // Filter files based on search
     const filteredFiles = useMemo(() => {
@@ -96,12 +77,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
         const filterItems = (items: FileItem[]): FileItem[] =>
             items.reduce<FileItem[]>((acc, item) => {
-                const matchesSearch = item.name
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase());
-                const filteredChildren = item.children
-                    ? filterItems(item.children)
-                    : [];
+                const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+                const filteredChildren = item.children ? filterItems(item.children) : [];
 
                 if (matchesSearch || filteredChildren.length > 0) {
                     acc.push({
@@ -120,9 +97,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         if (event) {
             event.stopPropagation();
         }
-        setSelectedFiles(prev =>
-            prev.includes(path) ? prev.filter(p => p !== path) : [...prev, path]
-        );
+        setSelectedFiles(prev => (prev.includes(path) ? prev.filter(p => p !== path) : [...prev, path]));
     };
 
     // Helper function to get all file paths recursively
@@ -159,10 +134,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
     const handleItemClick = (item: FileItem, event?: React.MouseEvent) => {
         // If selection mode is active or Ctrl/Cmd key is pressed, handle selection
-        if (
-            isSelectionModeActive ||
-            (event && (event.ctrlKey || event.metaKey))
-        ) {
+        if (isSelectionModeActive || (event && (event.ctrlKey || event.metaKey))) {
             handleSelectFile(item.path, event);
             return;
         }
@@ -185,8 +157,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         // Check depth before allowing folder creation
         const calculateDepth = (pathStr: string): number => {
             if (!pathStr || pathStr === "/") return 0;
-            return pathStr.split("/").filter(segment => segment.length > 0)
-                .length;
+            return pathStr.split("/").filter(segment => segment.length > 0).length;
         };
 
         const currentDepth = calculateDepth(parentPath);
@@ -219,17 +190,14 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     },
                     onError: error => {
                         console.error("Folder creation failed:", error);
-                        const errorMessage =
-                            error instanceof Error
-                                ? error.message
-                                : "Failed to create folder";
+                        const errorMessage = error instanceof Error ? error.message : "Failed to create folder";
                         toast({
                             variant: "destructive",
                             title: "Failed to create folder",
                             description: errorMessage,
                         });
                     },
-                }
+                },
             );
         }
     };
@@ -238,9 +206,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         if (selectedFiles.length === 0) return;
 
         // TODO: Replace with proper confirmation dialog
-        const confirmDelete = window.confirm(
-            `Are you sure you want to delete ${selectedFiles.length} item(s)?`
-        );
+        const confirmDelete = window.confirm(`Are you sure you want to delete ${selectedFiles.length} item(s)?`);
 
         if (!confirmDelete) return;
 
@@ -254,10 +220,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             });
         } catch (error) {
             console.error("Delete failed:", error);
-            const errorMessage =
-                error instanceof Error
-                    ? error.message
-                    : "Failed to delete items";
+            const errorMessage = error instanceof Error ? error.message : "Failed to delete items";
             toast({
                 variant: "destructive",
                 title: "Failed to delete items",
@@ -284,10 +247,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             });
         } catch (error) {
             console.error("Upload failed:", error);
-            const errorMessage =
-                error instanceof Error
-                    ? error.message
-                    : "Failed to upload files";
+            const errorMessage = error instanceof Error ? error.message : "Failed to upload files";
             toast({
                 variant: "destructive",
                 title: "Failed to upload files",
@@ -350,9 +310,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
     const handleDeleteSingleItem = async (itemPath: string) => {
         // TODO: Replace with proper confirmation dialog
-        const confirmDelete = window.confirm(
-            `Are you sure you want to delete "${itemPath}"?`
-        );
+        const confirmDelete = window.confirm(`Are you sure you want to delete "${itemPath}"?`);
 
         if (!confirmDelete) return;
 
@@ -365,10 +323,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             });
         } catch (error) {
             console.error("Delete failed:", error);
-            const errorMessage =
-                error instanceof Error
-                    ? error.message
-                    : "Failed to delete item";
+            const errorMessage = error instanceof Error ? error.message : "Failed to delete item";
             toast({
                 variant: "destructive",
                 title: "Failed to delete item",
@@ -381,10 +336,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         if (!moveItemPath) return;
 
         // Prevent moving to self or invalid paths
-        if (
-            targetPath === moveItemPath ||
-            moveItemPath.startsWith(`${targetPath}/`)
-        ) {
+        if (targetPath === moveItemPath || moveItemPath.startsWith(`${targetPath}/`)) {
             toast({
                 variant: "destructive",
                 title: "Invalid move",
@@ -402,8 +354,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             const targetName =
                 targetPath === ""
                     ? "root folder"
-                    : (filteredFiles.find(f => f.path === targetPath)?.name ??
-                      "destination folder");
+                    : (filteredFiles.find(f => f.path === targetPath)?.name ?? "destination folder");
 
             toast({
                 variant: "success",
@@ -416,8 +367,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             setMoveItemName("");
         } catch (error) {
             console.error("Move failed:", error);
-            const errorMessage =
-                error instanceof Error ? error.message : "Failed to move item";
+            const errorMessage = error instanceof Error ? error.message : "Failed to move item";
             toast({
                 variant: "destructive",
                 title: "Move failed",
@@ -426,30 +376,22 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         }
     };
 
-    const renderFolderList = (
-        items: FileItem[],
-        level = 0
-    ): React.ReactNode[] =>
+    const renderFolderList = (items: FileItem[], level = 0): React.ReactNode[] =>
         items
             .map(item => {
                 if (item.type === "folder" && item.path !== moveItemPath) {
-                    const hasChildren =
-                        item.children && item.children.length > 0;
+                    const hasChildren = item.children && item.children.length > 0;
                     return (
                         <div key={item.path}>
                             <Button
                                 variant="ghost"
-                                className={cn(
-                                    "h-auto w-full justify-start px-2 py-1 text-left",
-                                    level > 0 && "ml-4"
-                                )}
+                                className={cn("h-auto w-full justify-start px-2 py-1 text-left", level > 0 && "ml-4")}
                                 onClick={() => handleMoveToFolder(item.path)}
                             >
                                 <Folder className="mr-2 h-4 w-4" />
                                 {item.name}
                             </Button>
-                            {hasChildren &&
-                                renderFolderList(item.children!, level + 1)}
+                            {hasChildren && renderFolderList(item.children!, level + 1)}
                         </div>
                     );
                 }
@@ -458,11 +400,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             .filter(Boolean);
 
     // Drag and drop handlers
-    const handleDragStart = (
-        e: React.DragEvent,
-        itemPath: string,
-        itemName: string
-    ) => {
+    const handleDragStart = (e: React.DragEvent, itemPath: string, itemName: string) => {
         setDraggedItem(itemPath);
         setDraggedItemName(itemName);
         setIsDragging(true);
@@ -486,11 +424,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         });
     };
 
-    const handleDragOver = (
-        e: React.DragEvent,
-        targetPath: string,
-        isFolder: boolean
-    ) => {
+    const handleDragOver = (e: React.DragEvent, targetPath: string, isFolder: boolean) => {
         e.preventDefault();
         if (!isFolder || !isDragging || draggedItem === targetPath) return;
 
@@ -534,20 +468,11 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         }
     };
 
-    const handleDrop = async (
-        e: React.DragEvent,
-        targetPath: string,
-        isFolder: boolean
-    ) => {
+    const handleDrop = async (e: React.DragEvent, targetPath: string, isFolder: boolean) => {
         e.preventDefault();
         setDragOverFolder(null);
 
-        if (
-            !isFolder ||
-            !draggedItem ||
-            draggedItem === targetPath ||
-            !isDragging
-        ) {
+        if (!isFolder || !draggedItem || draggedItem === targetPath || !isDragging) {
             handleDragEnd();
             return;
         }
@@ -558,8 +483,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             toast({
                 variant: "destructive",
                 title: "Invalid move",
-                description:
-                    "Cannot move a folder into itself or its subfolder.",
+                description: "Cannot move a folder into itself or its subfolder.",
             });
             return;
         }
@@ -573,8 +497,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             const targetName =
                 targetPath === ""
                     ? "root folder"
-                    : (filteredFiles.find(f => f.path === targetPath)?.name ??
-                      "destination folder");
+                    : (filteredFiles.find(f => f.path === targetPath)?.name ?? "destination folder");
 
             toast({
                 variant: "success",
@@ -583,8 +506,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             });
         } catch (error) {
             console.error("Move failed:", error);
-            const errorMessage =
-                error instanceof Error ? error.message : "Failed to move item";
+            const errorMessage = error instanceof Error ? error.message : "Failed to move item";
             toast({
                 variant: "destructive",
                 title: "Move failed",
@@ -609,7 +531,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
         setAnimatingFolders(new Set());
 
         // Reset styles of all draggable elements with smooth transition
-        const dragElements = document.querySelectorAll('[draggable="true"]');
+        const dragElements = document.querySelectorAll("[draggable=\"true\"]");
         dragElements.forEach(el => {
             const element = el as HTMLElement;
             element.style.opacity = "";
@@ -626,10 +548,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     };
 
     // Helper function to handle checkbox selection
-    const handleCheckboxChange = (
-        itemPath: string,
-        checked: boolean | string
-    ) => {
+    const handleCheckboxChange = (itemPath: string, checked: boolean | string) => {
         if (checked) {
             handleSelectFile(itemPath);
         } else {
@@ -644,10 +563,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     };
 
     // Handle keyboard navigation for folder toggle
-    const handleFolderToggleKeyDown = (
-        e: React.KeyboardEvent,
-        itemPath: string
-    ) => {
+    const handleFolderToggleKeyDown = (e: React.KeyboardEvent, itemPath: string) => {
         if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             e.stopPropagation();
@@ -658,19 +574,11 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     // Render chevron icon for folders
     const renderChevronIcon = (isExpanded: boolean, hasChildren: boolean) => {
         if (!hasChildren) return <div className="h-4 w-4" />;
-        return isExpanded ? (
-            <ChevronDown size={14} />
-        ) : (
-            <ChevronRight size={14} />
-        );
+        return isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />;
     };
 
     // Render file/folder icon
-    const renderFileIcon = (
-        isFolder: boolean,
-        isExpanded: boolean,
-        hasChildren: boolean
-    ) => {
+    const renderFileIcon = (isFolder: boolean, isExpanded: boolean, hasChildren: boolean) => {
         if (isFolder) {
             return isExpanded && hasChildren ? (
                 <FolderOpen size={14} className="text-blue-500" />
@@ -684,17 +592,12 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     const renderFileItem = (item: FileItem, level = 0): React.ReactNode => {
         const isFolder = item.type === "folder";
         const isExpanded = expandedFolders.has(item.path);
-        const hasChildren =
-            isFolder && item.children && item.children.length > 0;
+        const hasChildren = isFolder && item.children && item.children.length > 0;
         const indentLevel = level * 16;
         const isBeingDragged = draggedItem === item.path;
         const isDropTarget = dragOverFolder === item.path && isFolder;
         const isAnimating = animatingFolders.has(item.path);
-        const canReceiveDrop =
-            isFolder &&
-            isDragging &&
-            !isBeingDragged &&
-            !item.path.startsWith(draggedItem ?? "");
+        const canReceiveDrop = isFolder && isDragging && !isBeingDragged && !item.path.startsWith(draggedItem ?? "");
 
         return (
             <div
@@ -731,35 +634,22 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         selectedFiles.includes(item.path) && "bg-accent",
                         isBeingDragged && "scale-95 opacity-40 shadow-lg",
                         isDropTarget && "bg-blue-50 dark:bg-blue-900/20",
-                        isAnimating &&
-                            "animate-pulse border-2 border-green-300 bg-green-50 dark:bg-green-900/20",
+                        isAnimating && "animate-pulse border-2 border-green-300 bg-green-50 dark:bg-green-900/20",
                         canReceiveDrop &&
                             "hover:border-2 hover:border-dashed hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20",
-                        !canReceiveDrop &&
-                            isDragging &&
-                            isFolder &&
-                            "opacity-60"
+                        !canReceiveDrop && isDragging && isFolder && "opacity-60",
                     )}
                     style={{ paddingLeft: `${8 + indentLevel}px` }}
                     onClick={e => handleItemClick(item, e)}
                     onKeyDown={e => handleFileItemKeyDown(e, item)}
-                    title={
-                        canReceiveDrop
-                            ? `Drop "${draggedItemName}" here`
-                            : undefined
-                    }
-                    aria-label={`${
-                        item.type === "folder" ? "Folder" : "File"
-                    }: ${item.name}`}
+                    title={canReceiveDrop ? `Drop "${draggedItemName}" here` : undefined}
+                    aria-label={`${item.type === "folder" ? "Folder" : "File"}: ${item.name}`}
                 >
                     {/* Selection checkbox - show when in selection mode or when item is selected */}
-                    {(isSelectionModeActive ||
-                        selectedFiles.includes(item.path)) && (
+                    {(isSelectionModeActive || selectedFiles.includes(item.path)) && (
                         <Checkbox
                             checked={selectedFiles.includes(item.path)}
-                            onCheckedChange={checked =>
-                                handleCheckboxChange(item.path, checked)
-                            }
+                            onCheckedChange={checked => handleCheckboxChange(item.path, checked)}
                             className="flex-shrink-0"
                             onClick={e => e.stopPropagation()}
                         />
@@ -773,13 +663,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 e.stopPropagation();
                                 toggleFolder(item.path);
                             }}
-                            onKeyDown={e =>
-                                handleFolderToggleKeyDown(e, item.path)
-                            }
+                            onKeyDown={e => handleFolderToggleKeyDown(e, item.path)}
                             className="hover:bg-accent focus:ring-ring flex h-4 w-4 items-center justify-center rounded-sm focus:ring-2 focus:outline-none"
-                            aria-label={`${
-                                isExpanded ? "Collapse" : "Expand"
-                            } folder ${item.name}`}
+                            aria-label={`${isExpanded ? "Collapse" : "Expand"} folder ${item.name}`}
                         >
                             {renderChevronIcon(isExpanded, !!hasChildren)}
                         </button>
@@ -795,9 +681,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
                     {/* Drag over indicator */}
                     {dragOverFolder === item.path && isFolder && (
-                        <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                            Drop here
-                        </span>
+                        <span className="text-xs font-medium text-blue-600 dark:text-blue-400">Drop here</span>
                     )}
 
                     {/* Actions dropdown */}
@@ -813,25 +697,14 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 <MoreHorizontal size={12} />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                            align="end"
-                            className="bg-background/90 backdrop-blur-[90%]"
-                        >
+                        <DropdownMenuContent align="end" className="bg-background/90 backdrop-blur-[90%]">
                             {isFolder && (
                                 <>
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            handleCreateFile(item.path)
-                                        }
-                                    >
+                                    <DropdownMenuItem onClick={() => handleCreateFile(item.path)}>
                                         <Plus size={14} className="mr-2" />
                                         New File
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            handleCreateFolder(item.path)
-                                        }
-                                    >
+                                    <DropdownMenuItem onClick={() => handleCreateFolder(item.path)}>
                                         <Plus size={14} className="mr-2" />
                                         New Folder
                                     </DropdownMenuItem>
@@ -850,9 +723,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 Move to...
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() =>
-                                    handleDeleteSingleItem(item.path)
-                                }
+                                onClick={() => handleDeleteSingleItem(item.path)}
                                 className="text-red-600 focus:text-red-600"
                             >
                                 <Trash2 size={14} className="mr-2" />
@@ -864,11 +735,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
                 {/* Render children if folder is expanded */}
                 {isFolder && isExpanded && hasChildren && (
-                    <div>
-                        {item.children!.map(child =>
-                            renderFileItem(child, level + 1)
-                        )}
-                    </div>
+                    <div>{item.children!.map(child => renderFileItem(child, level + 1))}</div>
                 )}
             </div>
         );
@@ -888,9 +755,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             <aside
                 className={cn(
                     "bg-background border-border fixed top-0 left-0 z-40 h-screen w-80 transform border-r transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
-                    open
-                        ? "translate-x-0"
-                        : "-translate-x-full lg:translate-x-0"
+                    open ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
                 )}
             >
                 <div className="flex h-full flex-col">
@@ -898,12 +763,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     <div className="border-border flex items-center justify-between border-b p-4">
                         <h2 className="text-lg font-semibold">Files</h2>
                         <div className="flex items-center gap-1">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleCreateFile()}
-                                title="New File"
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => handleCreateFile()} title="New File">
                                 <Plus className="h-4 w-4" />
                             </Button>
                             <input
@@ -917,11 +777,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() =>
-                                    document
-                                        .getElementById("file-upload")
-                                        ?.click()
-                                }
+                                onClick={() => document.getElementById("file-upload")?.click()}
                                 title="Upload Files"
                                 disabled={uploadFilesMutation.isPending}
                             >
@@ -935,24 +791,12 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 variant="ghost"
                                 size="sm"
                                 onClick={toggleSelectionMode}
-                                title={
-                                    isSelectionModeActive
-                                        ? "Exit Selection Mode"
-                                        : "Enter Selection Mode"
-                                }
-                                className={cn(
-                                    "px-2 text-xs",
-                                    isSelectionModeActive && "bg-accent"
-                                )}
+                                title={isSelectionModeActive ? "Exit Selection Mode" : "Enter Selection Mode"}
+                                className={cn("px-2 text-xs", isSelectionModeActive && "bg-accent")}
                             >
                                 {isSelectionModeActive ? "Exit" : "Select"}
                             </Button>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onOpenChange(false)}
-                                className="lg:hidden"
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="lg:hidden">
                                 ✕
                             </Button>
                         </div>
@@ -962,9 +806,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     {selectedFiles.length > 0 && (
                         <div className="bg-accent/20 border-border flex items-center justify-between border-b px-4 py-2">
                             <div className="flex items-center gap-2">
-                                <span className="text-muted-foreground text-xs">
-                                    {selectedFiles.length} selected
-                                </span>
+                                <span className="text-muted-foreground text-xs">{selectedFiles.length} selected</span>
                                 <Button
                                     variant="ghost"
                                     size="sm"
@@ -1003,9 +845,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     <div className="border-border border-b p-4">
                         <SearchInput
                             searchTerm={searchTerm}
-                            onSearchChange={(
-                                e: React.ChangeEvent<HTMLInputElement>
-                            ) => setSearchTerm(e.target.value)}
+                            onSearchChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                             onClearSearch={() => setSearchTerm("")}
                             resultsCount={filteredFiles.length}
                             hasResults={filteredFiles.length > 0}
@@ -1016,24 +856,12 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     {/* Folder Controls */}
                     {!searchTerm && filteredFiles.length > 0 && (
                         <div className="border-border flex items-center justify-between border-b px-4 py-2">
-                            <span className="text-muted-foreground text-xs font-medium">
-                                FOLDERS
-                            </span>
+                            <span className="text-muted-foreground text-xs font-medium">FOLDERS</span>
                             <div className="flex items-center gap-1">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={expandAll}
-                                    className="h-6 px-2 text-xs"
-                                >
+                                <Button variant="ghost" size="sm" onClick={expandAll} className="h-6 px-2 text-xs">
                                     Expand All
                                 </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={collapseAll}
-                                    className="h-6 px-2 text-xs"
-                                >
+                                <Button variant="ghost" size="sm" onClick={collapseAll} className="h-6 px-2 text-xs">
                                     Collapse All
                                 </Button>
                             </div>
@@ -1044,7 +872,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     <section
                         className={cn(
                             "relative flex-1 overflow-auto",
-                            isDragging && "bg-blue-50/30 dark:bg-blue-900/10"
+                            isDragging && "bg-blue-50/30 dark:bg-blue-900/10",
                         )}
                         onDragOver={e => handleDragOver(e, "", true)}
                         onDragLeave={handleDragLeave}
@@ -1056,8 +884,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                             <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-blue-500/5">
                                 <div className="rounded-lg border border-blue-300 bg-white px-4 py-2 shadow-lg dark:bg-gray-800">
                                     <div className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                                        📁 Drop to move "{draggedItemName}" to
-                                        root folder
+                                        📁 Drop to move "{draggedItemName}" to root folder
                                     </div>
                                     <div className="mt-1 text-xs text-blue-600 dark:text-blue-400">
                                         Or drop on a specific folder below
@@ -1075,15 +902,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         {error && (
                             <div className="p-4">
                                 <Card className="border-destructive bg-destructive/10 p-4">
-                                    <p className="text-destructive text-sm">
-                                        Failed to load files: {error.message}
-                                    </p>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => refetch()}
-                                        className="mt-2"
-                                    >
+                                    <p className="text-destructive text-sm">Failed to load files: {error.message}</p>
+                                    <Button variant="outline" size="sm" onClick={() => refetch()} className="mt-2">
                                         Retry
                                     </Button>
                                 </Card>
@@ -1093,15 +913,10 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         {!isLoading && !error && (
                             <>
                                 {filteredFiles.length === 0 ? (
-                                    <NoResults
-                                        searchTerm={searchTerm}
-                                        onClearSearch={() => setSearchTerm("")}
-                                    />
+                                    <NoResults searchTerm={searchTerm} onClearSearch={() => setSearchTerm("")} />
                                 ) : (
                                     <div className="space-y-1 p-2">
-                                        {filteredFiles.map(item =>
-                                            renderFileItem(item)
-                                        )}
+                                        {filteredFiles.map(item => renderFileItem(item))}
                                     </div>
                                 )}
                             </>
@@ -1112,8 +927,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     {isSelectionModeActive && selectedFiles.length === 0 && (
                         <div className="border-border bg-muted/20 border-t p-3">
                             <div className="text-muted-foreground text-center text-xs">
-                                Selection mode active - click checkboxes to
-                                select items
+                                Selection mode active - click checkboxes to select items
                             </div>
                         </div>
                     )}
@@ -1132,9 +946,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                 <DialogContent className="bg-background/90 backdrop-blur-[90%]">
                     <DialogHeader>
                         <DialogTitle>Move "{moveItemName}"</DialogTitle>
-                        <DialogDescription>
-                            Select a destination folder for "{moveItemName}"
-                        </DialogDescription>
+                        <DialogDescription>Select a destination folder for "{moveItemName}"</DialogDescription>
                     </DialogHeader>
                     <div className="max-h-96 space-y-1 overflow-auto">
                         {/* Root folder option */}
@@ -1150,10 +962,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         {renderFolderList(filteredFiles)}
                     </div>
                     <div className="flex justify-end gap-2 pt-4">
-                        <Button
-                            variant="outline"
-                            onClick={() => setShowMoveDialog(false)}
-                        >
+                        <Button variant="outline" onClick={() => setShowMoveDialog(false)}>
                             Cancel
                         </Button>
                     </div>

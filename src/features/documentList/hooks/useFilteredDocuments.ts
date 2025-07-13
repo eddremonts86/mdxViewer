@@ -1,34 +1,19 @@
 import { useMemo } from "react";
 
-import type {
-    DocumentCardProps,
-    DocumentsByFolder,
-    FilterType,
-} from "../types";
+import type { DocumentCardProps, DocumentsByFolder, FilterType } from "../types";
 
-export function useFilteredDocuments(
-    documents: DocumentCardProps[],
-    searchQuery: string,
-    selectedFilter: FilterType,
-) {
+export function useFilteredDocuments(documents: DocumentCardProps[], searchQuery: string, selectedFilter: FilterType) {
     // Filter documents based on search and type
     const filteredDocuments = useMemo(
         () =>
             documents.filter(doc => {
                 const matchesSearch =
                     searchQuery === "" ||
-                    doc.title
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase()) ||
-                    doc.folder
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase()) ||
-                    doc.description
-                        ?.toLowerCase()
-                        .includes(searchQuery.toLowerCase());
+                    doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    doc.folder.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    doc.description?.toLowerCase().includes(searchQuery.toLowerCase());
 
-                const matchesFilter =
-                    selectedFilter === "all" || doc.type === selectedFilter;
+                const matchesFilter = selectedFilter === "all" || doc.type === selectedFilter;
 
                 return matchesSearch && matchesFilter;
             }),

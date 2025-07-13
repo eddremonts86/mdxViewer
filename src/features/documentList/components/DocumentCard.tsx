@@ -5,13 +5,7 @@ import { Clock, ExternalLink, File, FileText } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 import type { DocumentCardProps } from "../types";
 
@@ -62,9 +56,7 @@ export function DocumentCard({
                                 isLoading ? "opacity-0" : "opacity-100"
                             }`}
                             onError={() => {
-                                console.log(
-                                    `Preview failed to load: ${title} - ${previewUrl}`,
-                                );
+                                console.log(`Preview failed to load: ${title} - ${previewUrl}`);
                                 setImageError(true);
                                 setIsLoading(false);
                             }}
@@ -100,10 +92,7 @@ export function DocumentCard({
                 {/* Preview indicator */}
                 {previewUrl && !imageError && (
                     <div className="absolute bottom-2 left-2">
-                        <Badge
-                            variant="outline"
-                            className="bg-background/80 px-1.5 py-0.5 text-xs backdrop-blur-sm"
-                        >
+                        <Badge variant="outline" className="bg-background/80 px-1.5 py-0.5 text-xs backdrop-blur-sm">
                             Preview
                         </Badge>
                     </div>
@@ -117,10 +106,7 @@ export function DocumentCard({
                             {title}
                         </CardTitle>
                         <div className="mt-1 flex flex-wrap items-center gap-2">
-                            <Badge
-                                variant="outline"
-                                className="px-1.5 py-0.5 text-xs"
-                            >
+                            <Badge variant="outline" className="px-1.5 py-0.5 text-xs">
                                 📁 {folder}
                             </Badge>
                             {previewUrl && !imageError && (
@@ -145,11 +131,7 @@ export function DocumentCard({
                 </div>
             </CardHeader>
             <CardContent className="pt-0">
-                {description && (
-                    <CardDescription className="mb-3 line-clamp-2 text-sm">
-                        {description}
-                    </CardDescription>
-                )}
+                {description && <CardDescription className="mb-3 line-clamp-2 text-sm">{description}</CardDescription>}
 
                 <div className="text-muted-foreground flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1">

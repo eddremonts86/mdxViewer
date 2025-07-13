@@ -52,18 +52,16 @@ class FileAPI {
         const result: ApiResponse<FileItem[]> = await response.json();
 
         if (!result.success) {
-            throw new Error(result.error || "Failed to get file list");
+            throw new Error(result.error ?? "Failed to get file list");
         }
 
-        return result.data || [];
+        return result.data ?? [];
     }
 
     /**
      * Get file content
      */
-    static async getFileContent(
-        filePath: string,
-    ): Promise<{ path: string; content: string }> {
+    static async getFileContent(filePath: string): Promise<{ path: string; content: string }> {
         // Convert path to kebab-case to match the file system structure
         const kebabCasePath = filePath
             .toLowerCase()
@@ -75,23 +73,16 @@ class FileAPI {
             .replace(/^-+/, "")
             .replace(/-+$/, "");
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/files/content?path=${encodeURIComponent(
-                kebabCasePath,
-            )}`,
-        );
+        const response = await fetch(`${API_BASE_URL}/api/files/content?path=${encodeURIComponent(kebabCasePath)}`);
 
         if (!response.ok) {
-            throw new Error(
-                `Failed to fetch file content: ${response.statusText}`,
-            );
+            throw new Error(`Failed to fetch file content: ${response.statusText}`);
         }
 
-        const result: ApiResponse<{ path: string; content: string }> =
-            await response.json();
+        const result: ApiResponse<{ path: string; content: string }> = await response.json();
 
         if (!result.success) {
-            throw new Error(result.error || "Failed to get file content");
+            throw new Error(result.error ?? "Failed to get file content");
         }
 
         return result.data!;
@@ -100,9 +91,7 @@ class FileAPI {
     /**
      * Create a new file
      */
-    static async createFile(
-        params: CreateFileRequest,
-    ): Promise<{ path: string; name: string }> {
+    static async createFile(params: CreateFileRequest): Promise<{ path: string; name: string }> {
         const response = await fetch(`${API_BASE_URL}/api/files/create`, {
             method: "POST",
             headers: {
@@ -113,17 +102,13 @@ class FileAPI {
 
         if (!response.ok) {
             const errorResult: ApiResponse = await response.json();
-            throw new Error(
-                errorResult.error ||
-                    `Failed to create file: ${response.statusText}`,
-            );
+            throw new Error(errorResult.error ?? `Failed to create file: ${response.statusText}`);
         }
 
-        const result: ApiResponse<{ path: string; name: string }> =
-            await response.json();
+        const result: ApiResponse<{ path: string; name: string }> = await response.json();
 
         if (!result.success) {
-            throw new Error(result.error || "Failed to create file");
+            throw new Error(result.error ?? "Failed to create file");
         }
 
         return result.data!;
@@ -132,9 +117,7 @@ class FileAPI {
     /**
      * Create a new folder
      */
-    static async createFolder(
-        params: CreateFolderRequest,
-    ): Promise<{ path: string; name: string }> {
+    static async createFolder(params: CreateFolderRequest): Promise<{ path: string; name: string }> {
         const response = await fetch(`${API_BASE_URL}/api/folders/create`, {
             method: "POST",
             headers: {
@@ -145,17 +128,13 @@ class FileAPI {
 
         if (!response.ok) {
             const errorResult: ApiResponse = await response.json();
-            throw new Error(
-                errorResult.error ||
-                    `Failed to create folder: ${response.statusText}`,
-            );
+            throw new Error(errorResult.error ?? `Failed to create folder: ${response.statusText}`);
         }
 
-        const result: ApiResponse<{ path: string; name: string }> =
-            await response.json();
+        const result: ApiResponse<{ path: string; name: string }> = await response.json();
 
         if (!result.success) {
-            throw new Error(result.error || "Failed to create folder");
+            throw new Error(result.error ?? "Failed to create folder");
         }
 
         return result.data!;
@@ -164,9 +143,7 @@ class FileAPI {
     /**
      * Delete files/folders
      */
-    static async deleteItems(
-        paths: string[],
-    ): Promise<{ deleted: Array<{ path: string; type: "file" | "folder" }> }> {
+    static async deleteItems(paths: string[]): Promise<{ deleted: Array<{ path: string; type: "file" | "folder" }> }> {
         const response = await fetch(`${API_BASE_URL}/api/files`, {
             method: "DELETE",
             headers: {
@@ -177,10 +154,7 @@ class FileAPI {
 
         if (!response.ok) {
             const errorResult: ApiResponse = await response.json();
-            throw new Error(
-                errorResult.error ||
-                    `Failed to delete items: ${response.statusText}`,
-            );
+            throw new Error(errorResult.error ?? `Failed to delete items: ${response.statusText}`);
         }
 
         const result: ApiResponse<{
@@ -188,7 +162,7 @@ class FileAPI {
         }> = await response.json();
 
         if (!result.success) {
-            throw new Error(result.error || "Failed to delete items");
+            throw new Error(result.error ?? "Failed to delete items");
         }
 
         return result.data!;
@@ -197,11 +171,7 @@ class FileAPI {
     /**
      * Upload multiple files
      */
-    static async uploadFiles(
-        files: File[],
-        targetPath = "",
-        createFolders = true,
-    ): Promise<any> {
+    static async uploadFiles(files: File[], targetPath = "", createFolders = true): Promise<any> {
         const formData = new FormData();
 
         files.forEach(file => {
@@ -218,16 +188,13 @@ class FileAPI {
 
         if (!response.ok) {
             const errorResult: ApiResponse = await response.json();
-            throw new Error(
-                errorResult.error ||
-                    `Failed to upload files: ${response.statusText}`,
-            );
+            throw new Error(errorResult.error ?? `Failed to upload files: ${response.statusText}`);
         }
 
         const result: ApiResponse = await response.json();
 
         if (!result.success) {
-            throw new Error(result.error || "Failed to upload files");
+            throw new Error(result.error ?? "Failed to upload files");
         }
 
         return result.data;
@@ -250,10 +217,7 @@ class FileAPI {
 
         if (!response.ok) {
             const errorResult: ApiResponse = await response.json();
-            throw new Error(
-                errorResult.error ||
-                    `Failed to move item: ${response.statusText}`,
-            );
+            throw new Error(errorResult.error ?? `Failed to move item: ${response.statusText}`);
         }
 
         const result: ApiResponse<{
@@ -263,7 +227,7 @@ class FileAPI {
         }> = await response.json();
 
         if (!result.success) {
-            throw new Error(result.error || "Failed to move item");
+            throw new Error(result.error ?? "Failed to move item");
         }
 
         return result.data!;

@@ -14,9 +14,7 @@ describe("🖼️ Complete Preview Accessibility Test", () => {
 
     beforeAll(async () => {
         // Import the actual server
-        const { default: serverApp } = await import(
-            "../../server/clean-server.ts"
-        );
+        const { default: serverApp } = await import("../../clean-server.ts");
         app = serverApp;
 
         // Get all files from the API
@@ -39,7 +37,7 @@ describe("🖼️ Complete Preview Accessibility Test", () => {
         previewUrls = allFiles.map(file => file.preview);
 
         console.log(
-            `🔍 Found ${allFiles.length} files with ${previewUrls.length} preview URLs`
+            `🔍 Found ${allFiles.length} files with ${previewUrls.length} preview URLs`,
         );
     });
 
@@ -79,7 +77,7 @@ describe("🖼️ Complete Preview Accessibility Test", () => {
                 // Progress indicator
                 if ((i + 1) % 10 === 0) {
                     console.log(
-                        `  ✅ Tested ${i + 1}/${previewUrls.length} previews`
+                        `  ✅ Tested ${i + 1}/${previewUrls.length} previews`,
                     );
                 }
             } catch (error) {
@@ -97,12 +95,12 @@ describe("🖼️ Complete Preview Accessibility Test", () => {
         const successful = results.filter(r => r.success);
         const failed = results.filter(r => !r.success);
 
-        console.log(`\\n📊 Preview Test Results:`);
+        console.log("\\n📊 Preview Test Results:");
         console.log(`  ✅ Successful: ${successful.length}/${results.length}`);
         console.log(`  ❌ Failed: ${failed.length}/${results.length}`);
 
         if (failed.length > 0) {
-            console.log(`\\n❌ Failed URLs:`);
+            console.log("\\n❌ Failed URLs:");
             failed.forEach(f => {
                 console.log(`    ${f.url} (${f.file}) - Status: ${f.status}`);
             });
@@ -136,7 +134,7 @@ describe("🖼️ Complete Preview Accessibility Test", () => {
     describe("🎯 Specific Nesting Level Tests", () => {
         it("should handle 1-level nesting", async () => {
             const level1Files = allFiles.filter(
-                f => f.path.split("/").length === 2
+                f => f.path.split("/").length === 2,
             );
 
             if (level1Files.length > 0) {
@@ -150,7 +148,7 @@ describe("🖼️ Complete Preview Accessibility Test", () => {
 
         it("should handle 2-level nesting", async () => {
             const level2Files = allFiles.filter(
-                f => f.path.split("/").length === 3
+                f => f.path.split("/").length === 3,
             );
 
             if (level2Files.length > 0) {
@@ -164,7 +162,7 @@ describe("🖼️ Complete Preview Accessibility Test", () => {
 
         it("should handle 3-level nesting", async () => {
             const level3Files = allFiles.filter(
-                f => f.path.split("/").length === 4
+                f => f.path.split("/").length === 4,
             );
 
             if (level3Files.length > 0) {
@@ -178,7 +176,7 @@ describe("🖼️ Complete Preview Accessibility Test", () => {
 
         it("should handle 4+ level nesting", async () => {
             const level4PlusFiles = allFiles.filter(
-                f => f.path.split("/").length >= 5
+                f => f.path.split("/").length >= 5,
             );
 
             if (level4PlusFiles.length > 0) {
@@ -199,7 +197,7 @@ describe("🖼️ Complete Preview Accessibility Test", () => {
             });
 
             console.log(
-                `🔍 Testing deepest file: ${deepestFile.path} (${deepestFile.path.split("/").length} levels)`
+                `🔍 Testing deepest file: ${deepestFile.path} (${deepestFile.path.split("/").length} levels)`,
             );
 
             await request(app)
@@ -254,7 +252,7 @@ describe("🖼️ Complete Preview Accessibility Test", () => {
             expect(endTime - startTime).toBeLessThan(10000);
 
             console.log(
-                `⚡ Concurrent test completed in ${endTime - startTime}ms`
+                `⚡ Concurrent test completed in ${endTime - startTime}ms`,
             );
         });
 
@@ -287,13 +285,13 @@ describe("🖼️ Complete Preview Accessibility Test", () => {
 
             console.log("\\n📊 Test Coverage Report:");
             console.log(`  📄 Total files tested: ${allFiles.length}`);
-            console.log(`  🌳 Nesting levels covered:`);
+            console.log("  🌳 Nesting levels covered:");
             Array.from(nestingLevels.entries())
                 .sort(([a], [b]) => a - b)
                 .forEach(([level, count]) => {
                     console.log(`    Level ${level}: ${count} files`);
                 });
-            console.log(`  📝 File types tested:`);
+            console.log("  📝 File types tested:");
             Array.from(fileTypes.entries()).forEach(([type, count]) => {
                 console.log(`    ${type}: ${count} files`);
             });

@@ -3,13 +3,7 @@
  */
 import type { ReactNode } from "react";
 
-import {
-    ChevronDown,
-    ChevronRight,
-    File,
-    Folder,
-    FolderOpen,
-} from "lucide-react";
+import { ChevronDown, ChevronRight, File, Folder, FolderOpen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -22,11 +16,7 @@ interface ToggleButtonProps {
     isSearching: boolean;
 }
 
-export const ToggleButton = ({
-    isExpanded,
-    onToggle,
-    isSearching,
-}: ToggleButtonProps) => (
+export const ToggleButton = ({ isExpanded, onToggle, isSearching }: ToggleButtonProps) => (
     <Button
         variant="ghost"
         size="sm"
@@ -41,11 +31,7 @@ export const ToggleButton = ({
         disabled={isSearching}
         type="button"
     >
-        {isExpanded ? (
-            <ChevronDown className="h-3 w-3" />
-        ) : (
-            <ChevronRight className="h-3 w-3" />
-        )}
+        {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
     </Button>
 );
 
@@ -56,26 +42,16 @@ interface NodeIconProps {
     hasActiveChild: boolean;
 }
 
-export const NodeIcon = ({
-    node,
-    isExpanded,
-    hasActiveChild,
-}: NodeIconProps) => {
+export const NodeIcon = ({ node, isExpanded, hasActiveChild }: NodeIconProps) => {
     if (node.type === "folder") {
         const iconClass = cn(
             "w-4 h-4 min-w-4 flex-shrink-0",
-            hasActiveChild ? "text-primary" : "text-muted-foreground"
+            hasActiveChild ? "text-primary" : "text-muted-foreground",
         );
-        return isExpanded ? (
-            <FolderOpen className={iconClass} />
-        ) : (
-            <Folder className={iconClass} />
-        );
+        return isExpanded ? <FolderOpen className={iconClass} /> : <Folder className={iconClass} />;
     }
 
-    return (
-        <File className="text-muted-foreground h-4 w-4 min-w-4 flex-shrink-0" />
-    );
+    return <File className="text-muted-foreground h-4 w-4 min-w-4 flex-shrink-0" />;
 };
 
 // Highlighted text component
@@ -84,28 +60,19 @@ interface HighlightedTextProps {
     searchTerm?: string;
 }
 
-export const HighlightedText = ({
-    text,
-    searchTerm,
-}: HighlightedTextProps): ReactNode => {
+export const HighlightedText = ({ text, searchTerm }: HighlightedTextProps): ReactNode => {
     if (!searchTerm?.trim()) return text;
 
-    const regex = new RegExp(
-        `(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
-        "gi"
-    );
+    const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
     const parts = text.split(regex);
 
     return parts.map((part, index) =>
         regex.test(part) ? (
-            <mark
-                key={`${part}-${index}`}
-                className="rounded bg-yellow-200 px-1 dark:bg-yellow-800"
-            >
+            <mark key={`${part}-${index}`} className="rounded bg-yellow-200 px-1 dark:bg-yellow-800">
                 {part}
             </mark>
         ) : (
             part
-        )
+        ),
     );
 };

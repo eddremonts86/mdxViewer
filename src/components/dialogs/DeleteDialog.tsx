@@ -57,34 +57,21 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({
                 <DialogHeader>
                     <DialogTitle className="text-destructive flex items-center space-x-2">
                         <AlertTriangle className="h-5 w-5" />
-                        <span>
-                            Delete {itemType === "file" ? "File" : "Folder"}
-                        </span>
+                        <span>Delete {itemType === "file" ? "File" : "Folder"}</span>
                     </DialogTitle>
                     <DialogDescription>
                         Are you sure you want to delete{" "}
-                        <span className="text-foreground font-semibold">
-                            "{itemName}"
-                        </span>
-                        ?
+                        <span className="text-foreground font-semibold">"{itemName}"</span>?
                         {itemType === "folder" && (
                             <span className="text-destructive/80 mt-2 block">
-                                This will also delete all files and subfolders
-                                inside it.
+                                This will also delete all files and subfolders inside it.
                             </span>
                         )}
-                        <span className="mt-2 block font-medium">
-                            This action cannot be undone.
-                        </span>
+                        <span className="mt-2 block font-medium">This action cannot be undone.</span>
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="flex space-x-2">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => onOpenChange(false)}
-                        disabled={isLoading}
-                    >
+                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
                         Cancel
                     </Button>
                     <Button

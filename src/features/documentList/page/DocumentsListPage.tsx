@@ -29,11 +29,7 @@ export function DocumentsListPage() {
     const documents = useProcessedDocuments(files ?? []);
 
     // Filter and group documents
-    const { filteredDocuments, documentsByFolder } = useFilteredDocuments(
-        documents,
-        searchQuery,
-        selectedFilter
-    );
+    const { filteredDocuments, documentsByFolder } = useFilteredDocuments(documents, searchQuery, selectedFilter);
 
     if (loading) {
         return <LoadingState />;

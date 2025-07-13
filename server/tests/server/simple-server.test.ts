@@ -11,9 +11,7 @@ describe("🧪 MDX Viewer Server Tests", () => {
 
     beforeAll(async () => {
         // Import the server
-        const { default: serverApp } = await import(
-            "../../server/clean-server.ts"
-        );
+        const { default: serverApp } = await import("../../clean-server.ts");
         app = serverApp;
     });
 
@@ -126,7 +124,7 @@ describe("🧪 MDX Viewer Server Tests", () => {
         it("should include CORS headers", async () => {
             const response = await request(app).get("/api/health");
             expect(response.headers).toHaveProperty(
-                "access-control-allow-origin"
+                "access-control-allow-origin",
             );
         });
     });

@@ -77,7 +77,7 @@ app.use("/api/previews", (req, res, _next) => {
 // Start server
 app.listen(SERVER_CONFIG.PORT, () => {
     console.warn(
-        `🚀 Clean MDX Viewer Server running on http://localhost:${SERVER_CONFIG.PORT}`
+        `🚀 Clean MDX Viewer Server running on http://localhost:${SERVER_CONFIG.PORT}`,
     );
     console.warn(`📁 Content directory: ${SERVER_CONFIG.CONTENT_PATH}`);
     console.warn("\n🎯 Features enabled:");
@@ -91,7 +91,7 @@ app.listen(SERVER_CONFIG.PORT, () => {
     console.warn("  GET  /api/files            - File tree");
     console.warn("  GET  /api/files/content    - File content");
     console.warn(
-        "  GET  /api/previews/**      - Universal previews (any depth)"
+        "  GET  /api/previews/**      - Universal previews (any depth)",
     );
 });
 

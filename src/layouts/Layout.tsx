@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 
 import { Bell, Menu, Settings } from "lucide-react";
 
-import { Sidebar } from "@/components/navigation/Sidebar";
+import { Sidebar } from "@/components/navigation/sidebar";
 import { NotificationCenter } from "@/components/progress/NotificationCenter";
 import { ModeToggle } from "@/components/theme/mode-toggle";
 import { Button } from "@/components/ui/button";
@@ -17,8 +17,7 @@ export function Layout() {
         {
             id: "1",
             title: "Welcome to MDXViewer",
-            message:
-                "You can view and edit MDX files with live preview functionality.",
+            message: "You can view and edit MDX files with live preview functionality.",
             type: "info" as const,
             timestamp: new Date(),
             isRead: false,
@@ -26,8 +25,7 @@ export function Layout() {
         {
             id: "2",
             title: "File Management",
-            message:
-                "Use the sidebar to create, upload, and organize your documents.",
+            message: "Use the sidebar to create, upload, and organize your documents.",
             type: "success" as const,
             timestamp: new Date(Date.now() - 60000),
             isRead: false,
@@ -46,25 +44,16 @@ export function Layout() {
                 <div className="flex h-16 items-center px-6">
                     {/* Left side */}
                     <div className="flex flex-1 items-center space-x-4">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="lg:hidden"
-                            onClick={toggleSidebar}
-                        >
+                        <Button variant="ghost" size="icon" className="lg:hidden" onClick={toggleSidebar}>
                             <Menu className="h-5 w-5" />
                             <span className="sr-only">Toggle Menu</span>
                         </Button>
 
                         <div className="flex items-center space-x-3">
                             <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
-                                <span className="text-primary-foreground text-sm font-bold">
-                                    M
-                                </span>
+                                <span className="text-primary-foreground text-sm font-bold">M</span>
                             </div>
-                            <h1 className="text-xl font-semibold">
-                                MDX Viewer
-                            </h1>
+                            <h1 className="text-xl font-semibold">MDX Viewer</h1>
                         </div>
                     </div>
 
@@ -74,8 +63,7 @@ export function Layout() {
                             const Icon = item.icon;
                             const isActive =
                                 location.pathname === item.path ||
-                                (item.path !== "/" &&
-                                    location.pathname.startsWith(item.path));
+                                (item.path !== "/" && location.pathname.startsWith(item.path));
 
                             return (
                                 <Button
@@ -87,9 +75,7 @@ export function Layout() {
                                 >
                                     <Link to={item.path}>
                                         <Icon className="h-4 w-4" />
-                                        <span className="hidden text-sm md:inline">
-                                            {item.name}
-                                        </span>
+                                        <span className="hidden text-sm md:inline">{item.name}</span>
                                     </Link>
                                 </Button>
                             );
@@ -101,19 +87,13 @@ export function Layout() {
                         <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() =>
-                                setShowNotifications(!showNotifications)
-                            }
+                            onClick={() => setShowNotifications(!showNotifications)}
                             className="relative"
                         >
                             <Bell className="h-5 w-5" />
-                            {notifications.filter(n => !n.isRead).length >
-                                0 && (
+                            {notifications.filter(n => !n.isRead).length > 0 && (
                                 <span className="bg-destructive absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full text-xs text-white">
-                                    {
-                                        notifications.filter(n => !n.isRead)
-                                            .length
-                                    }
+                                    {notifications.filter(n => !n.isRead).length}
                                 </span>
                             )}
                             <span className="sr-only">Notifications</span>
@@ -141,16 +121,10 @@ export function Layout() {
                         <NotificationCenter
                             notifications={notifications}
                             onDismiss={(id: string) => {
-                                setNotifications(prev =>
-                                    prev.filter(n => n.id !== id)
-                                );
+                                setNotifications(prev => prev.filter(n => n.id !== id));
                             }}
                             onMarkAsRead={(id: string) => {
-                                setNotifications(prev =>
-                                    prev.map(n =>
-                                        n.id === id ? { ...n, isRead: true } : n
-                                    )
-                                );
+                                setNotifications(prev => prev.map(n => (n.id === id ? { ...n, isRead: true } : n)));
                             }}
                             onClearAll={() => {
                                 setNotifications([]);

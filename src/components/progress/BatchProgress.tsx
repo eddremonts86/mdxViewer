@@ -31,9 +31,7 @@ export const BatchProgress: React.FC<BatchProgressProps> = ({
             {label && (
                 <div className="flex items-center justify-between text-sm">
                     <span className="text-foreground font-medium">{label}</span>
-                    <span className="text-muted-foreground">
-                        {Math.round(progressPercentage)}%
-                    </span>
+                    <span className="text-muted-foreground">{Math.round(progressPercentage)}%</span>
                 </div>
             )}
             <div className="bg-secondary h-2 w-full overflow-hidden rounded-full">

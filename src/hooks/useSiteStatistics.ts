@@ -61,17 +61,13 @@ export function useSiteStatistics(): SiteStatistics {
                 const response = await fetch(`${API_BASE_URL}/statistics`);
 
                 if (!response.ok) {
-                    throw new Error(
-                        `API Error: ${response.status} ${response.statusText}`,
-                    );
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
                 }
 
                 const apiResponse = await response.json();
 
                 if (!apiResponse.success) {
-                    throw new Error(
-                        apiResponse.error ?? "Failed to fetch statistics",
-                    );
+                    throw new Error(apiResponse.error ?? "Failed to fetch statistics");
                 }
 
                 console.log("📊 Got statistics from API:", apiResponse.data);
@@ -86,10 +82,7 @@ export function useSiteStatistics(): SiteStatistics {
                 setStatistics(prev => ({
                     ...prev,
                     loading: false,
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : "Failed to load site statistics",
+                    error: error instanceof Error ? error.message : "Failed to load site statistics",
                 }));
             }
         }

@@ -44,16 +44,11 @@ export async function executeViewTransition(
     callback: () => void | Promise<void>,
     options: ViewTransitionOptions = {},
 ): Promise<void> {
-    const {
-        respectReducedMotion = true,
-        transitionName,
-        debug = false,
-    } = options;
+    const { respectReducedMotion = true, transitionName, debug = false } = options;
 
     // Skip transition if user prefers reduced motion and we should respect it
     if (respectReducedMotion && prefersReducedMotion()) {
-        if (debug)
-            console.log("View transition skipped: user prefers reduced motion");
+        if (debug) console.log("View transition skipped: user prefers reduced motion");
         await callback();
         return;
     }
@@ -70,19 +65,14 @@ export async function executeViewTransition(
 
         // Add transition name to document if provided
         if (transitionName) {
-            document.documentElement.style.setProperty(
-                "--transition-name",
-                transitionName,
-            );
+            document.documentElement.style.setProperty("--transition-name", transitionName);
         }
 
         const transition = (document as any).startViewTransition(callback);
 
         if (debug) {
             transition.ready.then(() => console.log("View transition ready"));
-            transition.finished.then(() =>
-                console.log("View transition finished"),
-            );
+            transition.finished.then(() => console.log("View transition finished"));
         }
 
         await transition.finished;

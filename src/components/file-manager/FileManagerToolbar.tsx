@@ -1,24 +1,10 @@
 import React from "react";
 
-import {
-    Download,
-    FileText,
-    FolderPlus,
-    Grid3X3,
-    List,
-    RefreshCw,
-    Trash2,
-    Upload,
-} from "lucide-react";
+import { Download, FileText, FolderPlus, Grid3X3, List, RefreshCw, Trash2, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface FileManagerToolbarProps {
@@ -59,13 +45,7 @@ const CreateActions = ({
     <div className="flex items-center gap-1">
         <Tooltip>
             <TooltipTrigger asChild>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onCreateFolder}
-                    disabled={disabled}
-                    className="h-8 w-8 p-0"
-                >
+                <Button variant="ghost" size="sm" onClick={onCreateFolder} disabled={disabled} className="h-8 w-8 p-0">
                     <FolderPlus className="h-4 w-4" />
                 </Button>
             </TooltipTrigger>
@@ -76,13 +56,7 @@ const CreateActions = ({
 
         <Tooltip>
             <TooltipTrigger asChild>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onCreateFile}
-                    disabled={disabled}
-                    className="h-8 w-8 p-0"
-                >
+                <Button variant="ghost" size="sm" onClick={onCreateFile} disabled={disabled} className="h-8 w-8 p-0">
                     <FileText className="h-4 w-4" />
                 </Button>
             </TooltipTrigger>
@@ -110,13 +84,7 @@ const FileOperations = ({
     <div className="flex items-center gap-1">
         <Tooltip>
             <TooltipTrigger asChild>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onUpload}
-                    disabled={disabled}
-                    className="h-8 w-8 p-0"
-                >
+                <Button variant="ghost" size="sm" onClick={onUpload} disabled={disabled} className="h-8 w-8 p-0">
                     <Upload className="h-4 w-4" />
                 </Button>
             </TooltipTrigger>
@@ -214,13 +182,7 @@ const ViewControls = ({
 
         <Tooltip>
             <TooltipTrigger asChild>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onRefresh}
-                    disabled={disabled}
-                    className="h-8 w-8 p-0"
-                >
+                <Button variant="ghost" size="sm" onClick={onRefresh} disabled={disabled} className="h-8 w-8 p-0">
                     <RefreshCw className="h-4 w-4" />
                 </Button>
             </TooltipTrigger>
@@ -250,17 +212,8 @@ export const FileManagerToolbar: React.FC<FileManagerToolbarProps> = ({
     className,
 }) => (
     <TooltipProvider>
-        <div
-            className={cn(
-                "bg-background flex items-center gap-2 border-b p-2",
-                className
-            )}
-        >
-            <CreateActions
-                onCreateFolder={onCreateFolder}
-                onCreateFile={onCreateFile}
-                disabled={disabled}
-            />
+        <div className={cn("bg-background flex items-center gap-2 border-b p-2", className)}>
+            <CreateActions onCreateFolder={onCreateFolder} onCreateFile={onCreateFile} disabled={disabled} />
 
             <Separator orientation="vertical" className="h-6" />
 

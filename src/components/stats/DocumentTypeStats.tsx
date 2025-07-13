@@ -15,23 +15,16 @@ interface DocumentTypeStatsProps {
     loading?: boolean;
 }
 
-export function DocumentTypeStats({
-    documentsByType,
-    loading = false,
-}: DocumentTypeStatsProps) {
+export function DocumentTypeStats({ documentsByType, loading = false }: DocumentTypeStatsProps) {
     const total = documentsByType.md + documentsByType.mdx;
-    const mdPercentage =
-        total > 0 ? Math.round((documentsByType.md / total) * 100) : 0;
-    const mdxPercentage =
-        total > 0 ? Math.round((documentsByType.mdx / total) * 100) : 0;
+    const mdPercentage = total > 0 ? Math.round((documentsByType.md / total) * 100) : 0;
+    const mdxPercentage = total > 0 ? Math.round((documentsByType.mdx / total) * 100) : 0;
 
     if (loading) {
         return (
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-sm font-medium">
-                        Document Types
-                    </CardTitle>
+                    <CardTitle className="text-sm font-medium">Document Types</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="animate-pulse space-y-2">
@@ -46,9 +39,7 @@ export function DocumentTypeStats({
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-sm font-medium">
-                    Document Types
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Document Types</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -57,12 +48,8 @@ export function DocumentTypeStats({
                         <span className="text-sm">Markdown</span>
                     </div>
                     <div className="text-right">
-                        <div className="text-sm font-medium">
-                            {documentsByType.md}
-                        </div>
-                        <div className="text-muted-foreground text-xs">
-                            {mdPercentage}%
-                        </div>
+                        <div className="text-sm font-medium">{documentsByType.md}</div>
+                        <div className="text-muted-foreground text-xs">{mdPercentage}%</div>
                     </div>
                 </div>
 
@@ -72,12 +59,8 @@ export function DocumentTypeStats({
                         <span className="text-sm">MDX</span>
                     </div>
                     <div className="text-right">
-                        <div className="text-sm font-medium">
-                            {documentsByType.mdx}
-                        </div>
-                        <div className="text-muted-foreground text-xs">
-                            {mdxPercentage}%
-                        </div>
+                        <div className="text-sm font-medium">{documentsByType.mdx}</div>
+                        <div className="text-muted-foreground text-xs">{mdxPercentage}%</div>
                     </div>
                 </div>
 

@@ -19,19 +19,14 @@ export class FileSystemAPI {
         try {
             // For Vite, use dynamic import with timestamp as query param
             const timestamp = Date.now();
-            const module = await import(
-                /* @vite-ignore */ `./contentIndex.ts?t=${timestamp}`
-            );
+            const module = await import(/* @vite-ignore */ `./contentIndex.ts?t=${timestamp}`);
             this.contentFiles = module.CONTENT_FILES ?? [];
             this.lastModified = timestamp;
             // Index updated successfully
             return this.contentFiles;
         } catch (error) {
             // Log error and return cached files
-            logError(
-                "Failed to load content index",
-                error instanceof Error ? error : new Error(String(error)),
-            );
+            logError("Failed to load content index", error instanceof Error ? error : new Error(String(error)));
             return this.contentFiles;
         }
     }
@@ -42,10 +37,7 @@ export class FileSystemAPI {
     private static async getContentFiles(): Promise<string[]> {
         // Si no hay archivos cargados o han pasado más de 5 segundos, recargar
         const now = Date.now();
-        if (
-            this.contentFiles.length === 0 ||
-            now - this.lastModified > TIME_INTERVALS.STATISTICS_REFRESH
-        ) {
+        if (this.contentFiles.length === 0 || now - this.lastModified > TIME_INTERVALS.STATISTICS_REFRESH) {
             await this.loadContentIndex();
         }
         return this.contentFiles;
@@ -91,10 +83,7 @@ export class FileSystemAPI {
                     logOperation(`Missing file: ${filePath}`);
                 }
             } catch (error) {
-                logError(
-                    `Error checking file ${filePath}`,
-                    error instanceof Error ? error : new Error(String(error)),
-                );
+                logError(`Error checking file ${filePath}`, error instanceof Error ? error : new Error(String(error)));
             }
         }
 
@@ -147,9 +136,7 @@ export class FileSystemAPI {
                     currentNode.children.push(fileNode);
                 } else {
                     // Es una carpeta intermedia
-                    let subFolder = currentNode.children?.find(
-                        child => child.name === part && child.type === "folder",
-                    );
+                    let subFolder = currentNode.children?.find(child => child.name === part && child.type === "folder");
 
                     if (!subFolder) {
                         subFolder = {
@@ -179,9 +166,7 @@ export class FileSystemAPI {
             const response = await fetch(fullUrl);
 
             if (!response.ok) {
-                throw new Error(
-                    `HTTP ${response.status}: ${response.statusText}`,
-                );
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const content = await response.text();
@@ -196,10 +181,7 @@ export class FileSystemAPI {
                 type: path.endsWith(".mdx") ? "mdx" : "md",
             };
         } catch (error) {
-            logError(
-                `Error reading file: ${path}`,
-                error instanceof Error ? error : new Error(String(error)),
-            );
+            logError(`Error reading file: ${path}`, error instanceof Error ? error : new Error(String(error)));
             return null;
         }
     }
@@ -216,11 +198,8 @@ export class FileSystemAPI {
     /**
      * Extrae índice de contenido del markdown
      */
-    static extractTableOfContents(
-        content: string,
-    ): Array<{ level: number; title: string; id: string }> {
-        const headings: Array<{ level: number; title: string; id: string }> =
-            [];
+    static extractTableOfContents(content: string): Array<{ level: number; title: string; id: string }> {
+        const headings: Array<{ level: number; title: string; id: string }> = [];
         const headingRegex = /^(#{1,6})\s+(.+)$/gm;
         let match;
 
@@ -241,12 +220,7 @@ export class FileSystemAPI {
     /**
      * Create a new file using the file manager
      */
-    static async createFile(params: {
-        name: string;
-        type: string;
-        path: string;
-        content?: string;
-    }) {
+    static async createFile(params: { name: string; type: string; path: string; content?: string }) {
         try {
             logOperation("Creating file", params);
             const response = await fetch("/api/files/create", {
@@ -258,20 +232,14 @@ export class FileSystemAPI {
             });
 
             if (!response.ok) {
-                throw new Error(
-                    `HTTP ${response.status}: ${response.statusText}`,
-                );
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const result = await response.json();
             logSuccess("File created successfully", { name: params.name });
             return result;
         } catch (error) {
-            logError(
-                "Failed to create file",
-                error instanceof Error ? error : new Error(String(error)),
-                params,
-            );
+            logError("Failed to create file", error instanceof Error ? error : new Error(String(error)), params);
             throw error;
         }
     }
@@ -291,20 +259,14 @@ export class FileSystemAPI {
             });
 
             if (!response.ok) {
-                throw new Error(
-                    `HTTP ${response.status}: ${response.statusText}`,
-                );
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const result = await response.json();
             logSuccess("Folder created successfully", { name: params.name });
             return result;
         } catch (error) {
-            logError(
-                "Failed to create folder",
-                error instanceof Error ? error : new Error(String(error)),
-                params,
-            );
+            logError("Failed to create folder", error instanceof Error ? error : new Error(String(error)), params);
             throw error;
         }
     }
@@ -324,20 +286,14 @@ export class FileSystemAPI {
             });
 
             if (!response.ok) {
-                throw new Error(
-                    `HTTP ${response.status}: ${response.statusText}`,
-                );
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const result = await response.json();
             logSuccess("Item deleted successfully", { path: params.path });
             return result;
         } catch (error) {
-            logError(
-                "Failed to delete item",
-                error instanceof Error ? error : new Error(String(error)),
-                params,
-            );
+            logError("Failed to delete item", error instanceof Error ? error : new Error(String(error)), params);
             throw error;
         }
     }
@@ -357,20 +313,16 @@ export class FileSystemAPI {
             });
 
             if (!response.ok) {
-                throw new Error(
-                    `HTTP ${response.status}: ${response.statusText}`,
-                );
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const result = await response.json();
             logSuccess("Batch delete completed", { count: paths.length });
             return result;
         } catch (error) {
-            logError(
-                "Failed to batch delete items",
-                error instanceof Error ? error : new Error(String(error)),
-                { paths },
-            );
+            logError("Failed to batch delete items", error instanceof Error ? error : new Error(String(error)), {
+                paths,
+            });
             throw error;
         }
     }

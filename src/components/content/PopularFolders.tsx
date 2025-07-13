@@ -19,26 +19,18 @@ interface PopularFoldersProps {
     loading?: boolean;
 }
 
-export function PopularFolders({
-    popularFolders,
-    loading = false,
-}: PopularFoldersProps) {
+export function PopularFolders({ popularFolders, loading = false }: PopularFoldersProps) {
     if (loading) {
         return (
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                        Popular Folders
-                    </CardTitle>
+                    <CardTitle className="text-sm font-medium">Popular Folders</CardTitle>
                     <TrendingUp className="text-muted-foreground h-4 w-4" />
                 </CardHeader>
                 <CardContent>
                     <div className="animate-pulse space-y-3">
                         {[1, 2, 3].map(i => (
-                            <div
-                                key={i}
-                                className="flex items-center justify-between"
-                            >
+                            <div key={i} className="flex items-center justify-between">
                                 <div className="bg-muted h-4 w-24 rounded"></div>
                                 <div className="bg-muted h-5 w-8 rounded"></div>
                             </div>
@@ -52,17 +44,13 @@ export function PopularFolders({
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                    Popular Folders
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Popular Folders</CardTitle>
                 <TrendingUp className="text-muted-foreground h-4 w-4" />
             </CardHeader>
             <CardContent>
                 <div className="space-y-3">
                     {popularFolders.length === 0 ? (
-                        <p className="text-muted-foreground text-sm">
-                            No folders found
-                        </p>
+                        <p className="text-muted-foreground text-sm">No folders found</p>
                     ) : (
                         popularFolders.map((folder, index) => (
                             <Link
@@ -76,17 +64,13 @@ export function PopularFolders({
                                         {folder.name}
                                     </span>
                                     {index === 0 && (
-                                        <Badge
-                                            variant="secondary"
-                                            className="px-1.5 py-0.5 text-xs"
-                                        >
+                                        <Badge variant="secondary" className="px-1.5 py-0.5 text-xs">
                                             Most Popular
                                         </Badge>
                                     )}
                                 </div>
                                 <Badge variant="outline" className="text-xs">
-                                    {folder.count}{" "}
-                                    {folder.count === 1 ? "doc" : "docs"}
+                                    {folder.count} {folder.count === 1 ? "doc" : "docs"}
                                 </Badge>
                             </Link>
                         ))

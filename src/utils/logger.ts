@@ -39,11 +39,7 @@ export class Logger {
         this.logLevel = level;
     }
 
-    public error(
-        message: string,
-        error?: Error,
-        context?: Record<string, unknown>,
-    ): void {
+    public error(message: string, error?: Error, context?: Record<string, unknown>): void {
         this.log(LogLevel.ERROR, message, context, error);
     }
 
@@ -59,12 +55,7 @@ export class Logger {
         this.log(LogLevel.DEBUG, message, context);
     }
 
-    private log(
-        level: LogLevel,
-        message: string,
-        context?: Record<string, unknown>,
-        error?: Error,
-    ): void {
+    private log(level: LogLevel, message: string, context?: Record<string, unknown>, error?: Error): void {
         if (level > this.logLevel) {
             return;
         }
@@ -94,12 +85,7 @@ export class Logger {
 
         switch (entry.level) {
         case LogLevel.ERROR:
-            console.error(
-                prefix,
-                entry.message,
-                entry.context ?? "",
-                entry.error ?? "",
-            );
+            console.error(prefix, entry.message, entry.context ?? "", entry.error ?? "");
             break;
         case LogLevel.WARN:
             console.warn(prefix, entry.message, entry.context ?? "");
@@ -136,31 +122,18 @@ export class Logger {
 export const logger = Logger.getInstance();
 
 // Helper functions for common logging patterns
-export const logOperation = (
-    operation: string,
-    context?: Record<string, unknown>,
-) => {
+export const logOperation = (operation: string, context?: Record<string, unknown>) => {
     logger.info(`🔄 ${operation}`, context);
 };
 
-export const logSuccess = (
-    operation: string,
-    context?: Record<string, unknown>,
-) => {
+export const logSuccess = (operation: string, context?: Record<string, unknown>) => {
     logger.info(`✅ ${operation}`, context);
 };
 
-export const logError = (
-    operation: string,
-    error: Error,
-    context?: Record<string, unknown>,
-) => {
+export const logError = (operation: string, error: Error, context?: Record<string, unknown>) => {
     logger.error(`❌ ${operation}`, error, context);
 };
 
-export const logWarning = (
-    message: string,
-    context?: Record<string, unknown>,
-) => {
+export const logWarning = (message: string, context?: Record<string, unknown>) => {
     logger.warn(`⚠️ ${message}`, context);
 };

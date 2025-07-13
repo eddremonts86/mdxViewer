@@ -6,9 +6,7 @@ import type { FileNode } from "@/types";
  */
 
 // Function to automatically create file structure
-export const createFileStructureFromDirectory = async (): Promise<
-    FileNode[]
-> => {
+export const createFileStructureFromDirectory = async (): Promise<FileNode[]> => {
     // En un entorno real, esto haría fetch a una API que lee el directorio
     // Por ahora, mantenermos la estructura manual pero facilitamos su actualización
 
@@ -130,22 +128,17 @@ export const addFileToStructure = (
 
     // Encontrar la carpeta objetivo
     const targetFolder = updatedStructure.find(
-        (folder: FileNode) =>
-            folder.name === pathParts[0] && folder.type === "folder",
+        (folder: FileNode) => folder.name === pathParts[0] && folder.type === "folder",
     );
 
     if (targetFolder?.children) {
         // Verificar si el archivo ya existe
-        const fileExists = targetFolder.children.some(
-            (child: FileNode) => child.name === fileName,
-        );
+        const fileExists = targetFolder.children.some((child: FileNode) => child.name === fileName);
 
         if (!fileExists) {
             targetFolder.children.push(newFile);
             // Sort files alphabetically
-            targetFolder.children.sort((a: FileNode, b: FileNode) =>
-                a.name.localeCompare(b.name),
-            );
+            targetFolder.children.sort((a: FileNode, b: FileNode) => a.name.localeCompare(b.name));
         }
     }
 

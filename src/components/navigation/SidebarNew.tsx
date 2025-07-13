@@ -9,13 +9,7 @@ import { NoResults } from "@/components/search/NoResults";
 import { SearchInput } from "@/components/search/SearchInput";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-    useCreateFile,
-    useCreateFolder,
-    useDeleteFiles,
-    useFiles,
-    useUploadFiles,
-} from "@/hooks/api/useFiles";
+import { useCreateFile, useCreateFolder, useDeleteFiles, useFiles, useUploadFiles } from "@/hooks/api/useFiles";
 import { cn } from "@/lib/utils";
 import type { FileNode } from "@/types";
 
@@ -28,9 +22,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     const { data: files = [], isLoading, error, refetch } = useFiles();
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
-    const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
-        new Set()
-    );
+    const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
 
     // Mutations
     const createFileMutation = useCreateFile();
@@ -49,12 +41,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
         const filterItems = (items: FileItem[]): FileItem[] =>
             items.reduce<FileItem[]>((acc, item) => {
-                const matchesSearch = item.name
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase());
-                const filteredChildren = item.children
-                    ? filterItems(item.children)
-                    : [];
+                const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+                const filteredChildren = item.children ? filterItems(item.children) : [];
 
                 if (matchesSearch || filteredChildren.length > 0) {
                     acc.push({
@@ -70,9 +58,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     }, [files, searchTerm]);
 
     const handleSelectFile = (path: string) => {
-        setSelectedFiles(prev =>
-            prev.includes(path) ? prev.filter(p => p !== path) : [...prev, path]
-        );
+        setSelectedFiles(prev => (prev.includes(path) ? prev.filter(p => p !== path) : [...prev, path]));
     };
 
     const handleCreateFile = (parentPath = "") => {
@@ -129,9 +115,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                 key={item.path}
                 node={convertToFileNode(item)}
                 level={level}
-                expandedFolder={
-                    expandedFolders.has(item.path) ? item.path : null
-                }
+                expandedFolder={expandedFolders.has(item.path) ? item.path : null}
                 setExpandedFolder={(path: string | null) => {
                     if (path) {
                         setExpandedFolders(prev => new Set([...prev, path]));
@@ -157,21 +141,14 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             <aside
                 className={cn(
                     "sidebar bg-background border-border fixed top-0 left-0 z-40 h-screen w-80 transform border-r transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
-                    open
-                        ? "translate-x-0"
-                        : "-translate-x-full lg:translate-x-0"
+                    open ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
                 )}
             >
                 <div className="flex h-full flex-col">
                     {/* Header */}
                     <div className="border-border flex items-center justify-between border-b p-4">
                         <h2 className="text-lg font-semibold">Files</h2>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onOpenChange(false)}
-                            className="lg:hidden"
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="lg:hidden">
                             ✕
                         </Button>
                     </div>
@@ -213,9 +190,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     <div className="border-border border-b p-4">
                         <SearchInput
                             searchTerm={searchTerm}
-                            onSearchChange={(
-                                e: React.ChangeEvent<HTMLInputElement>
-                            ) => setSearchTerm(e.target.value)}
+                            onSearchChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                             onClearSearch={() => setSearchTerm("")}
                             resultsCount={filteredFiles.length}
                             hasResults={filteredFiles.length > 0}
@@ -235,15 +210,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         {error && (
                             <div className="p-4">
                                 <Card className="border-destructive bg-destructive/10 p-4">
-                                    <p className="text-destructive text-sm">
-                                        Failed to load files: {error.message}
-                                    </p>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => refetch()}
-                                        className="mt-2"
-                                    >
+                                    <p className="text-destructive text-sm">Failed to load files: {error.message}</p>
+                                    <Button variant="outline" size="sm" onClick={() => refetch()} className="mt-2">
                                         Retry
                                     </Button>
                                 </Card>
@@ -253,14 +221,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         {!isLoading && !error && (
                             <>
                                 {filteredFiles.length === 0 ? (
-                                    <NoResults
-                                        searchTerm={searchTerm}
-                                        onClearSearch={() => setSearchTerm("")}
-                                    />
+                                    <NoResults searchTerm={searchTerm} onClearSearch={() => setSearchTerm("")} />
                                 ) : (
-                                    <div className="p-2">
-                                        {renderFileTree(filteredFiles)}
-                                    </div>
+                                    <div className="p-2">{renderFileTree(filteredFiles)}</div>
                                 )}
                             </>
                         )}
@@ -294,14 +257,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 try {
                                     if (createType === "file") {
                                         await createFileMutation.mutateAsync({
-                                            name:
-                                                name.endsWith(".md") ||
-                                                name.endsWith(".mdx")
-                                                    ? name
-                                                    : `${name}.md`,
-                                            type: name.endsWith(".mdx")
-                                                ? "mdx"
-                                                : "md",
+                                            name: name.endsWith(".md") || name.endsWith(".mdx") ? name : `${name}.md`,
+                                            type: name.endsWith(".mdx") ? "mdx" : "md",
                                             path: createParentPath,
                                             content: "",
                                         });
@@ -319,30 +276,20 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         >
                             <input
                                 name="name"
-                                placeholder={`${
-                                    createType === "file" ? "File" : "Folder"
-                                } name`}
+                                placeholder={`${createType === "file" ? "File" : "Folder"} name`}
                                 className="border-border mb-4 w-full rounded border p-2"
                                 autoFocus
                                 required
                             />
                             <div className="flex justify-end gap-2">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => setShowCreateDialog(false)}
-                                >
+                                <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)}>
                                     Cancel
                                 </Button>
                                 <Button
                                     type="submit"
-                                    disabled={
-                                        createFileMutation.isPending ||
-                                        createFolderMutation.isPending
-                                    }
+                                    disabled={createFileMutation.isPending || createFolderMutation.isPending}
                                 >
-                                    {createFileMutation.isPending ||
-                                    createFolderMutation.isPending ? (
+                                    {createFileMutation.isPending || createFolderMutation.isPending ? (
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     ) : null}
                                     Create

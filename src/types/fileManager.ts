@@ -98,15 +98,15 @@ export interface FileManagerContextType {
     selectedItems: Set<string>;
     isMultiSelectMode: boolean;
     currentBatchOperation: BatchOperation | null;
-    setSelectedItems: (items: Set<string>) => void;
-    toggleItemSelection: (path: string) => void;
+    setSelectedItems: (_items: Set<string>) => void;
+    toggleItemSelection: (_path: string) => void;
     clearSelection: () => void;
     enterMultiSelectMode: () => void;
     exitMultiSelectMode: () => void;
-    createFile: (params: CreateFileParams) => Promise<void>;
-    createFolder: (params: CreateFolderParams) => Promise<void>;
-    deleteItem: (params: DeleteItemParams) => Promise<void>;
-    batchDelete: (params: DeleteFileParams) => Promise<void>;
+    createFile: (_params: CreateFileParams) => Promise<void>;
+    createFolder: (_params: CreateFolderParams) => Promise<void>;
+    deleteItem: (_params: DeleteItemParams) => Promise<void>;
+    batchDelete: (_params: DeleteFileParams) => Promise<void>;
 }
 
 export interface FileTreeNodeProps {
@@ -114,12 +114,9 @@ export interface FileTreeNodeProps {
     level: number;
     isSelected?: boolean;
     isMultiSelectMode?: boolean;
-    onSelect?: (path: string) => void;
-    onToggleSelect?: (path: string) => void;
-    onContextMenu?: (
-        event: React.MouseEvent,
-        node: import("./index").FileNode
-    ) => void;
+    onSelect?: (_path: string) => void;
+    onToggleSelect?: (_path: string) => void;
+    onContextMenu?: (_event: React.MouseEvent, node: import("./index").FileNode) => void;
 }
 
 export interface FileManagerToolbarProps {
@@ -138,7 +135,7 @@ export interface CreateDialogProps {
     type: "file" | "folder";
     parentPath: string;
     onClose: () => void;
-    onConfirm: (name: string, content?: string) => void;
+    onConfirm: (_name: string, content?: string) => void;
 }
 
 export interface DeleteDialogProps {

@@ -20,17 +20,12 @@ interface RecentDocumentsProps {
     loading?: boolean;
 }
 
-export function RecentDocuments({
-    recentDocuments,
-    loading = false,
-}: RecentDocumentsProps) {
+export function RecentDocuments({ recentDocuments, loading = false }: RecentDocumentsProps) {
     if (loading) {
         return (
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                        Recent Documents
-                    </CardTitle>
+                    <CardTitle className="text-sm font-medium">Recent Documents</CardTitle>
                     <Clock className="text-muted-foreground h-4 w-4" />
                 </CardHeader>
                 <CardContent>
@@ -53,17 +48,13 @@ export function RecentDocuments({
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                    Recent Documents
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Recent Documents</CardTitle>
                 <Clock className="text-muted-foreground h-4 w-4" />
             </CardHeader>
             <CardContent>
                 <div className="space-y-3">
                     {recentDocuments.length === 0 ? (
-                        <p className="text-muted-foreground text-sm">
-                            No recent documents
-                        </p>
+                        <p className="text-muted-foreground text-sm">No recent documents</p>
                     ) : (
                         recentDocuments.map(doc => (
                             <Link
@@ -81,18 +72,11 @@ export function RecentDocuments({
                                         {doc.name}
                                     </div>
                                     <div className="mt-1 flex items-center gap-2">
-                                        <Badge
-                                            variant="outline"
-                                            className="px-1.5 py-0.5 text-xs"
-                                        >
+                                        <Badge variant="outline" className="px-1.5 py-0.5 text-xs">
                                             {doc.folder}
                                         </Badge>
                                         <Badge
-                                            variant={
-                                                doc.type === "mdx"
-                                                    ? "default"
-                                                    : "secondary"
-                                            }
+                                            variant={doc.type === "mdx" ? "default" : "secondary"}
                                             className="px-1.5 py-0.5 text-xs"
                                         >
                                             {doc.type.toUpperCase()}

@@ -27,9 +27,7 @@ export function SearchInput({
                 <Search
                     className={cn(
                         "absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors duration-200",
-                        searchTerm
-                            ? "text-primary"
-                            : "text-muted-foreground group-focus-within:text-primary"
+                        searchTerm ? "text-primary" : "text-muted-foreground group-focus-within:text-primary",
                     )}
                 />
                 <Input
@@ -40,7 +38,7 @@ export function SearchInput({
                     className={cn(
                         "h-9 pr-9 pl-9 text-sm transition-all duration-200",
                         "focus:ring-primary/20 focus:border-primary focus:ring-2",
-                        searchTerm && "border-primary/50"
+                        searchTerm && "border-primary/50",
                     )}
                 />
                 {searchTerm && (
@@ -59,20 +57,14 @@ export function SearchInput({
                 <div className="animate-in slide-in-from-top-1 mt-3 duration-300">
                     <div className="flex items-center justify-between text-xs">
                         {isTyping ? (
-                            <span className="text-muted-foreground animate-pulse font-medium">
-                                Searching...
-                            </span>
+                            <span className="text-muted-foreground animate-pulse font-medium">Searching...</span>
                         ) : (
                             <span className="text-primary font-medium">
                                 {resultsCount} result
                                 {resultsCount !== 1 ? "s" : ""} found
                             </span>
                         )}
-                        {hasResults && !isTyping && (
-                            <span className="text-muted-foreground">
-                                ⌘F to search
-                            </span>
-                        )}
+                        {hasResults && !isTyping && <span className="text-muted-foreground">⌘F to search</span>}
                     </div>
                 </div>
             )}

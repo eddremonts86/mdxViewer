@@ -23,11 +23,7 @@ export function DocumentPage() {
     // Remove 'document/' prefix if it exists
     const filePath = slug?.startsWith("document/") ? slug.slice(9) : slug;
 
-    const {
-        data: fileData,
-        isLoading,
-        error,
-    } = useFileContent(filePath ?? "", !!filePath);
+    const { data: fileData, isLoading, error } = useFileContent(filePath ?? "", !!filePath);
 
     // Create breadcrumb items from file path
     const createBreadcrumbItems = (path: string): LocalBreadcrumbItem[] => {
@@ -42,9 +38,7 @@ export function DocumentPage() {
             ];
 
         const segments = path.split("/").filter(Boolean);
-        const items: LocalBreadcrumbItem[] = [
-            { name: "Home", path: "/", type: "root", isActive: false },
-        ];
+        const items: LocalBreadcrumbItem[] = [{ name: "Home", path: "/", type: "root", isActive: false }];
 
         let currentPath = "";
         segments.forEach((segment, index) => {
@@ -87,7 +81,7 @@ export function DocumentPage() {
             {
                 transitionName: "breadcrumb-navigation",
                 debug: process.env.NODE_ENV === "development",
-            }
+            },
         );
     };
 
@@ -96,9 +90,7 @@ export function DocumentPage() {
             <div className="relative container">
                 <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
                     <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
-                        <h3 className="mt-4 text-lg font-semibold">
-                            Welcome to MDX Viewer
-                        </h3>
+                        <h3 className="mt-4 text-lg font-semibold">Welcome to MDX Viewer</h3>
                         <p className="text-muted-foreground mt-2 mb-4 text-sm">
                             Select a document from the sidebar to begin viewing.
                         </p>
@@ -114,9 +106,7 @@ export function DocumentPage() {
                 <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
                     <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
                         <div className="border-primary mb-4 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent"></div>
-                        <p className="text-muted-foreground text-sm">
-                            Loading document...
-                        </p>
+                        <p className="text-muted-foreground text-sm">Loading document...</p>
                     </div>
                 </div>
             </div>
@@ -128,12 +118,9 @@ export function DocumentPage() {
             <div className="relative container">
                 <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
                     <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
-                        <h3 className="mt-4 text-lg font-semibold">
-                            Document not found
-                        </h3>
+                        <h3 className="mt-4 text-lg font-semibold">Document not found</h3>
                         <p className="text-muted-foreground mt-2 mb-4 text-sm">
-                            {error?.message ??
-                                "The document you are looking for does not exist."}
+                            {error?.message ?? "The document you are looking for does not exist."}
                         </p>
                     </div>
                 </div>
@@ -192,10 +179,7 @@ export function DocumentPage() {
             )}
 
             <div className="document-content">
-                <DocumentViewer
-                    document={document}
-                    tableOfContents={getTableOfContents(content)}
-                />
+                <DocumentViewer document={document} tableOfContents={getTableOfContents(content)} />
             </div>
         </div>
     );

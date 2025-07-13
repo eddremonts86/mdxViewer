@@ -52,13 +52,7 @@ export interface DemoProps {
 
 export interface CustomButtonProps {
     children: React.ReactNode;
-    variant?:
-        | "default"
-        | "destructive"
-        | "outline"
-        | "secondary"
-        | "ghost"
-        | "link";
+    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
     onClick?: () => void;
 }
 
@@ -80,5 +74,5 @@ export type Theme = "light" | "dark" | "system";
 
 export interface ThemeContextType {
     theme: Theme;
-    setTheme: (theme: Theme) => void;
+    setTheme: (_theme: Theme) => void;
 }

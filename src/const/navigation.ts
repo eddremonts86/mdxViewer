@@ -1,11 +1,4 @@
-import {
-    BarChart3,
-    BookOpen,
-    Home,
-    PlayCircle,
-    Settings,
-    Users,
-} from "lucide-react";
+import { BarChart3, BookOpen, Home, PlayCircle, Settings, Users } from "lucide-react";
 
 export const navigationItems = [
     {

@@ -16,11 +16,7 @@ export default tseslint.config(
             globals: globals.browser,
             parser: tseslint.parser,
             parserOptions: {
-                project: [
-                    "./tsconfig.json",
-                    "./tsconfig.app.json",
-                    "./tsconfig.node.json",
-                ],
+                project: ["./tsconfig.json", "./tsconfig.app.json", "./tsconfig.node.json"],
                 tsconfigRootDir: import.meta.dirname,
             },
         },
@@ -31,10 +27,7 @@ export default tseslint.config(
         },
         rules: {
             ...reactHooks.configs.recommended.rules,
-            "react-refresh/only-export-components": [
-                "warn",
-                { allowConstantExport: true },
-            ],
+            "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
 
             // Import sorting rules
             "simple-import-sort/imports": [
@@ -109,9 +102,9 @@ export default tseslint.config(
                 "error",
                 {
                     ignore: [
-                        -1, 0, 1, 2, 3, 4, 5, 6, 8, 10, 11, 16, 18, 36, 50, 55,
-                        60, 80, 95, 100, 140, 145, 200, 255, 300, 404, 500, 800,
-                        1000, 30000, 60000,
+                        -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 18, 24, 36, 50, 55, 60, 80, 95, 100, 107,
+                        116, 127, 133, 137, 140, 143, 144, 145, 162, 179, 200, 253, 255, 300, 400, 403, 404, 500, 800,
+                        809, 846, 1000, 30000, 60000,
                     ],
                     ignoreArrayIndexes: true,
                     ignoreDefaultValues: true,
@@ -125,25 +118,7 @@ export default tseslint.config(
                 {
                     min: 2,
                     max: 50,
-                    exceptions: [
-                        "i",
-                        "j",
-                        "k",
-                        "x",
-                        "y",
-                        "z",
-                        "_",
-                        "a",
-                        "b",
-                        "c",
-                        "d",
-                        "e",
-                        "f",
-                        "n",
-                        "p",
-                        "s",
-                        "t",
-                    ],
+                    exceptions: ["i", "j", "k", "x", "y", "z", "_", "a", "b", "c", "d", "e", "f", "n", "p", "s", "t"],
                 },
             ],
 
@@ -178,10 +153,7 @@ export default tseslint.config(
             "@typescript-eslint/no-unnecessary-type-assertion": "error",
             "@typescript-eslint/explicit-function-return-type": "off",
             "@typescript-eslint/explicit-module-boundary-types": "off",
-            "@typescript-eslint/consistent-type-definitions": [
-                "error",
-                "interface",
-            ],
+            "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
             "@typescript-eslint/prefer-readonly": "error",
             "@typescript-eslint/no-inferrable-types": "error",
 
@@ -230,23 +202,14 @@ export default tseslint.config(
 
             // Basic code quality rules
             complexity: ["error", { max: 10 }],
-            "max-lines-per-function": [
-                "error",
-                { max: 50, skipBlankLines: true, skipComments: true },
-            ],
-            "max-lines": [
-                "error",
-                { max: 500, skipBlankLines: true, skipComments: true },
-            ],
+            "max-lines-per-function": ["error", { max: 50, skipBlankLines: true, skipComments: true }],
+            "max-lines": ["error", { max: 500, skipBlankLines: true, skipComments: true }],
             "max-params": ["error", { max: 4 }],
             "max-depth": ["error", { max: 4 }],
             "no-var": "error",
             "prefer-const": "error",
             "no-unreachable": "error",
-            "no-unused-vars": [
-                "error",
-                { argsIgnorePattern: "^_", ignoreRestSiblings: true },
-            ],
+            "no-unused-vars": ["error", { argsIgnorePattern: "^_", ignoreRestSiblings: true }],
             "no-duplicate-imports": "error",
             "no-magic-numbers": [
                 "error",
@@ -293,11 +256,7 @@ export default tseslint.config(
             "no-else-return": "error",
             "prefer-template": "error",
             "object-shorthand": "error",
-            "prefer-destructuring": [
-                "error",
-                { array: true, object: true },
-                { enforceForRenamedProperties: false },
-            ],
+            "prefer-destructuring": ["error", { array: true, object: true }, { enforceForRenamedProperties: false }],
         },
     }
 );

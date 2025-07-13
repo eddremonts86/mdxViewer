@@ -7,9 +7,9 @@ import type { DocumentCardProps, FilterType } from "../types";
 
 interface SearchAndFiltersProps {
     searchQuery: string;
-    setSearchQuery: (query: string) => void;
+    setSearchQuery: (_query: string) => void;
     selectedFilter: FilterType;
-    setSelectedFilter: (filter: FilterType) => void;
+    setSelectedFilter: (_filter: FilterType) => void;
     documents: DocumentCardProps[];
 }
 

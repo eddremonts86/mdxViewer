@@ -48,9 +48,7 @@ function createPreviewUrl(filePath: string): string {
     const sanitizedFilename = sanitizeFilename(filename);
 
     // Build final path
-    const finalPath = sanitizedFolderPath
-        ? `${sanitizedFolderPath}/${sanitizedFilename}`
-        : sanitizedFilename;
+    const finalPath = sanitizedFolderPath ? `${sanitizedFolderPath}/${sanitizedFilename}` : sanitizedFilename;
 
     return `/api/previews/${finalPath.replace(/\.(md|mdx)$/i, ".png")}`;
 }
@@ -65,13 +63,8 @@ export function useProcessedDocuments(files: any[]) {
 
         const processFiles = (fileList: any[], currentPath = "") => {
             fileList.forEach(file => {
-                if (
-                    file.type === "file" &&
-                    (file.name.endsWith(".md") || file.name.endsWith(".mdx"))
-                ) {
-                    const filePath = currentPath
-                        ? `${currentPath}/${file.name}`
-                        : file.name;
+                if (file.type === "file" && (file.name.endsWith(".md") || file.name.endsWith(".mdx"))) {
+                    const filePath = currentPath ? `${currentPath}/${file.name}` : file.name;
                     const fileType = file.name.endsWith(".mdx") ? "mdx" : "md";
                     const title = file.name.replace(/\.(md|mdx)$/, "");
                     const folder = currentPath || "root";
@@ -80,9 +73,7 @@ export function useProcessedDocuments(files: any[]) {
                     const previewUrl = createPreviewUrl(filePath);
 
                     docs.push({
-                        title:
-                            title.charAt(0).toUpperCase() +
-                            title.slice(1).replace(/-/g, " "),
+                        title: title.charAt(0).toUpperCase() + title.slice(1).replace(/-/g, " "),
                         description: `${fileType.toUpperCase()} document in ${folder} folder`,
                         path: filePath,
                         type: fileType,
@@ -92,9 +83,7 @@ export function useProcessedDocuments(files: any[]) {
                         previewUrl,
                     });
                 } else if (file.type === "folder" && file.children) {
-                    const newPath = currentPath
-                        ? `${currentPath}/${file.name}`
-                        : file.name;
+                    const newPath = currentPath ? `${currentPath}/${file.name}` : file.name;
                     processFiles(file.children, newPath);
                 }
             });

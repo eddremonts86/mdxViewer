@@ -13,11 +13,7 @@ interface CreateDocumentDialogProps {
     initialPath?: string;
 }
 
-export function CreateDocumentDialog({
-    isOpen,
-    onClose,
-    initialPath = "",
-}: CreateDocumentDialogProps) {
+export function CreateDocumentDialog({ isOpen, onClose, initialPath = "" }: CreateDocumentDialogProps) {
     const { data: files = [] } = useFiles();
     const createFileMutation = useCreateFile();
     const createFolderMutation = useCreateFolder();
@@ -36,10 +32,7 @@ export function CreateDocumentDialog({
     };
 
     // Validate depth before submission
-    const validateDepth = (
-        finalPath: string,
-        isCreatingFolder: boolean,
-    ): { valid: boolean; error?: string } => {
+    const validateDepth = (finalPath: string, isCreatingFolder: boolean): { valid: boolean; error?: string } => {
         const MAX_DEPTH = 10;
         const currentDepth = calculateDepth(finalPath);
         const finalDepth = isCreatingFolder ? currentDepth + 1 : currentDepth;
@@ -60,8 +53,7 @@ export function CreateDocumentDialog({
         currentPath = "",
         depth = 0,
     ): Array<{ path: string; name: string; depth: number }> => {
-        const folders: Array<{ path: string; name: string; depth: number }> =
-            [];
+        const folders: Array<{ path: string; name: string; depth: number }> = [];
         const MAX_DISPLAY_DEPTH = 10;
 
         // Add root option
@@ -87,13 +79,7 @@ export function CreateDocumentDialog({
 
                     // Recursively get subfolders only if we haven't reached the limit
                     if (item.children && folderDepth < MAX_DISPLAY_DEPTH) {
-                        folders.push(
-                            ...getAllFolders(
-                                item.children,
-                                fullPath,
-                                folderDepth,
-                            ),
-                        );
+                        folders.push(...getAllFolders(item.children, fullPath, folderDepth));
                     }
                 }
             }
@@ -117,19 +103,12 @@ export function CreateDocumentDialog({
 
             // Create new folder if requested
             if (createNewFolder && newFolderName.trim()) {
-                const newFolderPath = targetFolder
-                    ? `${targetFolder}/${newFolderName.trim()}`
-                    : newFolderName.trim();
+                const newFolderPath = targetFolder ? `${targetFolder}/${newFolderName.trim()}` : newFolderName.trim();
 
                 // Validate depth for folder creation
-                const folderDepthValidation = validateDepth(
-                    newFolderPath,
-                    true,
-                );
+                const folderDepthValidation = validateDepth(newFolderPath, true);
                 if (!folderDepthValidation.valid) {
-                    setError(
-                        folderDepthValidation.error || "Invalid folder depth",
-                    );
+                    setError(folderDepthValidation.error ?? "Invalid folder depth");
                     return;
                 }
 
@@ -144,14 +123,12 @@ export function CreateDocumentDialog({
             // Validate depth for file creation
             const fileDepthValidation = validateDepth(finalTargetPath, false);
             if (!fileDepthValidation.valid) {
-                setError(fileDepthValidation.error || "Invalid file depth");
+                setError(fileDepthValidation.error ?? "Invalid file depth");
                 return;
             }
 
             // Create the file
-            const fileNameWithExtension = fileName.endsWith(`.${extension}`)
-                ? fileName
-                : `${fileName}.${extension}`;
+            const fileNameWithExtension = fileName.endsWith(`.${extension}`) ? fileName : `${fileName}.${extension}`;
 
             await createFileMutation.mutateAsync({
                 name: fileNameWithExtension,
@@ -170,10 +147,7 @@ export function CreateDocumentDialog({
             onClose();
         } catch (error) {
             console.error("Failed to create document:", error);
-            const errorMessage =
-                error instanceof Error
-                    ? error.message
-                    : "Failed to create document";
+            const errorMessage = error instanceof Error ? error.message : "Failed to create document";
             setError(errorMessage);
         }
     };
@@ -185,9 +159,7 @@ export function CreateDocumentDialog({
             <Card className="max-h-[80vh] w-[500px] overflow-y-auto p-6">
                 <div className="mb-6 flex items-center gap-2">
                     <Plus className="h-5 w-5" />
-                    <h3 className="text-lg font-semibold">
-                        Create New Document
-                    </h3>
+                    <h3 className="text-lg font-semibold">Create New Document</h3>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -195,11 +167,7 @@ export function CreateDocumentDialog({
                     {error && (
                         <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                             <div className="flex items-center gap-2">
-                                <svg
-                                    className="h-4 w-4 flex-shrink-0"
-                                    fill="currentColor"
-                                    viewBox="0 0 20 20"
-                                >
+                                <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path
                                         fillRule="evenodd"
                                         d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -213,9 +181,7 @@ export function CreateDocumentDialog({
 
                     {/* File Name */}
                     <div>
-                        <label className="mb-2 block text-sm font-medium">
-                            Document Name *
-                        </label>
+                        <label className="mb-2 block text-sm font-medium">Document Name *</label>
                         <input
                             type="text"
                             value={fileName}
@@ -229,9 +195,7 @@ export function CreateDocumentDialog({
 
                     {/* Extension Selection */}
                     <div>
-                        <label className="mb-2 block text-sm font-medium">
-                            File Extension *
-                        </label>
+                        <label className="mb-2 block text-sm font-medium">File Extension *</label>
                         <div className="flex gap-3">
                             <label className="flex cursor-pointer items-center gap-2">
                                 <input
@@ -239,9 +203,7 @@ export function CreateDocumentDialog({
                                     name="extension"
                                     value="md"
                                     checked={extension === "md"}
-                                    onChange={e =>
-                                        setExtension(e.target.value as "md")
-                                    }
+                                    onChange={e => setExtension(e.target.value as "md")}
                                     className="h-4 w-4"
                                 />
                                 <span>.md (Markdown)</span>
@@ -252,9 +214,7 @@ export function CreateDocumentDialog({
                                     name="extension"
                                     value="mdx"
                                     checked={extension === "mdx"}
-                                    onChange={e =>
-                                        setExtension(e.target.value as "mdx")
-                                    }
+                                    onChange={e => setExtension(e.target.value as "mdx")}
                                     className="h-4 w-4"
                                 />
                                 <span>.mdx (MDX)</span>
@@ -264,9 +224,7 @@ export function CreateDocumentDialog({
 
                     {/* Target Folder */}
                     <div>
-                        <label className="mb-2 block text-sm font-medium">
-                            Destination Folder
-                        </label>
+                        <label className="mb-2 block text-sm font-medium">Destination Folder</label>
                         <select
                             value={targetFolder}
                             onChange={e => setTargetFolder(e.target.value)}
@@ -286,30 +244,22 @@ export function CreateDocumentDialog({
                             <input
                                 type="checkbox"
                                 checked={createNewFolder}
-                                onChange={e =>
-                                    setCreateNewFolder(e.target.checked)
-                                }
+                                onChange={e => setCreateNewFolder(e.target.checked)}
                                 className="h-4 w-4"
                             />
-                            <span className="text-sm font-medium">
-                                Create new folder
-                            </span>
+                            <span className="text-sm font-medium">Create new folder</span>
                         </label>
 
                         {createNewFolder && (
                             <div className="mt-2">
                                 <div className="mb-2 flex items-center gap-2">
                                     <FolderPlus className="h-4 w-4" />
-                                    <span className="text-sm">
-                                        New folder name:
-                                    </span>
+                                    <span className="text-sm">New folder name:</span>
                                 </div>
                                 <input
                                     type="text"
                                     value={newFolderName}
-                                    onChange={e =>
-                                        setNewFolderName(e.target.value)
-                                    }
+                                    onChange={e => setNewFolderName(e.target.value)}
                                     placeholder="Enter folder name"
                                     className="border-border focus:ring-primary w-full rounded-md border p-3 focus:ring-2 focus:outline-none"
                                 />
@@ -319,9 +269,7 @@ export function CreateDocumentDialog({
 
                     {/* Preview Path */}
                     <div className="bg-muted rounded-md p-3">
-                        <div className="text-muted-foreground mb-1 text-sm">
-                            File will be created at:
-                        </div>
+                        <div className="text-muted-foreground mb-1 text-sm">File will be created at:</div>
                         <div className="font-mono text-sm">
                             {(() => {
                                 let path = "";
@@ -333,26 +281,18 @@ export function CreateDocumentDialog({
                                     path = targetFolder;
                                 }
 
-                                const finalFileName = fileName.endsWith(
-                                    `.${extension}`,
-                                )
+                                const finalFileName = fileName.endsWith(`.${extension}`)
                                     ? fileName
                                     : `${fileName}.${extension}`;
 
-                                return path
-                                    ? `${path}/${finalFileName}`
-                                    : finalFileName;
+                                return path ? `${path}/${finalFileName}` : finalFileName;
                             })()}
                         </div>
                     </div>
 
                     {/* Actions */}
                     <div className="flex justify-end gap-3 pt-4">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={onClose}
-                        >
+                        <Button type="button" variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
                         <Button
@@ -364,8 +304,7 @@ export function CreateDocumentDialog({
                                 (createNewFolder && !newFolderName.trim())
                             }
                         >
-                            {(createFileMutation.isPending ||
-                                createFolderMutation.isPending) && (
+                            {(createFileMutation.isPending || createFolderMutation.isPending) && (
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             )}
                             Create Document

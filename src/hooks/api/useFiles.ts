@@ -2,8 +2,7 @@
  * TanStack Query hooks for file management with improved error handling
  */
 
-import type { CreateFileRequest, CreateFolderRequest } from "@/api/fileAPI";
-import { FileAPI } from "@/api/fileAPI";
+import { type CreateFileRequest, type CreateFolderRequest, FileAPI } from "@/api/fileAPI";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -85,8 +84,7 @@ export function useCreateFolder() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (request: CreateFolderRequest) =>
-            FileAPI.createFolder(request),
+        mutationFn: (request: CreateFolderRequest) => FileAPI.createFolder(request),
         onSuccess: () => {
             // Invalidate and refetch file list
             queryClient.invalidateQueries({ queryKey: fileKeys.list() });
@@ -151,8 +149,7 @@ export function useMoveItem() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (params: { sourcePath: string; targetPath: string }) =>
-            FileAPI.moveItem(params),
+        mutationFn: (params: { sourcePath: string; targetPath: string }) => FileAPI.moveItem(params),
         onSuccess: () => {
             // Invalidate and refetch file list
             queryClient.invalidateQueries({ queryKey: fileKeys.list() });

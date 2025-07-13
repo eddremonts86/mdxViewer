@@ -1,13 +1,6 @@
 import React, { useMemo } from "react";
 
-import {
-    ChevronLeft,
-    ChevronRight,
-    FileText,
-    Folder,
-    History,
-    Home,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, FileText, Folder, History, Home } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,7 +20,7 @@ interface NavigationBreadcrumbProps {
     /** Array of breadcrumb items */
     items: BreadcrumbItem[];
     /** Callback when breadcrumb item is clicked */
-    onNavigate: (path: string) => void;
+    onNavigate: (_path: string) => void;
     /** Whether navigation is loading */
     isLoading?: boolean;
     /** Maximum number of items to show before collapsing */
@@ -87,9 +80,7 @@ export const NavigationBreadcrumb: React.FC<NavigationBreadcrumbProps> = ({
         }
     };
 
-    const handleItemClick = (
-        item: BreadcrumbItem & { isEllipsis?: boolean },
-    ) => {
+    const handleItemClick = (item: BreadcrumbItem & { isEllipsis?: boolean }) => {
         if (item.isEllipsis ?? item.isActive ?? isLoading) return;
         onNavigate(item.path);
     };
@@ -130,45 +121,26 @@ export const NavigationBreadcrumb: React.FC<NavigationBreadcrumbProps> = ({
                         <React.Fragment key={`${item.path}-${index}`}>
                             {/* Breadcrumb item */}
                             <Button
-                                variant={
-                                    (item.isActive ?? false)
-                                        ? "secondary"
-                                        : "ghost"
-                                }
+                                variant={(item.isActive ?? false) ? "secondary" : "ghost"}
                                 size="sm"
                                 onClick={() => handleItemClick(item)}
-                                disabled={
-                                    isEllipsis ?? item.isActive ?? isLoading
-                                }
+                                disabled={isEllipsis ?? item.isActive ?? isLoading}
                                 className={`flex items-center space-x-2 transition-all duration-200 ${
-                                    isEllipsis
-                                        ? "cursor-default opacity-60"
-                                        : "hover:bg-accent"
+                                    isEllipsis ? "cursor-default opacity-60" : "hover:bg-accent"
                                 }`}
-                                aria-current={
-                                    (item.isActive ?? false)
-                                        ? "page"
-                                        : undefined
-                                }
+                                aria-current={(item.isActive ?? false) ? "page" : undefined}
                             >
                                 {getIcon(item.type)}
-                                <span className="max-w-32 truncate sm:max-w-none">
-                                    {item.name}
-                                </span>
+                                <span className="max-w-32 truncate sm:max-w-none">{item.name}</span>
                                 {(item.isActive ?? false) && (
-                                    <Badge
-                                        variant="secondary"
-                                        className="ml-1 text-xs"
-                                    >
+                                    <Badge variant="secondary" className="ml-1 text-xs">
                                         Current
                                     </Badge>
                                 )}
                             </Button>
 
                             {/* Separator */}
-                            {!isLast && (
-                                <ChevronRight className="text-muted-foreground h-4 w-4 flex-shrink-0" />
-                            )}
+                            {!isLast && <ChevronRight className="text-muted-foreground h-4 w-4 flex-shrink-0" />}
                         </React.Fragment>
                     );
                 })}

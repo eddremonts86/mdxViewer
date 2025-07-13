@@ -25,8 +25,7 @@ export function usePreviewStats(documents: any[]) {
             ...prev,
             total,
             loading: false,
-            coverage:
-                total > 0 ? Math.round((total / documents.length) * 100) : 0,
+            coverage: total > 0 ? Math.round((total / documents.length) * 100) : 0,
         }));
     }, [documents]);
 

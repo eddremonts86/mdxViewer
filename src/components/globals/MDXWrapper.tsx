@@ -1,13 +1,7 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type {
-    AlertProps,
-    CalloutProps,
-    CustomButtonProps,
-    DemoProps,
-    InfoCardProps,
-} from "@/types";
+import type { AlertProps, CalloutProps, CustomButtonProps, DemoProps, InfoCardProps } from "@/types";
 
 import { MDXProvider } from "@mdx-js/react";
 
@@ -72,11 +66,7 @@ const CustomCallout = ({ type = "note", children }: CalloutProps) => {
     };
 
     return (
-        <div
-            className={`my-4 rounded-r-md border-l-4 p-4 ${getCalloutStyles(
-                type,
-            )}`}
-        >
+        <div className={`my-4 rounded-r-md border-l-4 p-4 ${getCalloutStyles(type)}`}>
             <div className="flex items-start">
                 <span className="mr-2 text-lg">{getCalloutIcon(type)}</span>
                 <div className="flex-1">{children}</div>
@@ -90,22 +80,14 @@ const CustomDemo = ({ title, description, children }: DemoProps) => (
     <div className="border-border my-6 overflow-hidden rounded-lg border">
         <div className="border-border bg-muted border-b p-4">
             <h3 className="font-medium">{title}</h3>
-            {description && (
-                <p className="text-muted-foreground mt-1 text-sm">
-                    {description}
-                </p>
-            )}
+            {description && <p className="text-muted-foreground mt-1 text-sm">{description}</p>}
         </div>
         <div className="bg-card p-4">{children}</div>
     </div>
 );
 
 // Custom Button component for MDX
-const CustomButton = ({
-    children,
-    variant = "default",
-    onClick,
-}: CustomButtonProps) => (
+const CustomButton = ({ children, variant = "default", onClick }: CustomButtonProps) => (
     <Button variant={variant} onClick={onClick} className="my-2">
         {children}
     </Button>

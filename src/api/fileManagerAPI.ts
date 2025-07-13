@@ -18,15 +18,12 @@ import type {
 import { FileManagerUtils } from "@/utils/fileManagerUtils";
 
 export class FileManagerAPI {
-    private static readonly contentPath =
-        "/Volumes/Developer/Projects/mdxViewer/public/content";
+    private static readonly contentPath = "/Volumes/Developer/Projects/mdxViewer/public/content";
 
     /**
      * Create a new file
      */
-    static async createFile(
-        params: CreateFileParams,
-    ): Promise<OperationResult> {
+    static async createFile(params: CreateFileParams): Promise<OperationResult> {
         const operation: FileOperation = {
             id: FileManagerUtils.generateOperationId(),
             type: "create",
@@ -64,11 +61,7 @@ export class FileManagerAPI {
             await fs.mkdir(dirPath, { recursive: true });
 
             // Generate content
-            const content =
-                params.content ||
-                FileManagerUtils.getDefaultContent(
-                    `${params.name}.${params.type}`,
-                );
+            const content = params.content || FileManagerUtils.getDefaultContent(`${params.name}.${params.type}`);
 
             // Write file
             await fs.writeFile(fullPath, content, "utf8");
@@ -83,8 +76,7 @@ export class FileManagerAPI {
             };
         } catch (error) {
             operation.status = "failed";
-            operation.error =
-                error instanceof Error ? error.message : "Unknown error";
+            operation.error = error instanceof Error ? error.message : "Unknown error";
 
             console.error(`❌ Failed to create file: ${params.name}`, error);
 
@@ -100,9 +92,7 @@ export class FileManagerAPI {
     /**
      * Create a new folder
      */
-    static async createFolder(
-        params: CreateFolderParams,
-    ): Promise<OperationResult> {
+    static async createFolder(params: CreateFolderParams): Promise<OperationResult> {
         const operation: FileOperation = {
             id: FileManagerUtils.generateOperationId(),
             type: "create",
@@ -120,11 +110,7 @@ export class FileManagerAPI {
             }
 
             // Build full path
-            const fullPath = path.join(
-                this.contentPath,
-                params.path,
-                params.name,
-            );
+            const fullPath = path.join(this.contentPath, params.path, params.name);
             const relativePath = path.join(params.path, params.name);
 
             // Check if folder already exists
@@ -153,8 +139,7 @@ export class FileManagerAPI {
             };
         } catch (error) {
             operation.status = "failed";
-            operation.error =
-                error instanceof Error ? error.message : "Unknown error";
+            operation.error = error instanceof Error ? error.message : "Unknown error";
 
             console.error(`❌ Failed to create folder: ${params.name}`, error);
 
@@ -170,9 +155,7 @@ export class FileManagerAPI {
     /**
      * Delete a file or folder
      */
-    static async deleteItem(
-        params: DeleteItemParams,
-    ): Promise<OperationResult> {
+    static async deleteItem(params: DeleteItemParams): Promise<OperationResult> {
         const operation: FileOperation = {
             id: FileManagerUtils.generateOperationId(),
             type: "delete",
@@ -200,11 +183,7 @@ export class FileManagerAPI {
             }
 
             operation.status = "completed";
-            console.log(
-                `✅ ${params.isFolder ? "Folder" : "File"} deleted: ${
-                    params.path
-                }`,
-            );
+            console.log(`✅ ${params.isFolder ? "Folder" : "File"} deleted: ${params.path}`);
 
             return {
                 success: true,
@@ -213,15 +192,9 @@ export class FileManagerAPI {
             };
         } catch (error) {
             operation.status = "failed";
-            operation.error =
-                error instanceof Error ? error.message : "Unknown error";
+            operation.error = error instanceof Error ? error.message : "Unknown error";
 
-            console.error(
-                `❌ Failed to delete ${params.isFolder ? "folder" : "file"}: ${
-                    params.path
-                }`,
-                error,
-            );
+            console.error(`❌ Failed to delete ${params.isFolder ? "folder" : "file"}: ${params.path}`, error);
 
             return {
                 success: false,
@@ -235,9 +208,7 @@ export class FileManagerAPI {
     /**
      * Batch delete multiple items
      */
-    static async batchDelete(
-        params: DeleteFileParams,
-    ): Promise<BatchOperationResult> {
+    static async batchDelete(params: DeleteFileParams): Promise<BatchOperationResult> {
         const results: OperationResult[] = [];
         const errors: string[] = [];
 
@@ -268,8 +239,7 @@ export class FileManagerAPI {
                     errors.push(`${itemPath}: ${result.error}`);
                 }
             } catch (error) {
-                const errorMessage =
-                    error instanceof Error ? error.message : "Unknown error";
+                const errorMessage = error instanceof Error ? error.message : "Unknown error";
                 errors.push(`${itemPath}: ${errorMessage}`);
 
                 results.push({
@@ -292,9 +262,7 @@ export class FileManagerAPI {
         const successCount = results.filter(r => r.success).length;
         const totalCount = results.length;
 
-        console.log(
-            `✅ Batch delete completed: ${successCount}/${totalCount} successful`,
-        );
+        console.log(`✅ Batch delete completed: ${successCount}/${totalCount} successful`);
 
         return {
             success: errors.length === 0,

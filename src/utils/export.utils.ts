@@ -10,10 +10,7 @@ export interface ExportOptions {
 /**
  * Exporta un elemento HTML a PDF
  */
-export async function exportToPDF(
-    _element: HTMLElement,
-    options: ExportOptions = {},
-): Promise<void> {
+export async function exportToPDF(_element: HTMLElement, options: ExportOptions = {}): Promise<void> {
     try {
         const { filename = "document.pdf" } = options;
 
@@ -31,10 +28,7 @@ export async function exportToPDF(
 /**
  * Exporta un elemento HTML a archivo HTML
  */
-export async function exportToHTML(
-    element: HTMLElement,
-    options: ExportOptions = {},
-): Promise<void> {
+export async function exportToHTML(element: HTMLElement, options: ExportOptions = {}): Promise<void> {
     try {
         const { filename = "document.html", title = "Document" } = options;
 

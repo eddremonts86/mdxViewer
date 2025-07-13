@@ -55,10 +55,7 @@ export const useFileSearch = (fileStructure: FileNode[]) => {
     const [isTyping, setIsTyping] = useState<boolean>(false);
 
     // Filter file structure based on search term
-    const filteredFileStructure = useMemo(
-        () => filterFileTree(fileStructure, searchTerm),
-        [fileStructure, searchTerm],
-    );
+    const filteredFileStructure = useMemo(() => filterFileTree(fileStructure, searchTerm), [fileStructure, searchTerm]);
 
     // Count matching files
     const matchingFilesCount = useMemo(
@@ -77,13 +74,10 @@ export const useFileSearch = (fileStructure: FileNode[]) => {
     }, [searchTerm]);
 
     // Handle search input change
-    const handleSearchChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            const { value } = e.target;
-            setSearchTerm(value);
-        },
-        [],
-    );
+    const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        setSearchTerm(value);
+    }, []);
 
     // Clear search
     const clearSearch = useCallback(() => {

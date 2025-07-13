@@ -17,11 +17,7 @@ interface TableOfContentsProps {
     className?: string;
 }
 
-export function TableOfContents({
-    content,
-    items,
-    className,
-}: TableOfContentsProps) {
+export function TableOfContents({ content, items, className }: TableOfContentsProps) {
     const [toc, setToc] = useState<TableOfContentsItem[]>([]);
     const [activeId, setActiveId] = useState<string>("");
     const [isExpanded, setIsExpanded] = useState<boolean>(true);
@@ -87,8 +83,7 @@ export function TableOfContents({
             // Use a better scroll implementation with offset for header
             const headerOffset = 80; // Adjust based on your header height
             const elementPosition = element.getBoundingClientRect().top;
-            const offsetPosition =
-                elementPosition + window.pageYOffset - headerOffset;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
             window.scrollTo({
                 top: offsetPosition,
@@ -116,9 +111,7 @@ export function TableOfContents({
             >
                 <div className="flex items-center gap-2">
                     <Book className="text-muted-foreground h-4 w-4" />
-                    <h3 className="text-foreground text-sm font-semibold">
-                        Índice de Contenido
-                    </h3>
+                    <h3 className="text-foreground text-sm font-semibold">Índice de Contenido</h3>
                 </div>
                 {isExpanded ? (
                     <ChevronUp className="text-muted-foreground h-4 w-4" />
@@ -135,8 +128,7 @@ export function TableOfContents({
                             onClick={() => handleClick(id)}
                             className={cn(
                                 "group hover:bg-accent hover:text-accent-foreground flex w-full items-center gap-2 rounded-lg px-4 py-1.5 text-left text-sm transition-all duration-200",
-                                activeId === id &&
-                                    "bg-accent text-accent-foreground font-medium",
+                                activeId === id && "bg-accent text-accent-foreground font-medium",
                                 level === 1 && "font-medium",
                                 level === 2 && "pl-6",
                                 level === 3 && "pl-8 text-xs",
@@ -145,9 +137,7 @@ export function TableOfContents({
                                 level === 6 && "pl-14 text-xs opacity-50",
                             )}
                         >
-                            {level > 1 && (
-                                <ChevronRight className="text-muted-foreground h-3 w-3 flex-shrink-0" />
-                            )}
+                            {level > 1 && <ChevronRight className="text-muted-foreground h-3 w-3 flex-shrink-0" />}
                             <span className="truncate">{title}</span>
                         </button>
                     ))}

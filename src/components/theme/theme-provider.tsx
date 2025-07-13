@@ -10,7 +10,7 @@ interface ThemeProviderProps {
 
 interface ThemeProviderState {
     theme: Theme;
-    setTheme: (theme: Theme) => void;
+    setTheme: (_theme: Theme) => void;
 }
 
 const initialState: ThemeProviderState = {
@@ -28,12 +28,7 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
     const [theme, setTheme] = useState<Theme>(() => {
         const storedTheme = localStorage.getItem(storageKey) as Theme;
-        console.log(
-            "ThemeProvider: Stored theme:",
-            storedTheme,
-            "Default theme:",
-            defaultTheme,
-        );
+        console.log("ThemeProvider: Stored theme:", storedTheme, "Default theme:", defaultTheme);
         return storedTheme || defaultTheme;
     });
 
@@ -43,11 +38,7 @@ export function ThemeProvider({
         root.classList.remove("light", "dark");
 
         if (theme === "system") {
-            const systemTheme = window.matchMedia(
-                "(prefers-color-scheme: dark)",
-            ).matches
-                ? "dark"
-                : "light";
+            const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 
             console.log("Setting system theme:", systemTheme);
             root.classList.add(systemTheme);
@@ -80,8 +71,7 @@ export function ThemeProvider({
 export const useTheme = () => {
     const context = useContext(ThemeProviderContext);
 
-    if (context === undefined)
-        throw new Error("useTheme must be used within a ThemeProvider");
+    if (context === undefined) throw new Error("useTheme must be used within a ThemeProvider");
 
     return context;
 };

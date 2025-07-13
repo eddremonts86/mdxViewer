@@ -1,28 +1,13 @@
 import { Link } from "react-router-dom";
 
-import {
-    ArrowUpRight,
-    BarChart3,
-    BookOpen,
-    Calendar,
-    Eye,
-    FileText,
-    Folder,
-    TrendingUp,
-} from "lucide-react";
+import { ArrowUpRight, BarChart3, BookOpen, Calendar, Eye, FileText, Folder, TrendingUp } from "lucide-react";
 
 import { PopularFolders } from "@/components/content/PopularFolders";
 import { RecentDocuments } from "@/components/content/RecentDocuments";
 import { DocumentTypeStats } from "@/components/stats/DocumentTypeStats";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSiteStatistics } from "@/hooks/useSiteStatistics";
 
 export function HomePage() {
@@ -33,12 +18,8 @@ export function HomePage() {
             {/* Header Section */}
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">
-                        Overview
-                    </h1>
-                    <p className="text-muted-foreground">
-                        Welcome back! Here's your document management dashboard.
-                    </p>
+                    <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
+                    <p className="text-muted-foreground">Welcome back! Here's your document management dashboard.</p>
                 </div>
                 <div className="flex items-center space-x-2">
                     <Badge variant="outline" className="text-xs">
@@ -52,9 +33,7 @@ export function HomePage() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Total Documents
-                        </CardTitle>
+                        <CardTitle className="text-sm font-medium">Total Documents</CardTitle>
                         <FileText className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
@@ -65,12 +44,9 @@ export function HomePage() {
                             </div>
                         ) : (
                             <>
-                                <div className="text-2xl font-bold">
-                                    {statistics.totalDocuments}
-                                </div>
+                                <div className="text-2xl font-bold">{statistics.totalDocuments}</div>
                                 <p className="text-muted-foreground text-xs">
-                                    {statistics.documentsByType.md} MD +{" "}
-                                    {statistics.documentsByType.mdx} MDX
+                                    {statistics.documentsByType.md} MD + {statistics.documentsByType.mdx} MDX
                                 </p>
                             </>
                         )}
@@ -79,9 +55,7 @@ export function HomePage() {
 
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Folders
-                        </CardTitle>
+                        <CardTitle className="text-sm font-medium">Folders</CardTitle>
                         <Folder className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
@@ -92,12 +66,8 @@ export function HomePage() {
                             </div>
                         ) : (
                             <>
-                                <div className="text-2xl font-bold">
-                                    {statistics.totalFolders}
-                                </div>
-                                <p className="text-muted-foreground text-xs">
-                                    Content categories
-                                </p>
+                                <div className="text-2xl font-bold">{statistics.totalFolders}</div>
+                                <p className="text-muted-foreground text-xs">Content categories</p>
                             </>
                         )}
                     </CardContent>
@@ -105,9 +75,7 @@ export function HomePage() {
 
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            MDX Files
-                        </CardTitle>
+                        <CardTitle className="text-sm font-medium">MDX Files</CardTitle>
                         <Eye className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
@@ -121,9 +89,7 @@ export function HomePage() {
                                 <div className="text-2xl font-bold text-green-600">
                                     {statistics.documentsByType.mdx}
                                 </div>
-                                <p className="text-muted-foreground text-xs">
-                                    Interactive docs
-                                </p>
+                                <p className="text-muted-foreground text-xs">Interactive docs</p>
                             </>
                         )}
                     </CardContent>
@@ -131,9 +97,7 @@ export function HomePage() {
 
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Popular Folder
-                        </CardTitle>
+                        <CardTitle className="text-sm font-medium">Popular Folder</CardTitle>
                         <TrendingUp className="text-muted-foreground h-4 w-4" />
                     </CardHeader>
                     <CardContent>
@@ -145,12 +109,10 @@ export function HomePage() {
                         ) : (
                             <>
                                 <div className="text-2xl font-bold capitalize">
-                                    {statistics.popularFolders[0]?.name ||
-                                        "N/A"}
+                                    {statistics.popularFolders[0]?.name ?? "N/A"}
                                 </div>
                                 <p className="text-muted-foreground text-xs">
-                                    {statistics.popularFolders[0]?.count || 0}{" "}
-                                    documents
+                                    {statistics.popularFolders[0]?.count || 0} documents
                                 </p>
                             </>
                         )}
@@ -162,18 +124,12 @@ export function HomePage() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 {/* Document Type Distribution */}
                 <div className="lg:col-span-3">
-                    <DocumentTypeStats
-                        documentsByType={statistics.documentsByType}
-                        loading={statistics.loading}
-                    />
+                    <DocumentTypeStats documentsByType={statistics.documentsByType} loading={statistics.loading} />
                 </div>
 
                 {/* Popular Folders */}
                 <div className="lg:col-span-4">
-                    <PopularFolders
-                        popularFolders={statistics.popularFolders}
-                        loading={statistics.loading}
-                    />
+                    <PopularFolders popularFolders={statistics.popularFolders} loading={statistics.loading} />
                 </div>
             </div>
 
@@ -181,10 +137,7 @@ export function HomePage() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {/* Recent Documents */}
                 <div className="lg:col-span-1">
-                    <RecentDocuments
-                        recentDocuments={statistics.recentDocuments}
-                        loading={statistics.loading}
-                    />
+                    <RecentDocuments recentDocuments={statistics.recentDocuments} loading={statistics.loading} />
                 </div>
 
                 {/* Quick Actions */}
@@ -194,26 +147,18 @@ export function HomePage() {
                             <BookOpen className="h-5 w-5" />
                             Browse Documentation
                         </CardTitle>
-                        <CardDescription>
-                            Explore guides, examples, and API references
-                        </CardDescription>
+                        <CardDescription>Explore guides, examples, and API references</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-2">
                             <Link to="/docs">
-                                <Button
-                                    variant="outline"
-                                    className="w-full justify-start"
-                                >
+                                <Button variant="outline" className="w-full justify-start">
                                     <ArrowUpRight className="mr-2 h-4 w-4" />
                                     Documentation
                                 </Button>
                             </Link>
                             <Link to="/examples">
-                                <Button
-                                    variant="outline"
-                                    className="w-full justify-start"
-                                >
+                                <Button variant="outline" className="w-full justify-start">
                                     <ArrowUpRight className="mr-2 h-4 w-4" />
                                     Examples
                                 </Button>
@@ -228,9 +173,7 @@ export function HomePage() {
                             <BarChart3 className="h-5 w-5" />
                             Site Analytics
                         </CardTitle>
-                        <CardDescription>
-                            View detailed statistics and usage data
-                        </CardDescription>
+                        <CardDescription>View detailed statistics and usage data</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Link to="/statistics">
@@ -247,14 +190,10 @@ export function HomePage() {
             {statistics.error && (
                 <Card className="border-destructive">
                     <CardHeader>
-                        <CardTitle className="text-destructive">
-                            Error Loading Statistics
-                        </CardTitle>
+                        <CardTitle className="text-destructive">Error Loading Statistics</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground text-sm">
-                            {statistics.error}
-                        </p>
+                        <p className="text-muted-foreground text-sm">{statistics.error}</p>
                     </CardContent>
                 </Card>
             )}

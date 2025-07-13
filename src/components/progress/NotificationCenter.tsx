@@ -23,9 +23,9 @@ interface NotificationCenterProps {
     /** Array of notifications with proper typing */
     notifications: NotificationData[];
     /** Callback when notification is dismissed */
-    onDismiss: (id: string) => void;
+    onDismiss: (_id: string) => void;
     /** Callback when notification is marked as read */
-    onMarkAsRead: (id: string) => void;
+    onMarkAsRead: (_id: string) => void;
     /** Callback when all notifications are cleared */
     onClearAll: () => void;
     /** Maximum number of notifications to display */
@@ -55,10 +55,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
     // Memoized computed values with proper typing
     const sortedNotifications = useMemo(
-        () =>
-            [...notifications]
-                .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-                .slice(0, maxDisplayed),
+        () => [...notifications].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, maxDisplayed),
         [notifications, maxDisplayed],
     );
 
@@ -69,7 +66,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
     // Event handlers with proper typing
     const handleDismiss = useCallback(
-        (id: string, event: React.MouseEvent) => {
+        (_id: string, event: React.MouseEvent) => {
             event.stopPropagation();
             onDismiss(id);
         },
@@ -77,7 +74,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     );
 
     const handleToggleExpanded = useCallback(
-        (id: string) => {
+        (_id: string) => {
             setExpandedId(current => (current === id ? null : id));
             onMarkAsRead(id);
         },
@@ -98,9 +95,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         }
     };
 
-    const getNotificationVariant = (
-        type: NotificationData["type"],
-    ): "default" | "secondary" | "destructive" => {
+    const getNotificationVariant = (type: NotificationData["type"]): "default" | "secondary" | "destructive" => {
         switch (type) {
         case "error":
             return "destructive";
@@ -117,9 +112,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             <Card className={cn("w-full max-w-md", className)}>
                 <CardContent className="p-6 text-center">
                     <Info className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
-                    <p className="text-muted-foreground text-sm">
-                        No notifications to display
-                    </p>
+                    <p className="text-muted-foreground text-sm">No notifications to display</p>
                 </CardContent>
             </Card>
         );
@@ -132,10 +125,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                     <CardTitle className="text-foreground text-base font-medium">
                         Notifications
                         {unreadCount > 0 && (
-                            <Badge
-                                variant="destructive"
-                                className="ml-2 text-xs"
-                            >
+                            <Badge variant="destructive" className="ml-2 text-xs">
                                 {unreadCount}
                             </Badge>
                         )}
@@ -160,8 +150,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                         className={cn(
                             "w-full rounded-lg border p-3 text-left transition-colors",
                             "hover:bg-muted/50 focus:ring-primary focus:ring-2 focus:outline-none",
-                            !notification.isRead &&
-                                "bg-primary/5 border-primary/20",
+                            !notification.isRead && "bg-primary/5 border-primary/20",
                             compact && "p-2",
                         )}
                         onClick={() => handleToggleExpanded(notification.id)}
@@ -169,32 +158,20 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                         aria-label={`Notification: ${notification.title}`}
                     >
                         <div className="flex items-start gap-3">
-                            <div className="mt-0.5 flex-shrink-0">
-                                {getNotificationIcon(notification.type)}
-                            </div>
+                            <div className="mt-0.5 flex-shrink-0">{getNotificationIcon(notification.type)}</div>
                             <div className="min-w-0 flex-1">
                                 <div className="mb-1 flex items-center justify-between">
                                     <h4 className="text-foreground truncate text-sm font-medium">
                                         {notification.title}
                                     </h4>
                                     <div className="flex items-center gap-2">
-                                        <Badge
-                                            variant={getNotificationVariant(
-                                                notification.type,
-                                            )}
-                                            className="text-xs"
-                                        >
+                                        <Badge variant={getNotificationVariant(notification.type)} className="text-xs">
                                             {notification.type}
                                         </Badge>
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            onClick={e =>
-                                                handleDismiss(
-                                                    notification.id,
-                                                    e,
-                                                )
-                                            }
+                                            onClick={e => handleDismiss(notification.id, e)}
                                             className="text-muted-foreground hover:text-foreground h-6 w-6 p-0"
                                         >
                                             <X className="h-3 w-3" />
@@ -204,9 +181,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                                 <p
                                     className={cn(
                                         "text-muted-foreground text-sm",
-                                        expandedId === notification.id
-                                            ? "line-clamp-none"
-                                            : "line-clamp-2",
+                                        expandedId === notification.id ? "line-clamp-none" : "line-clamp-2",
                                     )}
                                 >
                                     {notification.message}
@@ -216,8 +191,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                                         <span className="text-muted-foreground text-xs">
                                             {notification.timestamp.toLocaleString()}
                                         </span>
-                                        {notification.actionLabel &&
-                                            notification.onAction && (
+                                        {notification.actionLabel && notification.onAction && (
                                             <Button
                                                 variant="outline"
                                                 size="sm"

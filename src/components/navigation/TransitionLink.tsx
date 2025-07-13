@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { transitionToRoute } from "@/utils/viewTransitions";
 
-interface TransitionLinkProps
-    extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+interface TransitionLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
     /** The route to navigate to */
     to: string;
     /** Optional transition name for CSS targeting */
@@ -49,13 +48,7 @@ export const TransitionLink: React.FC<TransitionLinkProps> = ({
         }
 
         // Don't interfere with modified clicks (middle click, ctrl+click, etc.)
-        if (
-            e.ctrlKey ||
-            e.metaKey ||
-            e.shiftKey ||
-            e.button !== 0 ||
-            e.defaultPrevented
-        ) {
+        if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0 || e.defaultPrevented) {
             return;
         }
 

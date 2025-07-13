@@ -71,8 +71,7 @@ export const FILE_VALIDATION = {
 
 // Default content templates
 export const DEFAULT_TEMPLATES = {
-    MD: (name: string) =>
-        `# ${name}\n\nStart writing your markdown content here.\n`,
+    MD: (name: string) => `# ${name}\n\nStart writing your markdown content here.\n`,
     MDX: (name: string) =>
         `---\ntitle: "${name}"\ndescription: "Description for this MDX file"\n---\n\n# ${name}\n\nStart writing your MDX content here.\n\n<div className="note">\n  This is an example MDX component.\n</div>\n`,
 } as const;
@@ -94,7 +93,6 @@ export const MESSAGES = {
 // File manager limits
 export const LIMITS = {
     MAX_BATCH_SIZE: PERCENTAGE.FULL,
-    MAX_FILE_SIZE:
-        FILE_LIMITS.FILE_SIZE_BYTES_TO_MB * FILE_LIMITS.MAX_FILE_SIZE_MB, // 5MB
+    MAX_FILE_SIZE: FILE_LIMITS.FILE_SIZE_BYTES_TO_MB * FILE_LIMITS.MAX_FILE_SIZE_MB, // 5MB
     OPERATION_TIMEOUT: 30000, // 30 seconds
 } as const;

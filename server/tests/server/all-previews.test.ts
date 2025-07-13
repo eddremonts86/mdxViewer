@@ -12,9 +12,7 @@ describe("🖼️ ALL Previews Accessibility Test", () => {
 
     beforeAll(async () => {
         // Import server
-        const { default: serverApp } = await import(
-            "../../server/clean-server.ts"
-        );
+        const { default: serverApp } = await import("../../clean-server.ts");
         app = serverApp;
 
         // Get all files and their preview URLs
@@ -52,7 +50,7 @@ describe("🖼️ ALL Previews Accessibility Test", () => {
                 // Progress indicator
                 if ((i + 1) % 10 === 0) {
                     console.log(
-                        `  ✅ Tested ${i + 1}/${allPreviewUrls.length} previews`
+                        `  ✅ Tested ${i + 1}/${allPreviewUrls.length} previews`,
                     );
                 }
             } catch (error) {
@@ -68,15 +66,15 @@ describe("🖼️ ALL Previews Accessibility Test", () => {
         const successful = results.filter(r => r.success);
         const failed = results.filter(r => !r.success);
 
-        console.log(`\\n📊 COMPLETE PREVIEW TEST RESULTS:`);
+        console.log("\\n📊 COMPLETE PREVIEW TEST RESULTS:");
         console.log(`  ✅ Successful: ${successful.length}/${results.length}`);
         console.log(`  ❌ Failed: ${failed.length}/${results.length}`);
         console.log(
-            `  📈 Success Rate: ${((successful.length / results.length) * 100).toFixed(2)}%`
+            `  📈 Success Rate: ${((successful.length / results.length) * 100).toFixed(2)}%`,
         );
 
         if (failed.length > 0) {
-            console.log(`\\n❌ Failed preview URLs:`);
+            console.log("\\n❌ Failed preview URLs:");
             failed.forEach(f => {
                 console.log(`    ${f.url} - Status: ${f.status}`);
             });
@@ -87,7 +85,7 @@ describe("🖼️ ALL Previews Accessibility Test", () => {
         expect(successful.length).toBe(allPreviewUrls.length);
 
         console.log(
-            `\\n🎉 SUCCESS: ALL ${allPreviewUrls.length} previews are accessible!`
+            `\\n🎉 SUCCESS: ALL ${allPreviewUrls.length} previews are accessible!`,
         );
     });
 
@@ -109,7 +107,7 @@ describe("🖼️ ALL Previews Accessibility Test", () => {
             .sort(([a], [b]) => a - b)
             .forEach(([level, count]) => {
                 console.log(
-                    `    ${level} level${level > 1 ? "s" : ""}: ${count} files`
+                    `    ${level} level${level > 1 ? "s" : ""}: ${count} files`,
                 );
             });
 
@@ -118,7 +116,7 @@ describe("🖼️ ALL Previews Accessibility Test", () => {
 
         // Should have deep nesting (at least 4+ levels)
         const deepFiles = Array.from(nestingStats.entries()).filter(
-            ([level]) => level >= 4
+            ([level]) => level >= 4,
         );
         expect(deepFiles.length).toBeGreaterThan(0);
     });

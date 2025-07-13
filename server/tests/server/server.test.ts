@@ -31,7 +31,7 @@ describe("🧪 Clean MDX Viewer Server - Complete Test Suite", () => {
             process.cwd(),
             "tests",
             "fixtures",
-            "content"
+            "content",
         );
         await fs.mkdir(testContentDir, { recursive: true });
 
@@ -335,7 +335,7 @@ describe("🧪 Clean MDX Viewer Server - Complete Test Suite", () => {
             it("should handle 5-level nesting", async () => {
                 await request(app)
                     .get(
-                        "/api/previews/guides%2Fadvanced%2Fperformance%2Foptimization.png"
+                        "/api/previews/guides%2Fadvanced%2Fperformance%2Foptimization.png",
                     )
                     .expect(200);
             });
@@ -343,7 +343,7 @@ describe("🧪 Clean MDX Viewer Server - Complete Test Suite", () => {
             it("should handle extreme nesting (10 levels)", async () => {
                 await request(app)
                     .get(
-                        "/api/previews/tests%2Fdeep%2Fnested%2Flevel4%2Flevel5%2Flevel6%2Flevel7%2Flevel8%2Flevel9%2Flevel10%2Fdeep-test.png"
+                        "/api/previews/tests%2Fdeep%2Fnested%2Flevel4%2Flevel5%2Flevel6%2Flevel7%2Flevel8%2Flevel9%2Flevel10%2Fdeep-test.png",
                     )
                     .expect(200);
             });
@@ -353,7 +353,7 @@ describe("🧪 Clean MDX Viewer Server - Complete Test Suite", () => {
             it("should handle spaces in paths", async () => {
                 await request(app)
                     .get(
-                        "/api/previews/special%2Fpath%20with%20spaces%2Ftest.png"
+                        "/api/previews/special%2Fpath%20with%20spaces%2Ftest.png",
                     )
                     .expect(200);
             });
@@ -361,7 +361,7 @@ describe("🧪 Clean MDX Viewer Server - Complete Test Suite", () => {
             it("should handle special characters", async () => {
                 await request(app)
                     .get(
-                        "/api/previews/special%2Fspecial-chars%2Ftest%40%23%24.png"
+                        "/api/previews/special%2Fspecial-chars%2Ftest%40%23%24.png",
                     )
                     .expect(200);
             });
@@ -397,7 +397,7 @@ describe("🧪 Clean MDX Viewer Server - Complete Test Suite", () => {
             });
 
             it("should handle very long paths", async () => {
-                const longPath = "a".repeat(1000) + ".png";
+                const longPath = `${"a".repeat(1000)  }.png`;
                 await request(app).get(`/api/previews/${longPath}`).expect(404);
             });
         });
@@ -413,14 +413,14 @@ describe("🧪 Clean MDX Viewer Server - Complete Test Suite", () => {
 
             it("should include appropriate cache headers", async () => {
                 const response = await request(app).get(
-                    "/api/previews/test.png"
+                    "/api/previews/test.png",
                 );
 
                 // Should have some form of caching header
                 expect(
                     response.headers["cache-control"] ||
                         response.headers["etag"] ||
-                        response.headers["last-modified"]
+                        response.headers["last-modified"],
                 ).toBeDefined();
             });
 
@@ -440,7 +440,7 @@ describe("🧪 Clean MDX Viewer Server - Complete Test Suite", () => {
             const response = await request(app).get("/api/health");
 
             expect(response.headers).toHaveProperty(
-                "access-control-allow-origin"
+                "access-control-allow-origin",
             );
         });
 
@@ -459,8 +459,8 @@ describe("🧪 Clean MDX Viewer Server - Complete Test Suite", () => {
 
             expect(consoleSpy).toHaveBeenCalledWith(
                 expect.stringMatching(
-                    /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z - GET \/api\/health/
-                )
+                    /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z - GET \/api\/health/,
+                ),
             );
 
             consoleSpy.mockRestore();
@@ -539,7 +539,7 @@ describe("🧪 Clean MDX Viewer Server - Complete Test Suite", () => {
         it("should handle extremely deep nesting beyond normal limits", async () => {
             await request(app)
                 .get(
-                    "/api/previews/tests%2Fdeep%2Fnested%2Flevel4%2Flevel5%2Flevel6%2Flevel7%2Flevel8%2Flevel9%2Flevel10%2Fdeep-test.png"
+                    "/api/previews/tests%2Fdeep%2Fnested%2Flevel4%2Flevel5%2Flevel6%2Flevel7%2Flevel8%2Flevel9%2Flevel10%2Fdeep-test.png",
                 )
                 .expect(200);
         });

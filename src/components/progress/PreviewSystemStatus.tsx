@@ -14,10 +14,7 @@ export function PreviewSystemStatus({
     previewsAvailable,
     isLoading = false,
 }: PreviewSystemStatusProps) {
-    const coverage =
-        totalDocuments > 0
-            ? Math.round((previewsAvailable / totalDocuments) * 100)
-            : 0;
+    const coverage = totalDocuments > 0 ? Math.round((previewsAvailable / totalDocuments) * 100) : 0;
     const isFullyCovered = coverage >= 95;
     const hasGoodCoverage = coverage >= 80;
 
@@ -27,18 +24,15 @@ export function PreviewSystemStatus({
     let statusTextColor;
 
     if (isFullyCovered) {
-        cardClasses +=
-            "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950";
+        cardClasses += "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950";
         statusIcon = <CheckCircle className="h-4 w-4 text-green-600" />;
         statusTextColor = "text-green-900 dark:text-green-100";
     } else if (hasGoodCoverage) {
-        cardClasses +=
-            "border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950";
+        cardClasses += "border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950";
         statusIcon = <AlertCircle className="h-4 w-4 text-orange-600" />;
         statusTextColor = "text-orange-900 dark:text-orange-100";
     } else {
-        cardClasses +=
-            "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950";
+        cardClasses += "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950";
         statusIcon = <AlertCircle className="h-4 w-4 text-red-600" />;
         statusTextColor = "text-red-900 dark:text-red-100";
     }
@@ -62,15 +56,8 @@ export function PreviewSystemStatus({
                 <div className="flex items-center gap-3">
                     {statusIcon}
                     <div className="flex items-center gap-2">
-                        <span
-                            className={`text-sm font-medium ${statusTextColor}`}
-                        >
-                            Preview System Status
-                        </span>
-                        <Badge
-                            variant={isFullyCovered ? "default" : "secondary"}
-                            className="text-xs"
-                        >
+                        <span className={`text-sm font-medium ${statusTextColor}`}>Preview System Status</span>
+                        <Badge variant={isFullyCovered ? "default" : "secondary"} className="text-xs">
                             {coverage}% Coverage
                         </Badge>
                     </div>

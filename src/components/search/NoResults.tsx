@@ -20,12 +20,7 @@ export function NoResults({ searchTerm, onClearSearch }: NoResultsProps) {
                 <div className="space-y-1">
                     <p className="font-medium">No documents found</p>
                     <p className="text-xs">No results for "{searchTerm}"</p>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={onClearSearch}
-                        className="mt-2 h-7 text-xs"
-                    >
+                    <Button variant="ghost" size="sm" onClick={onClearSearch} className="mt-2 h-7 text-xs">
                         Clear search
                     </Button>
                 </div>

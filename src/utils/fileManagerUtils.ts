@@ -3,23 +3,19 @@
  * Utilities for file and folder management operations
  */
 
-import type {
-    BatchOperation,
-    FileMetadata,
-    FileOperation,
-} from "@/types/fileManager";
+import type { BatchOperation, FileMetadata, FileOperation } from "@/types/fileManager";
 
 // Use path-browserify for browser compatibility
 const path = {
-    basename: (path: string, ext?: string) => {
+    basename: (_path: string, ext?: string) => {
         const base = path.split("/").pop() ?? "";
         return ext ? base.replace(ext, "") : base;
     },
-    dirname: (path: string) => {
+    dirname: (_path: string) => {
         const parts = path.split("/");
         return parts.slice(0, -1).join("/") || ".";
     },
-    extname: (path: string) => {
+    extname: (_path: string) => {
         const base = path.split("/").pop() ?? "";
         const dotIndex = base.lastIndexOf(".");
         return dotIndex > 0 ? base.substring(dotIndex) : "";
@@ -31,24 +27,20 @@ export class FileManagerUtils {
      * Generate a unique operation ID
      */
     static generateOperationId(): string {
-        return `op_${Date.now()}_${Math.random()
-            .toString(36)
-            .substring(2, 11)}`;
+        return `op_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     }
 
     /**
      * Generate a unique batch operation ID
      */
     static generateBatchId(): string {
-        return `batch_${Date.now()}_${Math.random()
-            .toString(36)
-            .substring(2, 11)}`;
+        return `batch_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     }
 
     /**
      * Validate file name
      */
-    static validateFileName(name: string): {
+    static validateFileName(_name: string): {
         isValid: boolean;
         error?: string;
     } {
@@ -112,7 +104,7 @@ export class FileManagerUtils {
     /**
      * Validate folder name
      */
-    static validateFolderName(name: string): {
+    static validateFolderName(_name: string): {
         isValid: boolean;
         error?: string;
     } {
@@ -148,7 +140,7 @@ export class FileManagerUtils {
     /**
      * Normalize file path
      */
-    static normalizePath(path: string): string {
+    static normalizePath(_path: string): string {
         return path.replace(/\\/g, "/").replace(/\/+/g, "/");
     }
 
@@ -206,10 +198,7 @@ export class FileManagerUtils {
     /**
      * Create a new folder operation
      */
-    static createFolderOperation(
-        type: "create" | "delete",
-        path: string,
-    ): FileOperation {
+    static createFolderOperation(type: "create" | "delete", path: string): FileOperation {
         return {
             id: this.generateOperationId(),
             type,
@@ -223,10 +212,7 @@ export class FileManagerUtils {
     /**
      * Create a batch operation
      */
-    static createBatchOperation(
-        operations: FileOperation[],
-        description?: string,
-    ): BatchOperation {
+    static createBatchOperation(operations: FileOperation[], description?: string): BatchOperation {
         return {
             id: this.generateBatchId(),
             operations,
@@ -239,10 +225,7 @@ export class FileManagerUtils {
     /**
      * Simulate file creation (for development)
      */
-    static async simulateCreateFile(
-        path: string,
-        content = "",
-    ): Promise<{ success: boolean; error?: string }> {
+    static async simulateCreateFile(_path: string, content = ""): Promise<{ success: boolean; error?: string }> {
         try {
             await new Promise(resolve => setTimeout(resolve, 100));
             console.log(`[Simulated] Creating file: ${path}`, {
@@ -260,9 +243,7 @@ export class FileManagerUtils {
     /**
      * Simulate folder creation (for development)
      */
-    static async simulateCreateFolder(
-        path: string,
-    ): Promise<{ success: boolean; error?: string }> {
+    static async simulateCreateFolder(_path: string): Promise<{ success: boolean; error?: string }> {
         try {
             await new Promise(resolve => setTimeout(resolve, 100));
             console.log(`[Simulated] Creating folder: ${path}`);
@@ -278,9 +259,7 @@ export class FileManagerUtils {
     /**
      * Simulate file deletion (for development)
      */
-    static async simulateDeleteFile(
-        path: string,
-    ): Promise<{ success: boolean; error?: string }> {
+    static async simulateDeleteFile(_path: string): Promise<{ success: boolean; error?: string }> {
         try {
             await new Promise(resolve => setTimeout(resolve, 100));
             console.log(`[Simulated] Deleting file: ${path}`);
@@ -296,9 +275,7 @@ export class FileManagerUtils {
     /**
      * Simulate folder deletion (for development)
      */
-    static async simulateDeleteFolder(
-        path: string,
-    ): Promise<{ success: boolean; error?: string }> {
+    static async simulateDeleteFolder(_path: string): Promise<{ success: boolean; error?: string }> {
         try {
             await new Promise(resolve => setTimeout(resolve, 100));
             console.log(`[Simulated] Deleting folder: ${path}`);
@@ -314,9 +291,7 @@ export class FileManagerUtils {
     /**
      * Execute a single file operation
      */
-    static async executeFileOperation(
-        operation: FileOperation,
-    ): Promise<FileOperation> {
+    static async executeFileOperation(operation: FileOperation): Promise<FileOperation> {
         const updatedOperation = {
             ...operation,
             status: "in-progress" as const,
@@ -359,11 +334,7 @@ export class FileManagerUtils {
      */
     static async executeBatchOperation(
         batch: BatchOperation,
-        onProgress?: (progress: {
-            completed: number;
-            total: number;
-            currentOperation?: FileOperation;
-        }) => void,
+        onProgress?: (_progress: { completed: number; total: number; currentOperation?: FileOperation }) => void,
     ): Promise<BatchOperation> {
         const updatedBatch = { ...batch, status: "in-progress" as const };
         const results: FileOperation[] = [];
@@ -399,10 +370,7 @@ export class FileManagerUtils {
     /**
      * Real file creation using File System Access API or server API
      */
-    static async createFileReal(
-        filePath: string,
-        content = "",
-    ): Promise<{ success: boolean; error?: string }> {
+    static async createFileReal(filePath: string, content = ""): Promise<{ success: boolean; error?: string }> {
         try {
             // Parse the file path to extract name, type, and directory
             const fileName = path.basename(filePath);
@@ -411,21 +379,18 @@ export class FileManagerUtils {
             const baseName = path.basename(fileName, path.extname(fileName));
 
             // In a browser environment, we'll use the File Manager API
-            const response = await fetch(
-                "http://localhost:3001/api/files/create",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        name: baseName,
-                        type: fileExt || "md", // Default to md if no extension
-                        path: directory === "." ? "" : directory,
-                        content,
-                    }),
+            const response = await fetch("http://localhost:3001/api/files/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
                 },
-            );
+                body: JSON.stringify({
+                    name: baseName,
+                    type: fileExt || "md", // Default to md if no extension
+                    path: directory === "." ? "" : directory,
+                    content,
+                }),
+            });
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -446,28 +411,23 @@ export class FileManagerUtils {
     /**
      * Real folder creation using File System Access API or server API
      */
-    static async createFolderReal(
-        folderPath: string,
-    ): Promise<{ success: boolean; error?: string }> {
+    static async createFolderReal(folderPath: string): Promise<{ success: boolean; error?: string }> {
         try {
             // Parse the folder path to extract name and directory
             const folderName = path.basename(folderPath);
             const directory = path.dirname(folderPath);
 
             // In a browser environment, we'll use the File Manager API
-            const response = await fetch(
-                "http://localhost:3001/api/folders/create",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        name: folderName,
-                        path: directory === "." ? "" : directory,
-                    }),
+            const response = await fetch("http://localhost:3001/api/folders/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
                 },
-            );
+                body: JSON.stringify({
+                    name: folderName,
+                    path: directory === "." ? "" : directory,
+                }),
+            });
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -488,22 +448,17 @@ export class FileManagerUtils {
     /**
      * Real file deletion using File System Access API or server API
      */
-    static async deleteFileReal(
-        path: string,
-    ): Promise<{ success: boolean; error?: string }> {
+    static async deleteFileReal(_path: string): Promise<{ success: boolean; error?: string }> {
         try {
-            const response = await fetch(
-                "http://localhost:3001/api/files/delete",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        paths: [path],
-                    }),
+            const response = await fetch("http://localhost:3001/api/files/delete", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
                 },
-            );
+                body: JSON.stringify({
+                    paths: [path],
+                }),
+            });
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -524,22 +479,17 @@ export class FileManagerUtils {
     /**
      * Real folder deletion using File System Access API or server API
      */
-    static async deleteFolderReal(
-        path: string,
-    ): Promise<{ success: boolean; error?: string }> {
+    static async deleteFolderReal(_path: string): Promise<{ success: boolean; error?: string }> {
         try {
-            const response = await fetch(
-                "http://localhost:3001/api/folders/delete",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        paths: [path],
-                    }),
+            const response = await fetch("http://localhost:3001/api/folders/delete", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
                 },
-            );
+                body: JSON.stringify({
+                    paths: [path],
+                }),
+            });
 
             if (!response.ok) {
                 const errorData = await response.json();

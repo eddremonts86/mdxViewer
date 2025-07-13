@@ -20,11 +20,7 @@ interface CreateDialogProps {
     /** Callback when dialog open state changes */
     onOpenChange?: (_open: boolean) => void;
     /** Callback when file/folder is created */
-    onCreate?: (
-        _type: "file" | "folder",
-        _name: string,
-        _path?: string
-    ) => void;
+    onCreate?: (_type: "file" | "folder", _name: string, _path?: string) => void;
     /** Current directory path */
     currentPath?: string;
     /** Additional CSS classes */
@@ -69,23 +65,17 @@ export const CreateDialog: React.FC<CreateDialogProps> = ({
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>
-                        Create New {itemType === "file" ? "File" : "Folder"}
-                    </DialogTitle>
+                    <DialogTitle>Create New {itemType === "file" ? "File" : "Folder"}</DialogTitle>
                     <DialogDescription>
-                        Enter a name for the new{" "}
-                        {itemType === "file" ? "file" : "folder"}.
-                        {currentPath &&
-                            ` It will be created in: ${currentPath}`}
+                        Enter a name for the new {itemType === "file" ? "file" : "folder"}.
+                        {currentPath && ` It will be created in: ${currentPath}`}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="flex space-x-2">
                         <Button
                             type="button"
-                            variant={
-                                itemType === "file" ? "default" : "outline"
-                            }
+                            variant={itemType === "file" ? "default" : "outline"}
                             size="sm"
                             onClick={() => setItemType("file")}
                             className="flex-1"
@@ -95,9 +85,7 @@ export const CreateDialog: React.FC<CreateDialogProps> = ({
                         </Button>
                         <Button
                             type="button"
-                            variant={
-                                itemType === "folder" ? "default" : "outline"
-                            }
+                            variant={itemType === "folder" ? "default" : "outline"}
                             size="sm"
                             onClick={() => setItemType("folder")}
                             className="flex-1"
@@ -116,18 +104,10 @@ export const CreateDialog: React.FC<CreateDialogProps> = ({
                     />
                 </div>
                 <DialogFooter>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => onOpenChange?.(false)}
-                    >
+                    <Button type="button" variant="outline" onClick={() => onOpenChange?.(false)}>
                         Cancel
                     </Button>
-                    <Button
-                        type="button"
-                        onClick={handleCreate}
-                        disabled={!itemName.trim()}
-                    >
+                    <Button type="button" onClick={handleCreate} disabled={!itemName.trim()}>
                         Create {itemType === "file" ? "File" : "Folder"}
                     </Button>
                 </DialogFooter>
