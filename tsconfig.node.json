@@ -22,5 +22,5 @@
         "noUncheckedSideEffectImports": true,
         "forceConsistentCasingInFileNames": true
     },
-    "include": ["vite.config.ts", "server/**/*", "scripts/**/*.ts"]
+    "include": ["vite.config.ts", "server/**/*", "scripts/**/*.ts", "code-smell-detector.ts"]
 }

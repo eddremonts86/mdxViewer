@@ -7,8 +7,8 @@
  * detailed reports with severity levels and recommendations.
  */
 
-import { parseESLintOutput, runESLint } from "./eslint-runner";
-import { buildReport, logResults, writeReports } from "./report-builder";
+import { parseESLintOutput, runESLint } from "./scripts/code-smell/eslint-runner";
+import { buildReport, logResults, writeReports } from "./scripts/code-smell/report-builder";
 
 function main(): void {
     console.warn("🔍 Starting code smell analysis...");

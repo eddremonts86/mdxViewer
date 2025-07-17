@@ -37,7 +37,7 @@ export const CODE_SETTINGS = {
     lineHeight: "1.6",
     padding: "1.25rem",
     borderRadius: "0.5rem",
-    fontFeatures: "\"liga\" 1, \"calt\" 1",
+    fontFeatures: '"liga" 1, "calt" 1',
 } as const;
 
 // CSS class names for markdown elements
@@ -61,7 +61,7 @@ export const MARKDOWN_CLASSES = {
     th: "border-border bg-muted/30 text-foreground border-r px-6 py-4 text-left font-sans font-semibold antialiased [&[align=center]]:text-center [&[align=right]]:text-right",
     td: "border-border text-foreground border-r px-6 py-4 text-left font-sans antialiased [&[align=center]]:text-center [&[align=right]]:text-right",
     link: "text-primary hover:text-primary/80 decoration-primary/40 hover:decoration-primary/70 font-sans font-medium underline underline-offset-4 antialiased transition-all duration-200",
-    image: "border-border mx-auto h-auto max-w-full rounded-xl border shadow-lg",
+    image: "w-full h-auto object-cover border-border mx-auto rounded-xl border shadow-lg",
     imageCaption: "text-muted-foreground mt-3 text-center font-sans text-sm italic antialiased",
     hr: "border-border mx-auto my-12 w-1/3 border-t-2 opacity-50",
     strong: "text-foreground font-sans font-semibold antialiased",
