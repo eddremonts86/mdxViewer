@@ -37,7 +37,7 @@ export const CODE_SETTINGS = {
     lineHeight: "1.6",
     padding: "1.25rem",
     borderRadius: "0.5rem",
-    fontFeatures: '"liga" 1, "calt" 1',
+    fontFeatures: "\"liga\" 1, \"calt\" 1",
 } as const;
 
 // CSS class names for markdown elements

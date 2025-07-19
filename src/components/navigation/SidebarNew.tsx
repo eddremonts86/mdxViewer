@@ -1,140 +1,44 @@
+// Clean import block, absolute paths only, no duplicates
 import { useMemo, useState } from "react";
 
 import { Loader2 } from "lucide-react";
 
-import type { FileItem } from "@/api/fileAPI";
 import { FileManagerToolbar } from "@/components/file-manager/FileManagerToolbar";
-import { FileTreeNode } from "@/components/file-manager/FileTreeNode";
+import { useFileDelete } from "@/components/navigation/hooks/useFileDelete";
+import { useFileDialog } from "@/components/navigation/hooks/useFileDialog";
+import { useFileUpload } from "@/components/navigation/hooks/useFileUpload";
+import { useSidebarSelection } from "@/components/navigation/hooks/useSidebarSelection";
+import { SidebarCreateDialog } from "@/components/navigation/SidebarCreateDialog";
+import { SidebarFileTree } from "@/components/navigation/SidebarFileTree";
+import type { SidebarProps } from "@/components/navigation/types/Sidebar";
+import { triggerFileInput } from "@/components/navigation/utils/fileInput";
+import { filterFilesBySearch } from "@/components/navigation/utils/filterFiles";
 import { NoResults } from "@/components/search/NoResults";
 import { SearchInput } from "@/components/search/SearchInput";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { useCreateFile, useCreateFolder, useDeleteFiles, useFiles, useUploadFiles } from "@/hooks/api/useFiles";
+import { useCreateFile, useCreateFolder, useFiles } from "@/hooks/api/useFiles";
 import { cn } from "@/lib/utils";
-import type { FileNode } from "@/types";
-
-interface SidebarProps {
-    open: boolean;
-    onOpenChange: (_open: boolean) => void;
-}
 
 export function Sidebar({ open, onOpenChange }: SidebarProps) {
     const { data: files = [], isLoading, error, refetch } = useFiles();
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
-    const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
 
-    // Mutations
+    // Dialog state and actions
+    const { showCreateDialog, createType, createParentPath, openCreateFile, openCreateFolder, closeDialog } =
+        useFileDialog();
+
+    // Selection and expansion state via custom hook
+    const { selectedFiles, setSelectedFiles, expandedFolders, handleSelectFile, handleExpandFolder } =
+        useSidebarSelection();
+
+    // Upload and delete hooks
+    const { handleUpload } = useFileUpload();
+    const { handleDelete, deleteFilesMutation } = useFileDelete(selectedFiles, setSelectedFiles);
     const createFileMutation = useCreateFile();
     const createFolderMutation = useCreateFolder();
-    const deleteFilesMutation = useDeleteFiles();
-    const uploadFilesMutation = useUploadFiles();
-
-    // Dialog states
-    const [showCreateDialog, setShowCreateDialog] = useState(false);
-    const [createType, setCreateType] = useState<"file" | "folder">("file");
-    const [createParentPath, setCreateParentPath] = useState("");
 
     // Filter files based on search
-    const filteredFiles = useMemo(() => {
-        if (!searchTerm.trim()) return files;
-
-        const filterItems = (items: FileItem[]): FileItem[] =>
-            items.reduce<FileItem[]>((acc, item) => {
-                const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-                const filteredChildren = item.children ? filterItems(item.children) : [];
-
-                if (matchesSearch || filteredChildren.length > 0) {
-                    acc.push({
-                        ...item,
-                        children: filteredChildren,
-                    });
-                }
-
-                return acc;
-            }, []);
-
-        return filterItems(files);
-    }, [files, searchTerm]);
-
-    const handleSelectFile = (path: string) => {
-        setSelectedFiles(prev => (prev.includes(path) ? prev.filter(p => p !== path) : [...prev, path]));
-    };
-
-    const handleCreateFile = (parentPath = "") => {
-        setCreateType("file");
-        setCreateParentPath(parentPath);
-        setShowCreateDialog(true);
-    };
-
-    const handleCreateFolder = (parentPath = "") => {
-        setCreateType("folder");
-        setCreateParentPath(parentPath);
-        setShowCreateDialog(true);
-    };
-
-    const handleDelete = async () => {
-        if (selectedFiles.length === 0) return;
-
-        try {
-            await deleteFilesMutation.mutateAsync(selectedFiles);
-            setSelectedFiles([]);
-        } catch (error) {
-            console.error("Delete failed:", error);
-        }
-    };
-
-    const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { files } = event.target;
-        if (!files || files.length === 0) return;
-
-        try {
-            await uploadFilesMutation.mutateAsync({
-                files: Array.from(files),
-                targetPath: "",
-                createFolders: true,
-            });
-            event.target.value = ""; // Reset input
-        } catch (error) {
-            console.error("Upload failed:", error);
-        }
-    };
-
-    // Convert FileItem to FileNode for compatibility with FileTreeNode
-    const convertToFileNode = (item: FileItem): FileNode => ({
-        name: item.name,
-        path: item.path,
-        type: item.type,
-        extension: item.extension,
-        children: item.children?.map(convertToFileNode) ?? [],
-    });
-
-    const renderFileTree = (items: FileItem[], level = 0): React.ReactNode =>
-        items.map(item => (
-            <FileTreeNode
-                key={item.path}
-                node={convertToFileNode(item)}
-                level={level}
-                expandedFolder={expandedFolders.has(item.path) ? item.path : null}
-                setExpandedFolder={(path: string | null) => {
-                    if (path) {
-                        setExpandedFolders(prev => new Set([...prev, path]));
-                    } else {
-                        setExpandedFolders(prev => {
-                            const newSet = new Set(prev);
-                            newSet.delete(item.path);
-                            return newSet;
-                        });
-                    }
-                }}
-                searchTerm={searchTerm}
-                isSearching={!!searchTerm}
-                isSelected={selectedFiles.includes(item.path)}
-                isMultiSelectMode={selectedFiles.length > 0}
-                onToggleSelect={() => handleSelectFile(item.path)}
-                onContextMenu={(e: React.MouseEvent) => e.preventDefault()}
-            />
-        ));
+    const filteredFiles = useMemo(() => filterFilesBySearch(files, searchTerm), [files, searchTerm]);
 
     return (
         <>
@@ -156,26 +60,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     {/* File Manager Toolbar */}
                     <FileManagerToolbar
                         viewMode="list"
-                        onCreateFolder={() => handleCreateFolder()}
-                        onCreateFile={() => handleCreateFile()}
-                        onUpload={() => {
-                            const input = document.createElement("input");
-                            input.type = "file";
-                            input.multiple = true;
-                            input.accept = ".md,.mdx,.txt";
-                            input.onchange = event => {
-                                const target = event.target as HTMLInputElement;
-                                const { files } = target;
-                                if (files && files.length > 0) {
-                                    const reactEvent = {
-                                        target,
-                                        currentTarget: target,
-                                    } as React.ChangeEvent<HTMLInputElement>;
-                                    handleUpload(reactEvent);
-                                }
-                            };
-                            input.click();
-                        }}
+                        onCreateFolder={() => openCreateFolder()}
+                        onCreateFile={() => openCreateFile()}
+                        onUpload={() => triggerFileInput(handleUpload)}
                         onDelete={handleDelete}
                         onRefresh={() => window.location.reload()}
                         hasSelectedFiles={selectedFiles.length > 0}
@@ -209,12 +96,12 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
                         {error && (
                             <div className="p-4">
-                                <Card className="border-destructive bg-destructive/10 p-4">
+                                <div className="border-destructive bg-destructive/10 p-4">
                                     <p className="text-destructive text-sm">Failed to load files: {error.message}</p>
                                     <Button variant="outline" size="sm" onClick={() => refetch()} className="mt-2">
                                         Retry
                                     </Button>
-                                </Card>
+                                </div>
                             </div>
                         )}
 
@@ -223,7 +110,16 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                                 {filteredFiles.length === 0 ? (
                                     <NoResults searchTerm={searchTerm} onClearSearch={() => setSearchTerm("")} />
                                 ) : (
-                                    <div className="p-2">{renderFileTree(filteredFiles)}</div>
+                                    <div className="p-2">
+                                        <SidebarFileTree
+                                            items={filteredFiles}
+                                            expandedFolders={expandedFolders}
+                                            handleExpandFolder={handleExpandFolder}
+                                            searchTerm={searchTerm}
+                                            selectedFiles={selectedFiles}
+                                            handleSelectFile={handleSelectFile}
+                                        />
+                                    </div>
                                 )}
                             </>
                         )}
@@ -242,63 +138,14 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             </aside>
 
             {/* Simple create dialog */}
-            {showCreateDialog && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                    <Card className="w-96 p-6">
-                        <h3 className="mb-4 text-lg font-semibold">
-                            Create {createType === "file" ? "File" : "Folder"}
-                        </h3>
-                        <form
-                            onSubmit={async e => {
-                                e.preventDefault();
-                                const formData = new FormData(e.currentTarget);
-                                const name = formData.get("name") as string;
-
-                                try {
-                                    if (createType === "file") {
-                                        await createFileMutation.mutateAsync({
-                                            name: name.endsWith(".md") || name.endsWith(".mdx") ? name : `${name}.md`,
-                                            type: name.endsWith(".mdx") ? "mdx" : "md",
-                                            path: createParentPath,
-                                            content: "",
-                                        });
-                                    } else {
-                                        await createFolderMutation.mutateAsync({
-                                            name,
-                                            path: createParentPath,
-                                        });
-                                    }
-                                    setShowCreateDialog(false);
-                                } catch (error) {
-                                    console.error("Create failed:", error);
-                                }
-                            }}
-                        >
-                            <input
-                                name="name"
-                                placeholder={`${createType === "file" ? "File" : "Folder"} name`}
-                                className="border-border mb-4 w-full rounded border p-2"
-                                autoFocus
-                                required
-                            />
-                            <div className="flex justify-end gap-2">
-                                <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)}>
-                                    Cancel
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    disabled={createFileMutation.isPending || createFolderMutation.isPending}
-                                >
-                                    {createFileMutation.isPending || createFolderMutation.isPending ? (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    ) : null}
-                                    Create
-                                </Button>
-                            </div>
-                        </form>
-                    </Card>
-                </div>
-            )}
+            <SidebarCreateDialog
+                show={showCreateDialog}
+                createType={createType}
+                createParentPath={createParentPath}
+                closeDialog={closeDialog}
+                createFileMutation={createFileMutation}
+                createFolderMutation={createFolderMutation}
+            />
         </>
     );
 }

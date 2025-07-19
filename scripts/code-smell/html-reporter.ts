@@ -136,7 +136,7 @@ function generateSmellsTable(report: SmellReport): string {
                                 ${smell.fixable ? "✅ Auto-fixable" : "❌ Manual fix required"}
                             </td>
                         </tr>
-                    `
+                    `,
         )
         .join("");
 
@@ -169,8 +169,8 @@ function generateChartScript(report: SmellReport): string {
             type: 'doughnut',
             data: {
                 labels: [${Object.keys(report.categories)
-                    .map(c => `"${c}"`)
-                    .join(",")}],
+        .map(c => `"${c}"`)
+        .join(",")}],
                 datasets: [{
                     data: [${Object.values(report.categories).join(",")}],
                     backgroundColor: [

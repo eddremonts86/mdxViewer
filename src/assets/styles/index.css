@@ -109,9 +109,8 @@
     pre,
     .font-mono {
         font-family:
-            "JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", "Monaco",
-            "Inconsolata", "Roboto Mono", "Source Code Pro", "Menlo",
-            "Consolas", monospace !important;
+            "JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
+            "Source Code Pro", "Menlo", "Consolas", monospace !important;
         font-feature-settings:
             "liga" 1,
             "calt" 1;

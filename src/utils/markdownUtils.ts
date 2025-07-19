@@ -2,7 +2,7 @@ import React from "react";
 
 import { SCROLL_SETTINGS } from "@/const/markdown";
 import type { EffectiveTheme, ThemeType } from "@/types/markdown";
-import { extractTextFromReactNode as extractText,generateHeadingId as createHeadingId } from "@/utils/headingUtils";
+import { extractTextFromReactNode as extractText, generateHeadingId as createHeadingId } from "@/utils/headingUtils";
 
 /**
  * Helper function to generate heading IDs using our utility

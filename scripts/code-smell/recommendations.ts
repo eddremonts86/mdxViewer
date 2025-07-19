@@ -11,12 +11,12 @@ export function generateRecommendations(smells: CodeSmell[]): string[] {
             acc[smell.category] = (acc[smell.category] || 0) + 1;
             return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
     );
 
     if (categories["Complexity Issues"] > 10) {
         recommendations.push(
-            "🔴 HIGH PRIORITY: Consider breaking down complex functions into smaller, more focused functions."
+            "🔴 HIGH PRIORITY: Consider breaking down complex functions into smaller, more focused functions.",
         );
         recommendations.push("💡 Use the Single Responsibility Principle to reduce complexity.");
     }
