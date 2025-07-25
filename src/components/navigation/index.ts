@@ -1,4 +1,3 @@
 export { NavigationBreadcrumb } from "./NavigationBreadcrumb";
-export { Sidebar } from "./Sidebar";
-export { Sidebar as SidebarNew } from "./SidebarNew";
+export { Sidebar } from "./sidebar";
 export { TransitionLink } from "./TransitionLink";

@@ -66,7 +66,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
     // Event handlers with proper typing
     const handleDismiss = useCallback(
-        (_id: string, event: React.MouseEvent) => {
+        (id: string, event: React.MouseEvent) => {
             event.stopPropagation();
             onDismiss(id);
         },
@@ -74,7 +74,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     );
 
     const handleToggleExpanded = useCallback(
-        (_id: string) => {
+        (id: string) => {
             setExpandedId(current => (current === id ? null : id));
             onMarkAsRead(id);
         },

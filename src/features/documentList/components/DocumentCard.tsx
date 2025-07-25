@@ -92,7 +92,7 @@ export function DocumentCard({
                 {/* Preview indicator */}
                 {previewUrl && !imageError && (
                     <div className="absolute bottom-2 left-2">
-                        <Badge variant="outline" className="bg-background/80 px-1.5 py-0.5 text-xs backdrop-blur-sm">
+                        <Badge variant="outline" className="bg-background/95 dark:bg-background/98 px-1.5 py-0.5 text-xs backdrop-blur-sm">
                             Preview
                         </Badge>
                     </div>

@@ -11,7 +11,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 // Mock the module imports before importing the server
 vi.mock("path", async () => {
-    const actual = await vi.importActual("path");
+    const actual = await vi.importActual("path") as any;
     return {
         ...actual,
         join: vi.fn((...args) => actual.join(...args)),

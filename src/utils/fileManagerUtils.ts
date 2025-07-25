@@ -8,15 +8,15 @@ import type { BatchOperation, FileMetadata, FileOperation } from "@/types/fileMa
 // Use path-browserify for browser compatibility
 const path = {
     basename: (_path: string, ext?: string) => {
-        const base = path.split("/").pop() ?? "";
+        const base = _path.split("/").pop() ?? "";
         return ext ? base.replace(ext, "") : base;
     },
     dirname: (_path: string) => {
-        const parts = path.split("/");
+        const parts = _path.split("/");
         return parts.slice(0, -1).join("/") || ".";
     },
     extname: (_path: string) => {
-        const base = path.split("/").pop() ?? "";
+        const base = _path.split("/").pop() ?? "";
         const dotIndex = base.lastIndexOf(".");
         return dotIndex > 0 ? base.substring(dotIndex) : "";
     },
@@ -40,7 +40,7 @@ export class FileManagerUtils {
     /**
      * Validate file name
      */
-    static validateFileName(_name: string): {
+    static validateFileName(name: string): {
         isValid: boolean;
         error?: string;
     } {
@@ -104,7 +104,7 @@ export class FileManagerUtils {
     /**
      * Validate folder name
      */
-    static validateFolderName(_name: string): {
+    static validateFolderName(name: string): {
         isValid: boolean;
         error?: string;
     } {
@@ -140,8 +140,8 @@ export class FileManagerUtils {
     /**
      * Normalize file path
      */
-    static normalizePath(_path: string): string {
-        return path.replace(/\\/g, "/").replace(/\/+/g, "/");
+    static normalizePath(filePath: string): string {
+        return filePath.replace(/\\/g, "/").replace(/\/+/g, "/");
     }
 
     /**

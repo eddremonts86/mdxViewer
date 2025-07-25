@@ -68,7 +68,7 @@ const addToRemoveQueue = (toastId: string) => {
     toastTimeouts.set(toastId, timeout);
 };
 
-export const reducer = (_state: State, action: Action): State => {
+export const reducer = (state: State, action: Action): State => {
     switch (action.type) {
     case "ADD_TOAST":
         return {
@@ -79,7 +79,7 @@ export const reducer = (_state: State, action: Action): State => {
     case "UPDATE_TOAST":
         return {
             ...state,
-            toasts: state.toasts.map(t => (t.id === action.toast.id ? { ...t, ...action.toast } : t)),
+            toasts: state.toasts.map((t: ToasterToast) => (t.id === action.toast.id ? { ...t, ...action.toast } : t)),
         };
 
     case "DISMISS_TOAST": {
@@ -116,7 +116,7 @@ export const reducer = (_state: State, action: Action): State => {
         }
         return {
             ...state,
-            toasts: state.toasts.filter(t => t.id !== action.toastId),
+            toasts: state.toasts.filter((t: ToasterToast) => t.id !== action.toastId),
         };
     }
 };

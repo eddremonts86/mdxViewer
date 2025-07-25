@@ -22,7 +22,7 @@ export function SearchInput({
     isTyping = false,
 }: SearchInputProps) {
     return (
-        <div className="bg-card/50">
+        <div className="bg-card/90 dark:bg-card/95">
             <div className="group relative">
                 <Search
                     className={cn(

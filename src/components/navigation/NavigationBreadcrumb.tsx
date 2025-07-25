@@ -95,7 +95,7 @@ export const NavigationBreadcrumb: React.FC<NavigationBreadcrumbProps> = ({
 
     return (
         <nav
-            className={`bg-card/50 border-border flex items-center space-x-2 border-b p-3 ${className}`}
+            className={`bg-card/90 dark:bg-card/95 border-border flex items-center space-x-2 border-b p-3 ${className}`}
             aria-label="Navigation breadcrumb"
         >
             {/* Back button */}

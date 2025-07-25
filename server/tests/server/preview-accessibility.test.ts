@@ -85,7 +85,7 @@ describe("🖼️ Complete Preview Accessibility Test", () => {
                     url: previewUrl,
                     file: file.path,
                     status: "ERROR",
-                    error: error.message,
+                    error: error instanceof Error ? error.message : String(error),
                     success: false,
                 });
             }

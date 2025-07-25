@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 
 import { Bell, Menu, Settings } from "lucide-react";
 
-import { Sidebar } from "@/components/navigation/sidebar";
+import { Sidebar } from "@/components/navigation";
 import { NotificationCenter } from "@/components/progress/NotificationCenter";
 import { ModeToggle } from "@/components/theme/mode-toggle";
 import { Button } from "@/components/ui/button";
@@ -40,7 +40,7 @@ export function Layout() {
     return (
         <div className="bg-background text-foreground min-h-screen">
             {/* Header */}
-            <header className="border-border bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
+            <header className="border-border bg-background/98 dark:bg-background/99 sticky top-0 z-50 w-full border-b backdrop-blur-xl shadow-sm">
                 <div className="flex h-16 items-center px-6">
                     {/* Left side */}
                     <div className="flex flex-1 items-center space-x-4">
