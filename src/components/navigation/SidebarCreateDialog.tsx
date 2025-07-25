@@ -2,6 +2,9 @@ import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface SidebarCreateDialogProps {
     show: boolean;
@@ -20,11 +23,12 @@ export function SidebarCreateDialog({
     createFileMutation,
     createFolderMutation,
 }: SidebarCreateDialogProps) {
-    if (!show) return null;
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <Card className="w-96 p-6">
-                <h3 className="mb-4 text-lg font-semibold">Create {createType === "file" ? "File" : "Folder"}</h3>
+        <Dialog open={show} onOpenChange={(open) => !open && closeDialog()}>
+            <DialogContent className="max-w-sm w-full">
+                <DialogHeader>
+                    <DialogTitle>Create {createType === "file" ? "File" : "Folder"}</DialogTitle>
+                </DialogHeader>
                 <form
                     onSubmit={async e => {
                         e.preventDefault();
@@ -49,14 +53,19 @@ export function SidebarCreateDialog({
                             console.error("Create failed:", error);
                         }
                     }}
-                >
-                    <input
-                        name="name"
-                        placeholder={`${createType === "file" ? "File" : "Folder"} name`}
-                        className="border-border mb-4 w-full rounded border p-2"
-                        autoFocus
-                        required
-                    />
+                    className="space-y-3">
+                    <div className="space-y-2">
+                        <Label htmlFor="name">
+                            {createType === "file" ? "File" : "Folder"} name
+                        </Label>
+                        <Input
+                            id="name"
+                            name="name"
+                            placeholder={`${createType === "file" ? "File" : "Folder"} name`}
+                            autoFocus
+                            required
+                        />
+                    </div>
                     <div className="flex justify-end gap-2">
                         <Button type="button" variant="outline" onClick={closeDialog}>
                             Cancel
@@ -69,7 +78,7 @@ export function SidebarCreateDialog({
                         </Button>
                     </div>
                 </form>
-            </Card>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 }

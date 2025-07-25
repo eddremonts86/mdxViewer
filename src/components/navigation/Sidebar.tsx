@@ -387,9 +387,16 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
 
             {/* Create Document Dialog */}
             <CreateDocumentDialog
-                isOpen={isCreateDialogOpen}
-                onClose={closeCreateDialog}
+                open={isCreateDialogOpen}
+                onOpenChange={closeCreateDialog}
                 initialPath={moveDialogData?.sourcePath || ""}
+                availableFolders={filteredFiles
+                    .filter(item => item.type === "folder")
+                    .map(folder => ({
+                        name: folder.name,
+                        path: folder.path
+                    }))
+                }
             />
 
             {/* Move Item Dialog */}

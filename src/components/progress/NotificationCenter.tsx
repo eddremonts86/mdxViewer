@@ -144,11 +144,12 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             </CardHeader>
             <CardContent className="space-y-2">
                 {sortedNotifications.map(notification => (
-                    <button
+                    <Button
                         key={notification.id}
                         type="button"
+                        variant="ghost"
                         className={cn(
-                            "w-full rounded-lg border p-3 text-left transition-colors",
+                            "w-full rounded-lg border p-3 text-left transition-colors h-auto justify-start",
                             "hover:bg-muted/50 focus:ring-primary focus:ring-2 focus:outline-none",
                             !notification.isRead && "bg-primary/5 border-primary/20",
                             compact && "p-2",
@@ -208,7 +209,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                                 )}
                             </div>
                         </div>
-                    </button>
+                    </Button>
                 ))}
             </CardContent>
         </Card>

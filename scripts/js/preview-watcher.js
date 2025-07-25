@@ -16,6 +16,9 @@ const __dirname = path.dirname(__filename);
 const CONTENT_DIR = path.join(__dirname, "..", "public", "content");
 const PREVIEWS_DIR = path.join(__dirname, "..", "public", "previews");
 
+// Configuration constants
+const DEBOUNCE_DELAY_MS = 1000;
+
 console.log("👀 Starting preview watcher...");
 console.log("Watching:", CONTENT_DIR);
 console.log("Previews:", PREVIEWS_DIR);
@@ -67,7 +70,7 @@ async function generatePreviewForFile(filePath) {
 }
 
 // Debounced version to avoid too many rapid updates
-const debouncedGeneratePreview = debounce(generatePreviewForFile, 1000);
+const debouncedGeneratePreview = debounce(generatePreviewForFile, DEBOUNCE_DELAY_MS);
 
 // Watch for changes recursively
 function watchDirectory(dir) {

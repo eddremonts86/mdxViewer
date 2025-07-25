@@ -71,7 +71,7 @@ export const CreateDialog: React.FC<CreateDialogProps> = ({
                         {currentPath && ` It will be created in: ${currentPath}`}
                     </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
+                <div className="space-y-3">
                     <div className="flex space-x-2">
                         <Button
                             type="button"

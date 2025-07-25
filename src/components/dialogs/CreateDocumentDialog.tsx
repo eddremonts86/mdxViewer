@@ -1,29 +1,43 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 import { FolderPlus, Loader2, Plus } from "lucide-react";
 
 import type { FileItem } from "@/api/fileAPI";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { useCreateFile, useCreateFolder, useFiles } from "@/hooks/api/useFiles";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useCreateFile, useCreateFolder } from "@/hooks/api/useFiles";
 
 interface CreateDocumentDialogProps {
-    isOpen: boolean;
-    onClose: () => void;
+    /** Whether the dialog is open */
+    open: boolean;
+    /** Callback when dialog open state changes */
+    onOpenChange: (open: boolean) => void;
+    /** Initial path for file creation */
     initialPath?: string;
+    /** Available folders for selection */
+    availableFolders?: Array<{ name: string; path: string }>;
 }
 
-export function CreateDocumentDialog({ isOpen, onClose, initialPath = "" }: CreateDocumentDialogProps) {
-    const { data: files = [] } = useFiles();
-    const createFileMutation = useCreateFile();
-    const createFolderMutation = useCreateFolder();
-
+export function CreateDocumentDialog({ open, onOpenChange, initialPath = "", availableFolders = [] }: CreateDocumentDialogProps) {
     const [fileName, setFileName] = useState("");
     const [extension, setExtension] = useState<"md" | "mdx">("md");
     const [targetFolder, setTargetFolder] = useState(initialPath);
     const [createNewFolder, setCreateNewFolder] = useState(false);
     const [newFolderName, setNewFolderName] = useState("");
     const [error, setError] = useState<string | null>(null);
+
+    const createFileMutation = useCreateFile();
+    const createFolderMutation = useCreateFolder();
 
     // Calculate path depth for validation
     const calculateDepth = (pathStr: string): number => {
@@ -47,56 +61,14 @@ export function CreateDocumentDialog({ isOpen, onClose, initialPath = "" }: Crea
         return { valid: true };
     };
 
-    // Get all folders recursively for the dropdown with depth limit
-    const getAllFolders = (
-        items: FileItem[],
-        currentPath = "",
-        depth = 0,
-    ): Array<{ path: string; name: string; depth: number }> => {
-        const folders: Array<{ path: string; name: string; depth: number }> = [];
-        const MAX_DISPLAY_DEPTH = 10;
-
-        // Add root option
-        if (currentPath === "" && depth === 0) {
-            folders.push({ path: "", name: "📁 Root", depth: 0 });
-        }
-
-        items.forEach(item => {
-            if (item.type === "folder") {
-                const fullPath = currentPath
-                    ? `${currentPath}/${item.originalName || item.name}`
-                    : item.originalName || item.name;
-
-                const folderDepth = depth + 1;
-
-                // Only show folders within the depth limit
-                if (folderDepth <= MAX_DISPLAY_DEPTH) {
-                    folders.push({
-                        path: fullPath,
-                        name: `${"  ".repeat(depth)}📁 ${item.name}`,
-                        depth: folderDepth,
-                    });
-
-                    // Recursively get subfolders only if we haven't reached the limit
-                    if (item.children && folderDepth < MAX_DISPLAY_DEPTH) {
-                        folders.push(...getAllFolders(item.children, fullPath, folderDepth));
-                    }
-                }
-            }
-        });
-
-        return folders;
-    };
-
-    const availableFolders = getAllFolders(files);
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (!fileName.trim()) return;
-
-        // Clear previous errors
         setError(null);
+
+        if (!fileName.trim()) {
+            setError("Document name is required");
+            return;
+        }
 
         try {
             let finalTargetPath = targetFolder;
@@ -104,8 +76,7 @@ export function CreateDocumentDialog({ isOpen, onClose, initialPath = "" }: Crea
             // Create new folder if requested
             if (createNewFolder && newFolderName.trim()) {
                 const newFolderPath = targetFolder ? `${targetFolder}/${newFolderName.trim()}` : newFolderName.trim();
-
-                // Validate depth for folder creation
+                
                 const folderDepthValidation = validateDepth(newFolderPath, true);
                 if (!folderDepthValidation.valid) {
                     setError(folderDepthValidation.error ?? "Invalid folder depth");
@@ -144,7 +115,7 @@ export function CreateDocumentDialog({ isOpen, onClose, initialPath = "" }: Crea
             setCreateNewFolder(false);
             setNewFolderName("");
             setError(null);
-            onClose();
+            onOpenChange(false);
         } catch (error) {
             console.error("Failed to create document:", error);
             const errorMessage = error instanceof Error ? error.message : "Failed to create document";
@@ -152,20 +123,24 @@ export function CreateDocumentDialog({ isOpen, onClose, initialPath = "" }: Crea
         }
     };
 
-    if (!isOpen) return null;
+    const handleCheckboxChange = (checked: boolean | "indeterminate") => {
+        setCreateNewFolder(checked === true);
+    };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <Card className="max-h-[80vh] w-[500px] overflow-y-auto p-6">
-                <div className="mb-6 flex items-center gap-2">
-                    <Plus className="h-5 w-5" />
-                    <h3 className="text-lg font-semibold">Create New Document</h3>
-                </div>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-[500px] w-full max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <Plus className="h-5 w-5" />
+                        Create New Document
+                    </DialogTitle>
+                </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-3">
                     {/* Error Display */}
                     {error && (
-                        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                        <div className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
                             <div className="flex items-center gap-2">
                                 <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path
@@ -180,95 +155,81 @@ export function CreateDocumentDialog({ isOpen, onClose, initialPath = "" }: Crea
                     )}
 
                     {/* File Name */}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">Document Name *</label>
-                        <input
+                    <div className="space-y-2">
+                        <Label htmlFor="fileName">Document Name *</Label>
+                        <Input
+                            id="fileName"
                             type="text"
                             value={fileName}
                             onChange={e => setFileName(e.target.value)}
                             placeholder="Enter document name"
-                            className="border-border focus:ring-primary w-full rounded-md border p-3 focus:ring-2 focus:outline-none"
                             required
                             autoFocus
                         />
                     </div>
 
                     {/* Extension Selection */}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">File Extension *</label>
-                        <div className="flex gap-3">
-                            <label className="flex cursor-pointer items-center gap-2">
-                                <input
-                                    type="radio"
-                                    name="extension"
-                                    value="md"
-                                    checked={extension === "md"}
-                                    onChange={e => setExtension(e.target.value as "md")}
-                                    className="h-4 w-4"
-                                />
-                                <span>.md (Markdown)</span>
-                            </label>
-                            <label className="flex cursor-pointer items-center gap-2">
-                                <input
-                                    type="radio"
-                                    name="extension"
-                                    value="mdx"
-                                    checked={extension === "mdx"}
-                                    onChange={e => setExtension(e.target.value as "mdx")}
-                                    className="h-4 w-4"
-                                />
-                                <span>.mdx (MDX)</span>
-                            </label>
-                        </div>
+                    <div className="space-y-2">
+                        <Label>File Extension *</Label>
+                        <RadioGroup value={extension} onValueChange={(value: "md" | "mdx") => setExtension(value)}>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="md" id="md" />
+                                <Label htmlFor="md">.md (Markdown)</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="mdx" id="mdx" />
+                                <Label htmlFor="mdx">.mdx (MDX)</Label>
+                            </div>
+                        </RadioGroup>
                     </div>
 
                     {/* Target Folder */}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">Destination Folder</label>
-                        <select
-                            value={targetFolder}
-                            onChange={e => setTargetFolder(e.target.value)}
-                            className="border-border focus:ring-primary w-full rounded-md border p-3 focus:ring-2 focus:outline-none"
-                        >
-                            {availableFolders.map(folder => (
-                                <option key={folder.path} value={folder.path}>
-                                    {folder.name}
-                                </option>
-                            ))}
-                        </select>
+                    <div className="space-y-2">
+                        <Label htmlFor="targetFolder">Destination Folder</Label>
+                        <Select value={targetFolder} onValueChange={setTargetFolder}>
+                            <SelectTrigger id="targetFolder">
+                                <SelectValue placeholder="Select a folder" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {availableFolders.map(folder => (
+                                    <SelectItem key={folder.path} value={folder.path}>
+                                        {folder.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     {/* Create New Folder Option */}
-                    <div>
-                        <label className="flex cursor-pointer items-center gap-2">
-                            <input
-                                type="checkbox"
+                    <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="createNewFolder"
                                 checked={createNewFolder}
-                                onChange={e => setCreateNewFolder(e.target.checked)}
-                                className="h-4 w-4"
+                                onCheckedChange={handleCheckboxChange}
                             />
-                            <span className="text-sm font-medium">Create new folder</span>
-                        </label>
+                            <Label htmlFor="createNewFolder">Create new folder</Label>
+                        </div>
 
                         {createNewFolder && (
-                            <div className="mt-2">
-                                <div className="mb-2 flex items-center gap-2">
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
                                     <FolderPlus className="h-4 w-4" />
-                                    <span className="text-sm">New folder name:</span>
+                                    <Label htmlFor="newFolderName">New folder name:</Label>
                                 </div>
-                                <input
+                                <Input
+                                    id="newFolderName"
                                     type="text"
                                     value={newFolderName}
                                     onChange={e => setNewFolderName(e.target.value)}
                                     placeholder="Enter folder name"
-                                    className="border-border focus:ring-primary w-full rounded-md border p-3 focus:ring-2 focus:outline-none"
                                 />
                             </div>
                         )}
                     </div>
 
                     {/* Preview Path */}
-                    <div className="bg-muted rounded-md p-3">
+                    <div className="bg-muted rounded-md p-2">
                         <div className="text-muted-foreground mb-1 text-sm">File will be created at:</div>
                         <div className="font-mono text-sm">
                             {(() => {
@@ -291,8 +252,8 @@ export function CreateDocumentDialog({ isOpen, onClose, initialPath = "" }: Crea
                     </div>
 
                     {/* Actions */}
-                    <div className="flex justify-end gap-3 pt-4">
-                        <Button type="button" variant="outline" onClick={onClose}>
+                    <div className="flex justify-end gap-3 pt-2">
+                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                             Cancel
                         </Button>
                         <Button
@@ -311,7 +272,7 @@ export function CreateDocumentDialog({ isOpen, onClose, initialPath = "" }: Crea
                         </Button>
                     </div>
                 </form>
-            </Card>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 }

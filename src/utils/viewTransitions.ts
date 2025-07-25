@@ -48,31 +48,35 @@ export async function executeViewTransition(
 
     // Skip transition if user prefers reduced motion and we should respect it
     if (respectReducedMotion && prefersReducedMotion()) {
-        if (debug) console.log("View transition skipped: user prefers reduced motion");
+        if (debug) console.warn("View transition skipped: user prefers reduced motion");
         await callback();
         return;
     }
 
     // Skip transition if API is not supported
     if (!isViewTransitionSupported()) {
-        if (debug) console.log("View transition skipped: API not supported");
+        if (debug) console.warn("View transition skipped: API not supported");
         await callback();
         return;
     }
 
     try {
-        if (debug) console.log("Starting view transition", { transitionName });
+        if (debug) console.warn("Starting view transition", { transitionName });
 
         // Add transition name to document if provided
         if (transitionName) {
             document.documentElement.style.setProperty("--transition-name", transitionName);
         }
 
-        const transition = (document as any).startViewTransition(callback);
+        const transition = (document as Document & {
+            startViewTransition: (
+                _callback: () => void | Promise<void>,
+            ) => { ready: Promise<void>; finished: Promise<void> };
+        }).startViewTransition(callback);
 
         if (debug) {
-            transition.ready.then(() => console.log("View transition ready"));
-            transition.finished.then(() => console.log("View transition finished"));
+            transition.ready.then(() => console.warn("View transition ready"));
+            transition.finished.then(() => console.warn("View transition finished"));
         }
 
         await transition.finished;

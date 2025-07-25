@@ -183,18 +183,20 @@ export const FileItemRenderer: React.FC<FileItemRendererProps> = ({
 
                 {/* Expand/Collapse button for folders */}
                 {isFolder && (
-                    <button
+                    <Button
                         type="button"
+                        variant="ghost"
+                        size="sm"
                         onClick={e => {
                             e.stopPropagation();
                             onToggleFolder(item.path);
                         }}
                         onKeyDown={handleFolderToggleKeyDown}
-                        className="hover:bg-accent focus:ring-ring flex h-4 w-4 items-center justify-center rounded-sm focus:ring-2 focus:outline-none"
+                        className="h-4 w-4 p-0 hover:bg-accent focus:ring-ring focus:ring-2 focus:outline-none"
                         aria-label={`${isExpanded ? "Collapse" : "Expand"} folder ${item.name}`}
                     >
                         {renderChevronIcon(isExpanded, !!hasChildren)}
-                    </button>
+                    </Button>
                 )}
 
                 {/* File/Folder icon */}

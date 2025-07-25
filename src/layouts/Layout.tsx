@@ -112,7 +112,7 @@ export function Layout() {
             {/* Notification Center overlay */}
             {showNotifications && (
                 <div className="fixed inset-0 z-50">
-                    <button
+                    <div
                         className="absolute inset-0 cursor-default bg-black/20"
                         onClick={() => setShowNotifications(false)}
                         aria-label="Close notifications"

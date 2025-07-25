@@ -62,6 +62,31 @@ async function getAllMarkdownFiles(dir, basePath = "") {
     return files;
 }
 
+// Constants for SVG preview generation
+const PREVIEW_LINE_COUNT = 4;
+const PREVIEW_LINE_MAX_LENGTH = 50;
+const PREVIEW_BASE_Y_POSITION = 140;
+const PREVIEW_LINE_HEIGHT = 16;
+
+// SVG dimensions and layout constants
+const SVG_WIDTH = 400;
+const SVG_HEIGHT = 240;
+const BADGE_X = 20;
+const BADGE_Y = 20;
+const BADGE_WIDTH = 60;
+const BADGE_HEIGHT = 25;
+const BADGE_RADIUS = 4;
+const MDX_BADGE_X = 30;
+const MD_BADGE_X = 35;
+const BADGE_TEXT_Y = 38;
+const TITLE_X = 20;
+const TITLE_Y = 70;
+const FOLDER_X = 20;
+const FOLDER_Y = 95;
+const TYPE_X = 20;
+const TYPE_Y = 115;
+const TEXT_X = 20;
+
 // Create SVG preview content
 function createSVGPreview(title, type, folder, content) {
     // Clean and extract preview text
@@ -80,38 +105,38 @@ function createSVGPreview(title, type, folder, content) {
     const lines = cleanContent
         .split("\n")
         .filter(line => line.trim().length > 0)
-        .slice(0, 4)
+        .slice(0, PREVIEW_LINE_COUNT)
         .map(line =>
             line
                 .trim()
-                .substring(0, 50)
+                .substring(0, PREVIEW_LINE_MAX_LENGTH)
                 .replace(/[<>&"']/g, ""),
         );
 
     const badgeColor = type === "mdx" ? "#10b981" : "#3b82f6";
     const badgeText = type.toUpperCase();
-    const badgeX = type === "mdx" ? "30" : "35";
+    const badgeX = type === "mdx" ? MDX_BADGE_X : MD_BADGE_X;
 
-    return `<svg width="400" height="240" xmlns="http://www.w3.org/2000/svg">
+    return `<svg width="${SVG_WIDTH}" height="${SVG_HEIGHT}" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" style="stop-color:#f8f9fa;stop-opacity:1" />
                 <stop offset="100%" style="stop-color:#e9ecef;stop-opacity:1" />
             </linearGradient>
         </defs>
-        <rect width="400" height="240" fill="url(#bg)"/>
-        <rect x="20" y="20" width="60" height="25" fill="${badgeColor}" rx="4"/>
-        <text x="${badgeX}" y="38" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">${badgeText}</text>
-        <text x="20" y="70" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1a1a1a">${title}</text>
-        <text x="20" y="95" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">📁 ${folder}</text>
-        <text x="20" y="115" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Type: ${type === "mdx" ? "MDX Interactive" : "Markdown Document"}</text>
+        <rect width="${SVG_WIDTH}" height="${SVG_HEIGHT}" fill="url(#bg)"/>
+        <rect x="${BADGE_X}" y="${BADGE_Y}" width="${BADGE_WIDTH}" height="${BADGE_HEIGHT}" fill="${badgeColor}" rx="${BADGE_RADIUS}"/>
+        <text x="${badgeX}" y="${BADGE_TEXT_Y}" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">${badgeText}</text>
+        <text x="${TITLE_X}" y="${TITLE_Y}" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1a1a1a">${title}</text>
+        <text x="${FOLDER_X}" y="${FOLDER_Y}" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">📁 ${folder}</text>
+        <text x="${TYPE_X}" y="${TYPE_Y}" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Type: ${type === "mdx" ? "MDX Interactive" : "Markdown Document"}</text>
         ${lines
         .map(
             (line, i) =>
-                `<text x="20" y="${140 + i * 16}" font-family="Arial, sans-serif" font-size="11" fill="#374151">${line}</text>`,
+                `<text x="${TEXT_X}" y="${PREVIEW_BASE_Y_POSITION + i * PREVIEW_LINE_HEIGHT}" font-family="Arial, sans-serif" font-size="11" fill="#374151">${line}</text>`,
         )
         .join("")}
-        <rect x="0" y="0" width="400" height="240" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+        <rect x="0" y="0" width="${SVG_WIDTH}" height="${SVG_HEIGHT}" fill="none" stroke="#e5e7eb" stroke-width="1"/>
     </svg>`;
 }
 

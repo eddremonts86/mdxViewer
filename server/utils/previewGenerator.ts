@@ -7,6 +7,14 @@ import { createCanvas } from "canvas";
 import fs from "fs/promises";
 import path from "path";
 
+// Constants for preview generation
+const MAX_PREVIEW_LINES = 12;
+const TITLE_FONT_SIZE_OFFSET = 4;
+const TITLE_Y_OFFSET = 30;
+const LINE_HEIGHT_OFFSET = 4;
+const FADE_EFFECT_HEIGHT = 40;
+const FADE_EFFECT_OFFSET = 20;
+
 export interface PreviewOptions {
     width: number;
     height: number;
@@ -75,7 +83,7 @@ export async function generateDocumentPreview(
 
         // Extract and prepare text
         const text = extractTextFromMarkdown(content);
-        const lines = text.split("\n").slice(0, 12); // First 12 lines
+        const lines = text.split("\n").slice(0, MAX_PREVIEW_LINES); // First 12 lines
 
         // Set text style
         ctx.fillStyle = opts.textColor;
@@ -85,7 +93,7 @@ export async function generateDocumentPreview(
 
         // Draw title (filename without extension)
         const title = path.basename(filePath, path.extname(filePath));
-        ctx.font = `bold ${opts.fontSize + 4}px ${opts.fontFamily}`;
+        ctx.font = `bold ${opts.fontSize + TITLE_FONT_SIZE_OFFSET}px ${opts.fontFamily}`;
         ctx.fillStyle = "#1a1a1a";
         ctx.fillText(title, opts.padding, opts.padding);
 
@@ -93,8 +101,8 @@ export async function generateDocumentPreview(
         ctx.font = `${opts.fontSize}px ${opts.fontFamily}`;
         ctx.fillStyle = opts.textColor;
 
-        let yOffset = opts.padding + 30;
-        const lineHeight = opts.fontSize + 4;
+        let yOffset = opts.padding + TITLE_Y_OFFSET;
+        const lineHeight = opts.fontSize + LINE_HEIGHT_OFFSET;
 
         // Draw content lines
         for (const line of lines) {
@@ -131,10 +139,10 @@ export async function generateDocumentPreview(
         }
 
         // Add fade effect at bottom if text is cut off
-        if (yOffset >= opts.height - opts.padding - 20) {
+        if (yOffset >= opts.height - opts.padding - FADE_EFFECT_OFFSET) {
             const gradient = ctx.createLinearGradient(
                 0,
-                opts.height - 40,
+                opts.height - FADE_EFFECT_HEIGHT,
                 0,
                 opts.height,
             );
@@ -142,7 +150,7 @@ export async function generateDocumentPreview(
             gradient.addColorStop(1, opts.backgroundColor);
 
             ctx.fillStyle = gradient;
-            ctx.fillRect(0, opts.height - 40, opts.width, 40);
+            ctx.fillRect(0, opts.height - FADE_EFFECT_HEIGHT, opts.width, FADE_EFFECT_HEIGHT);
         }
 
         // Ensure output directory exists

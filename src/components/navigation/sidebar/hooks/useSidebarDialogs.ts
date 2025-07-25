@@ -18,8 +18,10 @@ export const useSidebarDialogs = () => {
         setIsCreateDialogOpen(true);
     }, []);
 
-    const closeCreateDialog = useCallback(() => {
-        setIsCreateDialogOpen(false);
+    const closeCreateDialog = useCallback((open?: boolean) => {
+        if (open === false || open === undefined) {
+            setIsCreateDialogOpen(false);
+        }
     }, []);
 
     const openMoveDialog = useCallback((sourcePath: string, itemName: string) => {

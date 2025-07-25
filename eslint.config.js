@@ -258,5 +258,59 @@ export default tseslint.config(
             "object-shorthand": "error",
             "prefer-destructuring": ["error", { array: true, object: true }, { enforceForRenamedProperties: false }],
         },
+    },
+    // Configuration for test files
+    {
+        extends: [js.configs.recommended, ...tseslint.configs.recommended],
+        files: ["tests/**/*.{ts,tsx}", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
+        languageOptions: {
+            ecmaVersion: 2020,
+            globals: { ...globals.browser, ...globals.node },
+            parser: tseslint.parser,
+            parserOptions: {
+                project: ["./tsconfig.test.json"],
+                tsconfigRootDir: import.meta.dirname,
+            },
+        },
+        rules: {
+            // Relaxed rules for test files
+            "@typescript-eslint/no-explicit-any": "off",
+            "max-lines-per-function": "off",
+            "max-lines": "off",
+            "no-magic-numbers": "off",
+        },
+    },
+    // Configuration for config files
+    {
+        extends: [js.configs.recommended],
+        files: ["*.config.js", "tailwind.config.js"],
+        languageOptions: {
+            ecmaVersion: 2020,
+            globals: { ...globals.browser, ...globals.node },
+            sourceType: "module",
+        },
+        rules: {
+            // Relaxed rules for config files
+            "no-magic-numbers": "off",
+        },
+    },
+    // Configuration for TypeScript config files
+    {
+        extends: [js.configs.recommended, ...tseslint.configs.recommended],
+        files: ["*.config.ts", "vite.config.ts", "vitest.config.ts"],
+        languageOptions: {
+            ecmaVersion: 2020,
+            globals: { ...globals.browser, ...globals.node },
+            parser: tseslint.parser,
+            parserOptions: {
+                project: ["./tsconfig.node.json"],
+                tsconfigRootDir: import.meta.dirname,
+            },
+        },
+        rules: {
+            // Relaxed rules for config files
+            "@typescript-eslint/no-explicit-any": "off",
+            "no-magic-numbers": "off",
+        },
     }
 );

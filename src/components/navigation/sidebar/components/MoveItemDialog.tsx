@@ -50,12 +50,12 @@ export const MoveItemDialog: React.FC<MoveItemDialogProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="bg-background/95 dark:bg-background/98 backdrop-blur-xl">
+            <DialogContent className="max-w-md w-full max-h-[80vh]">
                 <DialogHeader>
                     <DialogTitle>Move "{itemName}"</DialogTitle>
                     <DialogDescription>Select a destination folder for "{itemName}"</DialogDescription>
                 </DialogHeader>
-                <div className="max-h-96 space-y-1 overflow-auto">
+                <div className="max-h-80 space-y-1 overflow-auto">
                     {/* Root folder option */}
                     <Button
                         variant="ghost"
@@ -68,7 +68,7 @@ export const MoveItemDialog: React.FC<MoveItemDialogProps> = ({
                     {/* Folder list */}
                     {renderFolderList(filteredFiles)}
                 </div>
-                <div className="flex justify-end gap-2 pt-4">
+                <div className="flex justify-end gap-2 pt-2">
                     <Button variant="outline" onClick={onClose}>
                         Cancel
                     </Button>

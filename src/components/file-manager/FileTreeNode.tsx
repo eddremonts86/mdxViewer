@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 
 import { TransitionLink } from "@/components/navigation/TransitionLink";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { FileNode } from "@/types";
 
@@ -46,10 +47,11 @@ const NodeButton = ({
     onContextMenu: (_e: React.MouseEvent) => void;
     children: React.ReactNode;
 }) => (
-    <button
+    <Button
         type="button"
+        variant="ghost"
         className={cn(
-            "file-tree-node group flex w-full items-center text-left text-sm transition-colors",
+            "file-tree-node group flex w-full items-center justify-start text-left text-sm transition-colors h-auto p-0",
             "hover:bg-accent hover:text-accent-foreground rounded-sm",
             "focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none",
             level === 0 ? "pl-2" : "",
@@ -61,7 +63,7 @@ const NodeButton = ({
         onContextMenu={onContextMenu}
     >
         {children}
-    </button>
+    </Button>
 );
 
 const NodeContent = ({

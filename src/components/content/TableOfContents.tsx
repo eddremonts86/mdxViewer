@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Book, ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { generateHeadingId } from "@/utils/headingUtils";
 
@@ -105,9 +106,10 @@ export function TableOfContents({ content, items, className }: TableOfContentsPr
 
     return (
         <div className={cn("space-y-2", className)}>
-            <button
+            <Button
+                variant="ghost"
                 onClick={toggleExpanded}
-                className="hover:bg-accent/50 flex w-full items-center justify-between border-b px-4 py-2 transition-colors duration-200"
+                className="hover:bg-accent/50 flex w-full items-center justify-between border-b px-4 py-2 transition-colors duration-200 h-auto"
             >
                 <div className="flex items-center gap-2">
                     <Book className="text-muted-foreground h-4 w-4" />
@@ -118,16 +120,17 @@ export function TableOfContents({ content, items, className }: TableOfContentsPr
                 ) : (
                     <ChevronDown className="text-muted-foreground h-4 w-4" />
                 )}
-            </button>
+            </Button>
 
             {isExpanded && (
                 <nav className="space-y-1">
                     {toc.map(({ level, title, id }) => (
-                        <button
+                        <Button
                             key={id}
+                            variant="ghost"
                             onClick={() => handleClick(id)}
                             className={cn(
-                                "group hover:bg-accent hover:text-accent-foreground flex w-full items-center gap-2 rounded-lg px-4 py-1.5 text-left text-sm transition-all duration-200",
+                                "group hover:bg-accent hover:text-accent-foreground flex w-full items-center justify-start gap-2 rounded-lg px-4 py-1.5 text-left text-sm transition-all duration-200 h-auto",
                                 activeId === id && "bg-accent text-accent-foreground font-medium",
                                 level === 1 && "font-medium",
                                 level === 2 && "pl-6",
@@ -139,7 +142,7 @@ export function TableOfContents({ content, items, className }: TableOfContentsPr
                         >
                             {level > 1 && <ChevronRight className="text-muted-foreground h-3 w-3 flex-shrink-0" />}
                             <span className="truncate">{title}</span>
-                        </button>
+                        </Button>
                     ))}
                 </nav>
             )}
