@@ -16,20 +16,27 @@ interface PageHeaderProps {
 }
 
 /**
- * Reusable page header component with title, description and optional badge
+ * Page header component for the home page
  */
-export function PageHeader({ title, description, badgeText = "Live Data", className = "" }: PageHeaderProps) {
+export function PageHeader({
+    title,
+    description,
+    badgeText,
+    className = "",
+}: PageHeaderProps) {
     return (
-        <div className={`flex flex-col gap-4 md:flex-row md:items-center md:justify-between ${className}`}>
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
-                <p className="text-muted-foreground">{description}</p>
+        <div className={`flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between ${className}`}>
+            <div className="space-y-1">
+                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
+                <p className="text-sm text-muted-foreground sm:text-base">{description}</p>
             </div>
-            <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-xs">
-                    <Calendar className="mr-1 h-3 w-3" />
-                    {badgeText}
-                </Badge>
+            <div className="flex items-center gap-4">
+                {badgeText && (
+                    <Badge variant="secondary" className="text-xs">
+                        <Calendar className="mr-1 h-3 w-3" />
+                        {badgeText}
+                    </Badge>
+                )}
             </div>
         </div>
     );

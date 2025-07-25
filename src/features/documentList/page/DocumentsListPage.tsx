@@ -40,7 +40,7 @@ export function DocumentsListPage() {
     }
 
     return (
-        <div className="container mx-auto space-y-8 px-6 py-8">
+        <div className="container mx-auto space-y-6 px-4 py-6 sm:space-y-8 sm:px-6 sm:py-8 lg:px-8">
             {/* Header Section */}
             <div className="space-y-4">
                 <DocumentsHeader />

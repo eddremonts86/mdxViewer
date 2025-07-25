@@ -41,7 +41,7 @@ export function DocumentTypeStats({ documentsByType, loading = false }: Document
             <CardHeader>
                 <CardTitle className="text-sm font-medium">Document Types</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 w-80">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <FileText className="h-4 w-4 text-blue-600" />

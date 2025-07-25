@@ -1,6 +1,7 @@
+
 import React from "react";
 
-import { BarChart3, BookOpen, TrendingUp } from "lucide-react";
+import { BarChart3, BookOpen } from "lucide-react";
 
 import { PopularFolders } from "@/components/content/PopularFolders";
 import { RecentDocuments } from "@/components/content/RecentDocuments";
@@ -20,7 +21,7 @@ export function HomePage() {
     };
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6 p-4 sm:p-6 lg:p-8">
             {/* Header Section */}
             <PageHeader
                 title="Overview"
@@ -31,47 +32,61 @@ export function HomePage() {
             {/* Stats Cards */}
             <StatsGrid stats={statsData} loading={statistics.loading} />
 
-            {/* Charts and Activity Section */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            {/* Charts and Activity Section - Responsive Grid */}
+            <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2 xl:grid-cols-7 xl:gap-6">
                 {/* Document Type Distribution */}
-                <div className="lg:col-span-3">
-                    <DocumentTypeStats documentsByType={statistics.documentsByType} loading={statistics.loading} />
+                <div className="xl:col-span-3">
+                    <DocumentTypeStats 
+                        documentsByType={statistics.documentsByType} 
+                        loading={statistics.loading} 
+                    />
                 </div>
 
                 {/* Popular Folders */}
-                <div className="lg:col-span-4">
-                    <PopularFolders popularFolders={statistics.popularFolders} loading={statistics.loading} />
+                <div className="xl:col-span-4">
+                    <PopularFolders 
+                        popularFolders={statistics.popularFolders} 
+                        loading={statistics.loading} 
+                    />
                 </div>
             </div>
 
-            {/* Recent Activity and Quick Actions */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* Recent Activity and Quick Actions - Responsive Grid */}
+            <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:gap-6">
                 {/* Recent Documents */}
-                <div className="lg:col-span-1">
-                    <RecentDocuments recentDocuments={statistics.recentDocuments} loading={statistics.loading} />
+                <div className="order-1 md:order-1 lg:order-1">
+                    <RecentDocuments 
+                        recentDocuments={statistics.recentDocuments} 
+                        loading={statistics.loading} 
+                    />
                 </div>
 
-                {/* Quick Actions */}
-                <MultiActionCard
-                    title="Browse Documentation"
-                    description="Explore guides, examples, and API references"
-                    icon={BookOpen}
-                    actions={[
-                        { text: "Documentation", to: "/docs", variant: "outline" },
-                        { text: "Examples", to: "/examples", variant: "outline" },
-                        { text: "API Reference", to: "/api", variant: "outline" }
-                    ]}
-                />
+                {/* Browse Documentation */}
+                <div className="order-2 md:order-2 lg:order-2">
+                    <MultiActionCard
+                        title="Browse Documentation"
+                        description="Explore guides, examples, and API references"
+                        icon={BookOpen}
+                        actions={[
+                            { text: "Documentation", to: "/docs", variant: "outline" },
+                            { text: "Examples", to: "/examples", variant: "outline" },
+                            { text: "API Reference", to: "/api", variant: "outline" }
+                        ]}
+                    />
+                </div>
 
-                <MultiActionCard
-                    title="Site Analytics"
-                    description="View detailed statistics and usage data"
-                    icon={BarChart3}
-                    actions={[
-                        { text: "View Analytics", to: "/statistics", variant: "default" },
-                        { text: "Performance", to: "/statistics/performance", variant: "outline" }
-                    ]}
-                />
+                {/* Site Analytics */}
+                <div className="order-3 md:order-3 lg:order-3 md:col-span-2 lg:col-span-1">
+                    <MultiActionCard
+                        title="Site Analytics"
+                        description="View detailed statistics and usage data"
+                        icon={BarChart3}
+                        actions={[
+                            { text: "View Analytics", to: "/statistics", variant: "default" },
+                            { text: "Performance", to: "/statistics/performance", variant: "outline" }
+                        ]}
+                    />
+                </div>
             </div>
 
             {/* Error State */}

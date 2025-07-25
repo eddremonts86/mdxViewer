@@ -37,18 +37,18 @@ export function StatCard({
         <Card className={className}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{title}</CardTitle>
-                <Icon className="text-muted-foreground h-4 w-4" />
+                <Icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 {loading ? (
                     <div className="animate-pulse">
-                        <div className="bg-muted mb-1 h-8 w-16 rounded"></div>
-                        <div className="bg-muted h-4 w-24 rounded"></div>
+                        <div className="h-6 w-16 rounded bg-muted mb-1"></div>
+                        <div className="h-4 w-20 rounded bg-muted"></div>
                     </div>
                 ) : (
                     <>
-                        <div className={`text-2xl font-bold ${valueClassName}`}>{value}</div>
-                        <p className="text-muted-foreground text-xs">{subtitle}</p>
+                        <div className={`text-xl font-bold sm:text-2xl ${valueClassName}`}>{value}</div>
+                        <p className="text-xs text-muted-foreground sm:text-sm">{subtitle}</p>
                     </>
                 )}
             </CardContent>

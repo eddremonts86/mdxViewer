@@ -28,7 +28,7 @@ export function PopularFolders({ popularFolders, loading = false }: PopularFolde
                     <TrendingUp className="text-muted-foreground h-4 w-4" />
                 </CardHeader>
                 <CardContent>
-                    <div className="animate-pulse space-y-3">
+                    <div className="animate-pulse space-y-3 w-80">
                         {[1, 2, 3].map(i => (
                             <div key={i} className="flex items-center justify-between">
                                 <div className="bg-muted h-4 w-24 rounded"></div>
@@ -47,8 +47,8 @@ export function PopularFolders({ popularFolders, loading = false }: PopularFolde
                 <CardTitle className="text-sm font-medium">Popular Folders</CardTitle>
                 <TrendingUp className="text-muted-foreground h-4 w-4" />
             </CardHeader>
-            <CardContent>
-                <div className="space-y-3">
+            <CardContent className="space-y-3 w-80">
+                < >
                     {popularFolders.length === 0 ? (
                         <p className="text-muted-foreground text-sm">No folders found</p>
                     ) : (
@@ -75,7 +75,7 @@ export function PopularFolders({ popularFolders, loading = false }: PopularFolde
                             </Link>
                         ))
                     )}
-                </div>
+                </>
             </CardContent>
         </Card>
     );

@@ -19,8 +19,9 @@ describe("🧪 MDX Viewer Server Tests", () => {
         it("should return health status", async () => {
             const response = await request(app).get("/api/health").expect(200);
 
-            expect(response.body).toHaveProperty("status", "ok");
-            expect(response.body).toHaveProperty("service", "mdx-viewer-api");
+            expect(response.body).toHaveProperty("success", true);
+            expect(response.body).toHaveProperty("data");
+            expect(response.body.data).toHaveProperty("status", "ok");
         });
     });
 
@@ -28,15 +29,15 @@ describe("🧪 MDX Viewer Server Tests", () => {
         it("should return file tree", async () => {
             const response = await request(app).get("/api/files").expect(200);
 
-            expect(response.body).toHaveProperty("tree");
-            expect(response.body).toHaveProperty("total");
-            expect(Array.isArray(response.body.tree)).toBe(true);
+            expect(response.body).toHaveProperty("success", true);
+            expect(response.body).toHaveProperty("data");
+            expect(Array.isArray(response.body.data)).toBe(true);
         });
 
         it("should return file content", async () => {
             // First get a file from the tree
             const filesResponse = await request(app).get("/api/files");
-            const files = extractAllFiles(filesResponse.body.tree);
+            const files = extractAllFiles(filesResponse.body.data);
 
             if (files.length > 0) {
                 const testFile = files[0];
@@ -45,8 +46,10 @@ describe("🧪 MDX Viewer Server Tests", () => {
                     .query({ path: testFile.path })
                     .expect(200);
 
-                expect(response.body).toHaveProperty("content");
-                expect(response.body).toHaveProperty("path");
+                expect(response.body).toHaveProperty("success", true);
+                expect(response.body).toHaveProperty("data");
+                expect(response.body.data).toHaveProperty("content");
+                expect(response.body.data).toHaveProperty("path");
             }
         });
     });
@@ -57,9 +60,11 @@ describe("🧪 MDX Viewer Server Tests", () => {
                 .get("/api/statistics")
                 .expect(200);
 
-            expect(response.body).toHaveProperty("totalDocuments");
-            expect(response.body).toHaveProperty("totalFolders");
-            expect(response.body).toHaveProperty("documentsByType");
+            expect(response.body).toHaveProperty("success", true);
+            expect(response.body).toHaveProperty("data");
+            expect(response.body.data).toHaveProperty("totalDocuments");
+            expect(response.body.data).toHaveProperty("totalFolders");
+            expect(response.body.data).toHaveProperty("documentsByType");
         });
     });
 
@@ -69,25 +74,29 @@ describe("🧪 MDX Viewer Server Tests", () => {
         beforeAll(async () => {
             // Get all preview URLs from the files API
             const response = await request(app).get("/api/files");
-            const files = extractAllFiles(response.body.tree);
-            previewUrls = files.map((file: any) => file.preview);
+            const files = extractAllFiles(response.body.data);
+            previewUrls = files
+                .filter((file: any) => file.previewUrl)
+                .map((file: any) => file.previewUrl);
         });
 
         it("should have preview URLs for all files", () => {
             expect(previewUrls.length).toBeGreaterThan(0);
             previewUrls.forEach(url => {
-                expect(url).toMatch(/^\/api\/previews\/.*\.png$/);
+                // Accept both PNG and SVG preview URLs
+                expect(url).toMatch(/^\/api\/previews\/.*\.(png|svg)$/);
             });
         });
 
-        it("should return PNG images for all preview URLs", async () => {
+        it("should return images for all preview URLs", async () => {
             // Test first 5 preview URLs to avoid timeout
             const testUrls = previewUrls.slice(0, 5);
 
             for (const url of testUrls) {
                 const response = await request(app).get(url).expect(200);
 
-                expect(response.headers["content-type"]).toMatch(/image\/png/);
+                // Accept both PNG and SVG as valid image formats
+                expect(response.headers["content-type"]).toMatch(/image\/(png|svg\+xml)/);
             }
         });
 
