@@ -1,4 +1,3 @@
-import React from "react";
 
 interface DocumentErrorProps {
     title?: string;
@@ -12,11 +11,11 @@ export function DocumentError({
     className,
 }: DocumentErrorProps) {
     return (
-        <div className={`relative container ${className || ""}`}>
+        <div className={`relative container ${className ?? ""}`}>
             <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
                 <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
                     <h3 className="mt-4 text-lg font-semibold">{title}</h3>
-                    <p className="text-muted-foreground mt-2 mb-4 text-sm">{message}</p>
+                    <p className="mt-2 mb-4 text-sm text-muted-foreground">{message}</p>
                 </div>
             </div>
         </div>
