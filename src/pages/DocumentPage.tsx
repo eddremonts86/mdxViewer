@@ -104,6 +104,8 @@ export function DocumentPage() {
         return (
             <PlateEditor
                 filePath={filePath}
+                title={title}
+                folder={folder}
                 source={raw}
                 stamp={lastModified}
                 type={type}

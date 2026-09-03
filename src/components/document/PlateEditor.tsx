@@ -6,11 +6,17 @@ import { PlateLabel } from "@/components/atlas";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { Button } from "@/components/ui/button";
 import { useSaveFile } from "@/hooks/api/useFiles";
+import { useEffectiveTheme } from "@/hooks/useMarkdownTheme";
 import { formatSize } from "@/lib/atlas";
+import { plateColour } from "@/lib/plateColour";
 import { splitFrontmatter } from "@/utils/frontmatter";
 
 interface PlateEditorProps {
     filePath: string;
+    /** The document as it is catalogued, so the editor names it the way every
+        other surface does rather than only by its path. */
+    title: string;
+    folder: string;
     /** The file exactly as it sits on disk, frontmatter included. */
     source: string;
     /** The mtime this text was loaded at; the service refuses a stale save. */
@@ -26,13 +32,14 @@ interface PlateEditorProps {
  * source of truth, and rebuilding a file from a parsed frontmatter object would
  * reorder keys and reflow YAML the author never touched.
  */
-export function PlateEditor({ filePath, source, stamp, type, onClose }: PlateEditorProps) {
+export function PlateEditor({ filePath, title, folder, source, stamp, type, onClose }: PlateEditorProps) {
     const [draft, setDraft] = useState(source);
     const [saved, setSaved] = useState(source);
     const [currentStamp, setCurrentStamp] = useState(stamp);
     const [conflict, setConflict] = useState<string | null>(null);
 
     const save = useSaveFile();
+    const rendition = useEffectiveTheme() === "dark" ? "dark" : "light";
     const dirty = draft !== saved;
 
     // `body` is what the reader would see; the preview shows that, not the YAML.
@@ -76,11 +83,22 @@ export function PlateEditor({ filePath, source, stamp, type, onClose }: PlateEdi
     return (
         <div className="flex min-w-0 flex-1 flex-col xl:h-full xl:min-h-0" onKeyDown={onKeyDown}>
             <div className="border-rule flex flex-wrap items-center justify-between gap-3 border-b px-5 py-3 sm:px-8">
-                <div className="flex items-baseline gap-3">
+                <div className="flex min-w-0 flex-1 items-center gap-2.5">
                     <span className="text-mark-read text-[0.6875rem] font-semibold tracking-[0.13em] uppercase">
                         Editing
                     </span>
-                    <span className="text-ink-dim figures text-[0.75rem] break-all">{filePath}</span>
+                    {/* The folder's own hue, as everywhere else. */}
+                    <span
+                        aria-hidden="true"
+                        className="inline-block h-1.5 w-1.5 shrink-0 rounded-full"
+                        style={{ background: plateColour(folder, rendition) }}
+                    />
+                    {/* Named the way it is named everywhere else, with the path
+                        beside it — the editor used to give only the path, so the
+                        one screen where you change a document was the one screen
+                        that did not say which document it was. */}
+                    <span className="text-ink truncate font-serif text-[0.9375rem] italic">{title}</span>
+                    <span className="text-ink-dim figures hidden text-[0.75rem] break-all sm:inline">{filePath}</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button
