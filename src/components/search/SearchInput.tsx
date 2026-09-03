@@ -27,7 +27,7 @@ export function SearchInput({
                 <Search
                     className={cn(
                         "absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors duration-200",
-                        searchTerm ? "text-primary" : "text-muted-foreground group-focus-within:text-primary",
+                        searchTerm ? "text-primary" : "text-muted-foreground group-focus-within:text-primary"
                     )}
                 />
                 <Input
@@ -38,7 +38,7 @@ export function SearchInput({
                     className={cn(
                         "h-9 pr-9 pl-9 text-sm transition-all duration-200",
                         "focus:ring-primary/20 focus:border-primary focus:ring-2",
-                        searchTerm && "border-primary/50",
+                        searchTerm && "border-primary/50"
                     )}
                 />
                 {searchTerm && (

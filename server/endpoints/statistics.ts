@@ -7,20 +7,14 @@ import { promises as fs } from "fs";
 
 import { HTTP_STATUS, SERVER_CONFIG } from "../constants/index.js";
 import type { ApiResponse } from "../types/index.js";
-import {
-    calculateSiteStatistics,
-    scanDirectory,
-} from "../utils/fileOperations.js";
+import { calculateSiteStatistics, scanDirectory } from "../utils/fileOperations.js";
 import { logOperation, logServerError, logSuccess } from "../utils/logger.js";
 
 /**
  * Get site statistics
  * GET /api/statistics
  */
-export const getStatistics = async (
-    _req: Request,
-    res: Response<ApiResponse>,
-) => {
+export const getStatistics = async (_req: Request, res: Response<ApiResponse>) => {
     try {
         logOperation("Generating site statistics");
 
@@ -36,16 +30,10 @@ export const getStatistics = async (
             message: "Statistics generated successfully",
         });
     } catch (error) {
-        logServerError(
-            "❌ Failed to generate statistics:",
-            error instanceof Error ? error : new Error(String(error)),
-        );
+        logServerError("❌ Failed to generate statistics:", error instanceof Error ? error : new Error(String(error)));
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
-            error:
-                error instanceof Error
-                    ? error.message
-                    : "Failed to generate statistics",
+            error: error instanceof Error ? error.message : "Failed to generate statistics",
         });
     }
 };

@@ -33,9 +33,7 @@ async function getAllFiles(dir, basePath = "") {
 
         for (const entry of entries) {
             const fullPath = path.join(dir, entry.name);
-            const relativePath = basePath
-                ? `${basePath}/${entry.name}`
-                : entry.name;
+            const relativePath = basePath ? `${basePath}/${entry.name}` : entry.name;
 
             if (entry.isDirectory()) {
                 items.push({
@@ -81,9 +79,7 @@ async function renameItem(item) {
         // Check if target already exists
         try {
             await fs.access(newPath);
-            console.log(
-                `⚠️  Target already exists, skipping: ${item.name} -> ${sanitizedName}`,
-            );
+            console.log(`⚠️  Target already exists, skipping: ${item.name} -> ${sanitizedName}`);
             return {
                 renamed: false,
                 oldName: item.name,
@@ -130,9 +126,9 @@ async function processDirectory(dirPath, dirName) {
     let errors = 0;
 
     // Sort items by depth (deepest first) to avoid path conflicts
-    items.sort((a, b) => {
-        const depthA = a.relativePath.split("/").length;
-        const depthB = b.relativePath.split("/").length;
+    items.sort((first, second) => {
+        const depthA = first.relativePath.split("/").length;
+        const depthB = second.relativePath.split("/").length;
         return depthB - depthA;
     });
 
@@ -153,9 +149,7 @@ async function processDirectory(dirPath, dirName) {
 // Main function
 async function main() {
     console.log("🚀 Starting file rename process...");
-    console.log(
-        "This will rename files to use URL-safe names (spaces -> underscores)",
-    );
+    console.log("This will rename files to use URL-safe names (spaces -> underscores)");
 
     let totalProcessed = 0;
     let totalRenamed = 0;

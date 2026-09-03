@@ -36,11 +36,7 @@ export class ServerLogger {
     public error(message: string, error?: Error, context?: LogContext): void {
         if (this.logLevel >= LogLevel.ERROR) {
             const timestamp = new Date().toISOString();
-            console.error(
-                `[${timestamp}] ERROR: ${message}`,
-                context ?? {},
-                error ?? "",
-            );
+            console.error(`[${timestamp}] ERROR: ${message}`, context ?? {}, error ?? "");
         }
     }
 
@@ -78,11 +74,7 @@ export const logSuccess = (operation: string, context?: LogContext): void => {
     serverLogger.info(`✅ ${operation}`, context);
 };
 
-export const logServerError = (
-    operation: string,
-    error: Error,
-    context?: LogContext,
-): void => {
+export const logServerError = (operation: string, error: Error, context?: LogContext): void => {
     serverLogger.error(`❌ ${operation}`, error, context);
 };
 

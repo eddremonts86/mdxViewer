@@ -4,7 +4,7 @@ export function triggerFileInput(onUpload: (event: React.ChangeEvent<HTMLInputEl
     input.type = "file";
     input.multiple = true;
     input.accept = ".md,.mdx,.txt";
-    input.onchange = (event) => {
+    input.onchange = event => {
         onUpload(event as unknown as React.ChangeEvent<HTMLInputElement>);
     };
     input.click();

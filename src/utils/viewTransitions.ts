@@ -42,7 +42,7 @@ export function prefersReducedMotion(): boolean {
  */
 export async function executeViewTransition(
     callback: () => void | Promise<void>,
-    options: ViewTransitionOptions = {},
+    options: ViewTransitionOptions = {}
 ): Promise<void> {
     const { respectReducedMotion = true, transitionName, debug = false } = options;
 
@@ -68,11 +68,14 @@ export async function executeViewTransition(
             document.documentElement.style.setProperty("--transition-name", transitionName);
         }
 
-        const transition = (document as Document & {
-            startViewTransition: (
-                _callback: () => void | Promise<void>,
-            ) => { ready: Promise<void>; finished: Promise<void> };
-        }).startViewTransition(callback);
+        const transition = (
+            document as Document & {
+                startViewTransition: (_callback: () => void | Promise<void>) => {
+                    ready: Promise<void>;
+                    finished: Promise<void>;
+                };
+            }
+        ).startViewTransition(callback);
 
         if (debug) {
             transition.ready.then(() => console.warn("View transition ready"));
@@ -102,7 +105,7 @@ export async function executeViewTransition(
  */
 export async function transitionToRoute(
     navigationCallback: () => void | Promise<void>,
-    options: ViewTransitionOptions = {},
+    options: ViewTransitionOptions = {}
 ): Promise<void> {
     return executeViewTransition(navigationCallback, {
         respectReducedMotion: true,
@@ -121,7 +124,7 @@ export async function transitionToRoute(
  */
 export async function transitionModal(
     callback: () => void | Promise<void>,
-    options: ViewTransitionOptions = {},
+    options: ViewTransitionOptions = {}
 ): Promise<void> {
     return executeViewTransition(callback, {
         respectReducedMotion: true,
@@ -139,7 +142,7 @@ export async function transitionModal(
  */
 export async function transitionTheme(
     callback: () => void | Promise<void>,
-    options: ViewTransitionOptions = {},
+    options: ViewTransitionOptions = {}
 ): Promise<void> {
     return executeViewTransition(callback, {
         respectReducedMotion: false, // Theme transitions are usually acceptable even with reduced motion

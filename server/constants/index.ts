@@ -16,8 +16,12 @@ const DEFAULT_MAX_FOLDER_DEPTH = 10;
 const MAX_FOLDER_DEPTH_LIMIT = 20;
 const BYTES_PER_KILOBYTE = 1024;
 
-// Environment validation
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : DEFAULT_PORT;
+// Environment validation.
+// API_PORT wins over PORT: in development the client and the file service run
+// side by side and both would otherwise read the same inherited PORT. A
+// production host that only injects PORT still works.
+const PORT_VALUE = process.env.API_PORT ?? process.env.PORT;
+const PORT = PORT_VALUE ? parseInt(PORT_VALUE, 10) : DEFAULT_PORT;
 const MAX_FOLDER_DEPTH = process.env.MAX_FOLDER_DEPTH
     ? parseInt(process.env.MAX_FOLDER_DEPTH, 10)
     : DEFAULT_MAX_FOLDER_DEPTH;
@@ -27,39 +31,39 @@ const FILE_SIZE_LIMIT_MB = process.env.FILE_SIZE_LIMIT_MB
 
 // Validate environment values
 if (isNaN(PORT) || PORT < 1 || PORT > MAX_PORT_NUMBER) {
+    throw new Error(`Invalid API_PORT/PORT value: ${PORT_VALUE}. Must be a number between 1 and ${MAX_PORT_NUMBER}.`);
+}
+
+if (isNaN(MAX_FOLDER_DEPTH) || MAX_FOLDER_DEPTH < 1 || MAX_FOLDER_DEPTH > MAX_FOLDER_DEPTH_LIMIT) {
     throw new Error(
-        `Invalid PORT value: ${process.env.PORT}. Must be a number between 1 and ${MAX_PORT_NUMBER}.`,
+        `Invalid MAX_FOLDER_DEPTH value: ${process.env.MAX_FOLDER_DEPTH}. Must be a number between 1 and ${MAX_FOLDER_DEPTH_LIMIT}.`
     );
 }
 
-if (
-    isNaN(MAX_FOLDER_DEPTH) ||
-    MAX_FOLDER_DEPTH < 1 ||
-    MAX_FOLDER_DEPTH > MAX_FOLDER_DEPTH_LIMIT
-) {
+if (isNaN(FILE_SIZE_LIMIT_MB) || FILE_SIZE_LIMIT_MB < 1 || FILE_SIZE_LIMIT_MB > 100) {
     throw new Error(
-        `Invalid MAX_FOLDER_DEPTH value: ${process.env.MAX_FOLDER_DEPTH}. Must be a number between 1 and ${MAX_FOLDER_DEPTH_LIMIT}.`,
-    );
-}
-
-if (
-    isNaN(FILE_SIZE_LIMIT_MB) ||
-    FILE_SIZE_LIMIT_MB < 1 ||
-    FILE_SIZE_LIMIT_MB > 100
-) {
-    throw new Error(
-        `Invalid FILE_SIZE_LIMIT_MB value: ${process.env.FILE_SIZE_LIMIT_MB}. Must be a number between 1 and 100.`,
+        `Invalid FILE_SIZE_LIMIT_MB value: ${process.env.FILE_SIZE_LIMIT_MB}. Must be a number between 1 and 100.`
     );
 }
 
 // Server Configuration
 export const SERVER_CONFIG = {
     PORT,
-    CONTENT_PATH: path.join(__dirname, "../../public/content"),
+    // The folder this instance charts. A team installing MDXViewer points this
+    // at documentation they already own; the bundled public/content is only the
+    // default. Tests point it at a fixture so they never touch real documents.
+    CONTENT_PATH: process.env.CONTENT_DIR
+        ? path.resolve(process.env.CONTENT_DIR)
+        : path.join(__dirname, "../../public/content"),
     MAX_FOLDER_DEPTH,
-    FILE_SIZE_LIMIT:
-        FILE_SIZE_LIMIT_MB * BYTES_PER_KILOBYTE * BYTES_PER_KILOBYTE, // Convert MB to bytes
+    FILE_SIZE_LIMIT: FILE_SIZE_LIMIT_MB * BYTES_PER_KILOBYTE * BYTES_PER_KILOBYTE, // Convert MB to bytes
     JSON_LIMIT: "50mb",
+    MAX_UPLOAD_FILES: 50,
+    // Development runs the client on another port, so it is allowed by default.
+    ALLOWED_ORIGINS: (process.env.ALLOWED_ORIGINS ?? "http://localhost:5173")
+        .split(",")
+        .map(origin => origin.trim())
+        .filter(Boolean),
 } as const;
 
 // HTTP Status Codes
@@ -74,11 +78,7 @@ export const HTTP_STATUS = {
 
 // File Configuration
 export const FILE_CONFIG = {
-    ALLOWED_MIME_TYPES: [
-        "text/plain",
-        "text/markdown",
-        "application/octet-stream",
-    ],
+    ALLOWED_MIME_TYPES: ["text/plain", "text/markdown", "application/octet-stream"],
     ALLOWED_EXTENSIONS: [".md", ".mdx", ".txt"],
     MAX_FILENAME_LENGTH: 255,
     INVALID_FILENAME_CHARS: /[<>:"|\\?*]/,
@@ -148,8 +148,7 @@ export const ERRORS = {
     FILE_NAME_REQUIRED: "File name is required",
     FILE_NAME_TOO_LONG: "File name is too long (max {max} characters)",
     INVALID_FILE_NAME_CHARS: "File name contains invalid characters",
-    MAX_DEPTH_EXCEEDED:
-        "Maximum folder depth exceeded. Limit is {limit} levels, attempted depth is {depth}",
+    MAX_DEPTH_EXCEEDED: "Maximum folder depth exceeded. Limit is {limit} levels, attempted depth is {depth}",
     FILE_ALREADY_EXISTS: "File already exists: {name}",
     FOLDER_ALREADY_EXISTS: "Folder already exists: {name}",
     NO_FILES_PROVIDED: "No files provided",
@@ -162,4 +161,5 @@ export const ERRORS = {
     PREVIEW_NOT_FOUND: "Preview not found",
     PREVIEW_NOT_AVAILABLE: "Preview image is being generated or not available",
     ONLY_MARKDOWN_ALLOWED: "Only markdown, text files are allowed!",
+    OUTSIDE_CONTENT: "Path is outside the content folder",
 } as const;

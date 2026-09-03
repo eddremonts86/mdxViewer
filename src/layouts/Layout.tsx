@@ -1,149 +1,91 @@
 import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 
-import { Bell, Menu, Settings } from "lucide-react";
+import { Menu } from "lucide-react";
 
+import { CompassStar } from "@/components/atlas";
 import { Sidebar } from "@/components/navigation";
-import { NotificationCenter } from "@/components/progress/NotificationCenter";
 import { ModeToggle } from "@/components/theme/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { navigationItems } from "@/const";
+import { cn } from "@/lib/utils";
 
 export function Layout() {
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-    const [showNotifications, setShowNotifications] = useState<boolean>(false);
-    const [notifications, setNotifications] = useState([
-        {
-            id: "1",
-            title: "Welcome to MDXViewer",
-            message: "You can view and edit MDX files with live preview functionality.",
-            type: "info" as const,
-            timestamp: new Date(),
-            isRead: false,
-        },
-        {
-            id: "2",
-            title: "File Management",
-            message: "Use the sidebar to create, upload, and organize your documents.",
-            type: "success" as const,
-            timestamp: new Date(Date.now() - 60000),
-            isRead: false,
-        },
-    ]);
     const location = useLocation();
 
-    const toggleSidebar = (): void => {
-        setSidebarOpen(!sidebarOpen);
-    };
+    const isActive = (path: string) =>
+        location.pathname === path || (path !== "/" && location.pathname.startsWith(path));
 
     return (
-        <div className="bg-background text-foreground min-h-screen">
-            {/* Header */}
-            <header className="border-border bg-background/98 dark:bg-background/99 sticky top-0 z-50 w-full border-b backdrop-blur-xl shadow-sm">
-                <div className="flex h-16 items-center px-6">
-                    {/* Left side */}
-                    <div className="flex flex-1 items-center space-x-4">
-                        <Button variant="ghost" size="icon" className="lg:hidden" onClick={toggleSidebar}>
-                            <Menu className="h-5 w-5" />
-                            <span className="sr-only">Toggle Menu</span>
-                        </Button>
+        <div className="bg-sky text-ink flex h-screen flex-col">
+            <a
+                href="#plate"
+                className="focus:bg-mark focus:text-sky sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-3 focus:py-2 focus:text-[0.6875rem] focus:font-semibold focus:tracking-[0.11em] focus:uppercase"
+            >
+                Skip to content
+            </a>
 
-                        <div className="flex items-center space-x-3">
-                            <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
-                                <span className="text-primary-foreground text-sm font-bold">M</span>
-                            </div>
-                            <h1 className="text-xl font-semibold">MDX Viewer</h1>
-                        </div>
-                    </div>
+            {/* The header band. Nothing here is ever pushed out of the viewport:
+                navigation collapses into the index sheet, the observer's own
+                controls never move. */}
+            <header className="border-rule bg-sky flex h-14 shrink-0 items-center gap-3 border-b px-3 sm:px-5">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="lg:hidden"
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                    aria-expanded={sidebarOpen}
+                    aria-controls="plate-index"
+                >
+                    <Menu className="h-4 w-4" />
+                    <span className="sr-only">Toggle plate index</span>
+                </Button>
 
-                    {/* Navigation in center */}
-                    <nav className="flex flex-1 items-center justify-center space-x-1 md:space-x-2">
-                        {navigationItems.map(item => {
-                            const Icon = item.icon;
-                            const isActive =
-                                location.pathname === item.path ||
-                                (item.path !== "/" && location.pathname.startsWith(item.path));
+                <Link to="/" className="flex min-w-0 items-center gap-2.5">
+                    <CompassStar className="text-mark shrink-0" size={16} />
+                    <span className="truncate font-serif text-[1.0625rem] leading-none font-semibold tracking-tight">
+                        MDXViewer
+                    </span>
+                </Link>
 
-                            return (
-                                <Button
-                                    key={item.path}
-                                    variant={isActive ? "default" : "ghost"}
-                                    size="sm"
-                                    className="flex items-center space-x-1 px-2 md:space-x-2 md:px-3"
-                                    asChild
-                                >
-                                    <Link to={item.path}>
-                                        <Icon className="h-4 w-4" />
-                                        <span className="hidden text-sm md:inline">{item.name}</span>
-                                    </Link>
-                                </Button>
-                            );
-                        })}
-                    </nav>
+                <nav className="ml-4 hidden items-center gap-1 md:flex" aria-label="Main">
+                    {navigationItems.map(item => {
+                        const Icon = item.icon;
+                        const active = isActive(item.path);
+                        return (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                aria-current={active ? "page" : undefined}
+                                className={cn(
+                                    "flex items-center gap-2 border-b px-2.5 py-2 text-[0.6875rem] font-semibold tracking-[0.13em] uppercase transition-colors",
+                                    active
+                                        ? "border-mark text-mark-read"
+                                        : "text-ink-dim hover:text-ink border-transparent"
+                                )}
+                            >
+                                <Icon className="h-3.5 w-3.5" />
+                                {item.name}
+                            </Link>
+                        );
+                    })}
+                </nav>
 
-                    {/* Right side */}
-                    <div className="flex flex-1 items-center justify-end space-x-4">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setShowNotifications(!showNotifications)}
-                            className="relative"
-                        >
-                            <Bell className="h-5 w-5" />
-                            {notifications.filter(n => !n.isRead).length > 0 && (
-                                <span className="bg-destructive absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full text-xs text-white">
-                                    {notifications.filter(n => !n.isRead).length}
-                                </span>
-                            )}
-                            <span className="sr-only">Notifications</span>
-                        </Button>
-
-                        <Button variant="ghost" size="icon">
-                            <Settings className="h-5 w-5" />
-                            <span className="sr-only">Settings</span>
-                        </Button>
-
-                        <ModeToggle />
-                    </div>
+                <div className="ml-auto flex shrink-0 items-center gap-1">
+                    <ModeToggle />
                 </div>
             </header>
 
-            {/* Notification Center overlay */}
-            {showNotifications && (
-                <div className="fixed inset-0 z-50">
-                    <div
-                        className="absolute inset-0 cursor-default bg-black/20"
-                        onClick={() => setShowNotifications(false)}
-                        aria-label="Close notifications"
-                    />
-                    <div className="absolute top-16 right-6 max-w-md">
-                        <NotificationCenter
-                            notifications={notifications}
-                            onDismiss={(id: string) => {
-                                setNotifications(prev => prev.filter(n => n.id !== id));
-                            }}
-                            onMarkAsRead={(id: string) => {
-                                setNotifications(prev => prev.map(n => (n.id === id ? { ...n, isRead: true } : n)));
-                            }}
-                            onClearAll={() => {
-                                setNotifications([]);
-                                setShowNotifications(false);
-                            }}
-                        />
-                    </div>
-                </div>
-            )}
-
-            <div className="flex h-[calc(100vh-4rem)]">
-                {/* Sidebar */}
+            <div className="flex min-h-0 flex-1">
                 <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
 
-                {/* Main Content */}
-                <main className="flex-1 overflow-auto p-6">
+                <main id="plate" className="min-w-0 flex-1 overflow-y-auto">
                     <Outlet />
                 </main>
             </div>
+
             <Toaster />
         </div>
     );

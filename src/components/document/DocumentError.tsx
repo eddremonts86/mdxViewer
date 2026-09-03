@@ -1,3 +1,7 @@
+import { Link } from "react-router-dom";
+
+import { EmptyPlate } from "@/components/atlas/EmptyPlate";
+import { Button } from "@/components/ui/button";
 
 interface DocumentErrorProps {
     title?: string;
@@ -6,18 +10,21 @@ interface DocumentErrorProps {
 }
 
 export function DocumentError({
-    title = "Document not found",
-    message = "The document you are looking for does not exist.",
+    title = "This object is not in the catalogue",
+    message = "The document was moved, renamed or deleted. The chart shows everything the folder currently holds.",
     className,
 }: DocumentErrorProps) {
     return (
-        <div className={`relative container ${className ?? ""}`}>
-            <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
-                <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
-                    <h3 className="mt-4 text-lg font-semibold">{title}</h3>
-                    <p className="mt-2 mb-4 text-sm text-muted-foreground">{message}</p>
-                </div>
-            </div>
-        </div>
+        <EmptyPlate
+            designation="Not catalogued"
+            title={title}
+            message={message}
+            className={className}
+            action={
+                <Button asChild variant="outline">
+                    <Link to="/">Open the chart</Link>
+                </Button>
+            }
+        />
     );
 }

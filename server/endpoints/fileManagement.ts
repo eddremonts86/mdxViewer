@@ -6,10 +6,15 @@ import type { Request, Response } from "express";
 import { promises as fs } from "fs";
 import path from "path";
 
-import { HTTP_STATUS, SERVER_CONFIG } from "../constants/index.js";
+import { ERRORS, HTTP_STATUS } from "../constants/index.js";
 import type { ApiResponse } from "../types/index.js";
 import { logOperation, logServerError } from "../utils/logger.js";
-import { validateFileName, validateFolderDepth } from "../utils/validation.js";
+import {
+    realPathInsideContent,
+    resolveInsideContent,
+    validateFileName,
+    validateFolderDepth,
+} from "../utils/validation.js";
 
 /**
  * Create a new file
@@ -45,14 +50,14 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
         }
 
         const fileName = `${name}.${type}`;
-        const fullPath = path.join(
-            SERVER_CONFIG.CONTENT_PATH,
-            relativePath,
-            fileName,
-        );
-        const fileRelativePath = path
-            .join(relativePath, fileName)
-            .replace(/\\/g, "/");
+        const fullPath = resolveInsideContent(relativePath, fileName);
+        if (!fullPath) {
+            return res.status(HTTP_STATUS.FORBIDDEN).json({
+                success: false,
+                error: ERRORS.OUTSIDE_CONTENT,
+            });
+        }
+        const fileRelativePath = path.join(relativePath, fileName).replace(/\\/g, "/");
 
         // Check if file already exists
         try {
@@ -72,8 +77,7 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
         await fs.mkdir(dirPath, { recursive: true });
 
         // Default content
-        const fileContent =
-            content ?? `# ${name}\n\nThis is a new ${type} document.\n`;
+        const fileContent = content ?? `# ${name}\n\nThis is a new ${type} document.\n`;
 
         // Write file
         await fs.writeFile(fullPath, fileContent, "utf8");
@@ -89,16 +93,10 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
             message: `File ${fileName} created successfully`,
         });
     } catch (error) {
-        logServerError(
-            "❌ Failed to create file:",
-            error instanceof Error ? error : new Error(String(error)),
-        );
+        logServerError("❌ Failed to create file:", error instanceof Error ? error : new Error(String(error)));
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
-            error:
-                error instanceof Error
-                    ? error.message
-                    : "Failed to create file",
+            error: error instanceof Error ? error.message : "Failed to create file",
         });
     }
 };
@@ -107,10 +105,7 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
  * Create a new folder
  * POST /api/folders/create
  */
-export const createFolder = async (
-    req: Request,
-    res: Response<ApiResponse>,
-) => {
+export const createFolder = async (req: Request, res: Response<ApiResponse>) => {
     try {
         const { name, path: relativePath } = req.body;
 
@@ -139,14 +134,14 @@ export const createFolder = async (
             });
         }
 
-        const fullPath = path.join(
-            SERVER_CONFIG.CONTENT_PATH,
-            relativePath,
-            name,
-        );
-        const folderRelativePath = path
-            .join(relativePath, name)
-            .replace(/\\/g, "/");
+        const fullPath = resolveInsideContent(relativePath, name);
+        if (!fullPath) {
+            return res.status(HTTP_STATUS.FORBIDDEN).json({
+                success: false,
+                error: ERRORS.OUTSIDE_CONTENT,
+            });
+        }
+        const folderRelativePath = path.join(relativePath, name).replace(/\\/g, "/");
 
         // Check if folder already exists
         try {
@@ -177,16 +172,10 @@ export const createFolder = async (
             message: `Folder ${name} created successfully`,
         });
     } catch (error) {
-        logServerError(
-            "❌ Failed to create folder:",
-            error instanceof Error ? error : new Error(String(error)),
-        );
+        logServerError("❌ Failed to create folder:", error instanceof Error ? error : new Error(String(error)));
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
-            error:
-                error instanceof Error
-                    ? error.message
-                    : "Failed to create folder",
+            error: error instanceof Error ? error.message : "Failed to create folder",
         });
     }
 };
@@ -226,19 +215,20 @@ export const uploadFiles = async (req: Request, res: Response<ApiResponse>) => {
             error: string;
         }> = [];
 
-        const fullTargetPath = path.join(
-            SERVER_CONFIG.CONTENT_PATH,
-            targetPath,
-        );
+        const fullTargetPath = resolveInsideContent(targetPath);
+        if (!fullTargetPath) {
+            return res.status(HTTP_STATUS.FORBIDDEN).json({
+                success: false,
+                error: ERRORS.OUTSIDE_CONTENT,
+            });
+        }
         if (createFolders) {
             await fs.mkdir(fullTargetPath, { recursive: true });
         }
 
         for (const file of files) {
             try {
-                const filePath = path
-                    .join(targetPath, file.filename)
-                    .replace(/\\/g, "/");
+                const filePath = path.join(targetPath, file.filename).replace(/\\/g, "/");
                 results.push({
                     originalName: file.originalname,
                     filename: file.filename,
@@ -248,15 +238,14 @@ export const uploadFiles = async (req: Request, res: Response<ApiResponse>) => {
 
                 logOperation(`✅ File uploaded: ${filePath}`);
             } catch (error) {
-                const errorMessage =
-                    error instanceof Error ? error.message : "Unknown error";
+                const errorMessage = error instanceof Error ? error.message : "Unknown error";
                 errors.push({
                     filename: file.originalname,
                     error: errorMessage,
                 });
                 logServerError(
                     `❌ Failed to process file ${file.originalname}:`,
-                    error instanceof Error ? error : new Error(String(error)),
+                    error instanceof Error ? error : new Error(String(error))
                 );
             }
         }
@@ -273,16 +262,10 @@ export const uploadFiles = async (req: Request, res: Response<ApiResponse>) => {
             message: `Uploaded ${results.length}/${files.length} files successfully`,
         });
     } catch (error) {
-        logServerError(
-            "❌ Failed to upload files:",
-            error instanceof Error ? error : new Error(String(error)),
-        );
+        logServerError("❌ Failed to upload files:", error instanceof Error ? error : new Error(String(error)));
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
-            error:
-                error instanceof Error
-                    ? error.message
-                    : "Failed to upload files",
+            error: error instanceof Error ? error.message : "Failed to upload files",
         });
     }
 };
@@ -316,10 +299,13 @@ export const deleteFiles = async (req: Request, res: Response<ApiResponse>) => {
 
         for (const itemPath of paths) {
             try {
-                const fullPath = path.join(
-                    SERVER_CONFIG.CONTENT_PATH,
-                    itemPath,
-                );
+                const resolved = resolveInsideContent(itemPath);
+                const fullPath = resolved ? await realPathInsideContent(resolved) : null;
+                if (!fullPath) {
+                    errors.push({ path: itemPath, error: ERRORS.OUTSIDE_CONTENT });
+                    logServerError("Refused a delete outside the content folder", new Error(itemPath));
+                    continue;
+                }
                 const stats = await fs.stat(fullPath);
 
                 if (stats.isDirectory()) {
@@ -335,15 +321,14 @@ export const deleteFiles = async (req: Request, res: Response<ApiResponse>) => {
                     type: stats.isDirectory() ? "folder" : "file",
                 });
             } catch (error) {
-                const errorMessage =
-                    error instanceof Error ? error.message : "Unknown error";
+                const errorMessage = error instanceof Error ? error.message : "Unknown error";
                 errors.push({
                     path: itemPath,
                     error: errorMessage,
                 });
                 logServerError(
                     `❌ Failed to delete ${itemPath}:`,
-                    error instanceof Error ? error : new Error(String(error)),
+                    error instanceof Error ? error : new Error(String(error))
                 );
             }
         }
@@ -360,19 +345,75 @@ export const deleteFiles = async (req: Request, res: Response<ApiResponse>) => {
             message: `Deleted ${results.length}/${paths.length} items successfully`,
         });
     } catch (error) {
-        logServerError(
-            "❌ Failed to delete items:",
-            error instanceof Error ? error : new Error(String(error)),
-        );
+        logServerError("❌ Failed to delete items:", error instanceof Error ? error : new Error(String(error)));
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
-            error:
-                error instanceof Error
-                    ? error.message
-                    : "Failed to delete items",
+            error: error instanceof Error ? error.message : "Failed to delete items",
         });
     }
 };
+
+interface MoveTargets {
+    sourceFullPath: string;
+    targetFullPath: string;
+    targetDir: string;
+    targetRelativePath: string;
+}
+
+/** Everything a move must be true about before it happens, or the reason it is not. */
+async function vetMove(
+    sourcePath: string,
+    targetPath: string
+): Promise<{ ok: true; targets: MoveTargets } | { ok: false; status: number; error: string }> {
+    const sourceFileName = path.basename(sourcePath);
+    const sourceResolved = resolveInsideContent(sourcePath);
+    const targetFullPath = resolveInsideContent(targetPath, sourceFileName);
+    const targetDir = resolveInsideContent(targetPath);
+    const sourceFullPath = sourceResolved ? await realPathInsideContent(sourceResolved) : null;
+
+    if (!sourceFullPath || !targetFullPath || !targetDir) {
+        return { ok: false, status: HTTP_STATUS.FORBIDDEN, error: ERRORS.OUTSIDE_CONTENT };
+    }
+
+    // A folder cannot be moved inside itself.
+    if (targetPath === sourcePath || targetPath.startsWith(`${sourcePath}/`)) {
+        return { ok: false, status: HTTP_STATUS.BAD_REQUEST, error: ERRORS.CANNOT_MOVE_INTO_SELF };
+    }
+
+    const targetRelativePath = path.join(targetPath, sourceFileName).replace(/\\/g, "/");
+    const depth = validateFolderDepth(targetRelativePath);
+    if (!depth.isValid) {
+        return { ok: false, status: HTTP_STATUS.BAD_REQUEST, error: depth.error ?? "Too deep" };
+    }
+
+    try {
+        await fs.access(sourceFullPath);
+    } catch {
+        return { ok: false, status: HTTP_STATUS.NOT_FOUND, error: `Source file/folder not found: ${sourcePath}` };
+    }
+
+    try {
+        const targetStats = await fs.stat(targetDir);
+        if (!targetStats.isDirectory()) {
+            return { ok: false, status: HTTP_STATUS.BAD_REQUEST, error: `Target is not a directory: ${targetPath}` };
+        }
+    } catch {
+        return { ok: false, status: HTTP_STATUS.NOT_FOUND, error: `Target directory not found: ${targetPath}` };
+    }
+
+    try {
+        await fs.access(targetFullPath);
+        return {
+            ok: false,
+            status: HTTP_STATUS.CONFLICT,
+            error: `Item already exists at target location: ${sourceFileName}`,
+        };
+    } catch {
+        // Nothing there: that is what we want.
+    }
+
+    return { ok: true, targets: { sourceFullPath, targetFullPath, targetDir, targetRelativePath } };
+}
 
 /**
  * Move files/folders
@@ -391,84 +432,12 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
             });
         }
 
-        const sourceFullPath = path.join(
-            SERVER_CONFIG.CONTENT_PATH,
-            sourcePath,
-        );
+        const vetted = await vetMove(sourcePath, targetPath);
+        if (!vetted.ok) {
+            return res.status(vetted.status).json({ success: false, error: vetted.error });
+        }
+        const { sourceFullPath, targetFullPath, targetRelativePath } = vetted.targets;
         const sourceFileName = path.basename(sourcePath);
-        const targetFullPath = path.join(
-            SERVER_CONFIG.CONTENT_PATH,
-            targetPath,
-            sourceFileName,
-        );
-        const targetRelativePath = path
-            .join(targetPath, sourceFileName)
-            .replace(/\\/g, "/");
-
-        // Check if source exists
-        try {
-            await fs.access(sourceFullPath);
-        } catch (error) {
-            logServerError(
-                "❌ Source file/folder not found:",
-                error instanceof Error ? error : new Error(String(error)),
-            );
-            return res.status(HTTP_STATUS.NOT_FOUND).json({
-                success: false,
-                error: `Source file/folder not found: ${sourcePath}`,
-            });
-        }
-
-        // Check if target directory exists
-        const targetDir = path.join(SERVER_CONFIG.CONTENT_PATH, targetPath);
-        try {
-            const targetStats = await fs.stat(targetDir);
-            if (!targetStats.isDirectory()) {
-                return res.status(HTTP_STATUS.BAD_REQUEST).json({
-                    success: false,
-                    error: `Target is not a directory: ${targetPath}`,
-                });
-            }
-        } catch (error) {
-            logServerError(
-                "❌ Target directory not found:",
-                error instanceof Error ? error : new Error(String(error)),
-            );
-            return res.status(HTTP_STATUS.NOT_FOUND).json({
-                success: false,
-                error: `Target directory not found: ${targetPath}`,
-            });
-        }
-
-        // Check folder depth
-        const depthValidation = validateFolderDepth(targetRelativePath);
-        if (!depthValidation.isValid) {
-            return res.status(HTTP_STATUS.BAD_REQUEST).json({
-                success: false,
-                error: depthValidation.error,
-            });
-        }
-
-        // Check if item already exists at target
-        try {
-            await fs.access(targetFullPath);
-            return res.status(HTTP_STATUS.CONFLICT).json({
-                success: false,
-                error: `Item already exists at target location: ${sourceFileName}`,
-            });
-        } catch (error) {
-            if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-                throw error;
-            }
-        }
-
-        // Check for moving folder into itself
-        if (targetPath.startsWith(sourcePath)) {
-            return res.status(HTTP_STATUS.BAD_REQUEST).json({
-                success: false,
-                error: "Cannot move a folder into itself or its subfolder",
-            });
-        }
 
         // Move the item
         await fs.rename(sourceFullPath, targetFullPath);
@@ -485,14 +454,10 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
             message: `${sourceFileName} moved successfully`,
         });
     } catch (error) {
-        logServerError(
-            "❌ Failed to move item:",
-            error instanceof Error ? error : new Error(String(error)),
-        );
+        logServerError("❌ Failed to move item:", error instanceof Error ? error : new Error(String(error)));
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
-            error:
-                error instanceof Error ? error.message : "Failed to move item",
+            error: error instanceof Error ? error.message : "Failed to move item",
         });
     }
 };

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import type { FileItem } from "@/api/fileAPI";
 
@@ -41,7 +41,7 @@ export const useSidebarFileSelection = () => {
             const allPaths = getAllFilePaths(filteredFiles);
             setSelectedFiles(new Set(allPaths));
         },
-        [getAllFilePaths],
+        [getAllFilePaths]
     );
 
     const clearSelection = useCallback(() => {

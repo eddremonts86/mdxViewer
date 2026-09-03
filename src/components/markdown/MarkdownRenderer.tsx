@@ -1,103 +1,85 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 
-import { MDXWrapper } from "@/components/globals/MDXWrapper";
-import { createCodeComponent } from "@/components/markdown/componentFactories";
-import {
-    Blockquote,
-    Emphasis,
-    H1,
-    H2,
-    H3,
-    H4,
-    H5,
-    H6,
-    HorizontalRule,
-    Image,
-    Link,
-    ListItem,
-    OrderedList,
-    Paragraph,
-    Strong,
-    Table,
-    TableBody,
-    TableData,
-    TableHead,
-    TableHeader,
-    TableRow,
-    UnorderedList,
-} from "@/components/markdown/MarkdownComponents";
+import { createCodeComponent, H1, H2, H3, H4, H5, H6, Image, Link } from "@/components/markdown/MarkdownComponents";
 import { useEffectiveTheme } from "@/hooks/useMarkdownTheme";
 import type { MarkdownRendererProps } from "@/types/markdownIndex";
 
 // Import KaTeX CSS for math rendering
 import "katex/dist/katex.min.css";
 
-// Define custom markdown components mapping
-const createMarkdownComponents = (codeComponent: React.ComponentType<React.ComponentProps<"code">>) => ({
-    h1: H1,
-    h2: H2,
-    h3: H3,
-    h4: H4,
-    h5: H5,
-    h6: H6,
-    p: Paragraph,
-    blockquote: Blockquote,
-    ul: UnorderedList,
-    ol: OrderedList,
-    li: ListItem,
-    table: Table,
-    thead: TableHead,
-    tbody: TableBody,
-    tr: TableRow,
-    th: TableHeader,
-    td: TableData,
-    a: Link,
-    img: Image,
-    hr: HorizontalRule,
-    strong: Strong,
-    em: Emphasis,
-    code: codeComponent,
-});
+/**
+ * Raw HTML in a document is allowed, then filtered. Documents arrive through the
+ * upload endpoint, so unsanitised `rehypeRaw` output would let any uploaded file
+ * run script in a reader's session. KaTeX needs its own tags and class/style
+ * attributes to survive the filter, so they are allowed back explicitly.
+ */
+const schema = {
+    ...defaultSchema,
+    attributes: {
+        ...defaultSchema.attributes,
+        "*": [...(defaultSchema.attributes?.["*"] ?? []), "className", "style"],
+        math: ["xmlns", "display"],
+        svg: ["xmlns", "width", "height", "viewBox", "preserveAspectRatio", "style"],
+        path: ["d"],
+    },
+    tagNames: [
+        ...(defaultSchema.tagNames ?? []),
+        "math",
+        "semantics",
+        "mrow",
+        "mi",
+        "mo",
+        "mn",
+        "msup",
+        "msub",
+        "mfrac",
+        "msqrt",
+        "annotation",
+        "svg",
+        "path",
+    ],
+};
 
-export function MarkdownRenderer({ content, type }: MarkdownRendererProps) {
+const remarkPlugins = [remarkGfm, remarkMath];
+
+/**
+ * MDX and Markdown render through the same pipeline today: `.mdx` files are not
+ * compiled, so their JSX would not execute. The distinction is recorded in
+ * PRODUCT.md as a commitment, not shipped as a feature — which is why this
+ * component does not branch on the document's type.
+ */
+export function MarkdownRenderer({ content }: MarkdownRendererProps) {
     const effectiveTheme = useEffectiveTheme();
 
-    // Create code component with theme support
-    const codeComponent = useMemo(() => createCodeComponent(effectiveTheme), [effectiveTheme]);
+    const components = useMemo(
+        () => ({
+            h1: H1,
+            h2: H2,
+            h3: H3,
+            h4: H4,
+            h5: H5,
+            h6: H6,
+            a: Link,
+            img: Image,
+            code: createCodeComponent(effectiveTheme),
+        }),
+        [effectiveTheme]
+    );
 
-    const renderedContent = useMemo(() => {
-        const components = createMarkdownComponents(codeComponent);
-
-        if (type === "mdx") {
-            return (
-                <MDXWrapper>
-                    <ReactMarkdown
-                        remarkPlugins={[remarkGfm, remarkMath]}
-                        rehypePlugins={[rehypeKatex, rehypeRaw]}
-                        components={components}
-                    >
-                        {content}
-                    </ReactMarkdown>
-                </MDXWrapper>
-            );
-        }
-
-        return (
-            <ReactMarkdown
-                remarkPlugins={[remarkGfm, remarkMath]}
-                rehypePlugins={[rehypeKatex, rehypeRaw]}
-                components={components}
-            >
-                {content}
-            </ReactMarkdown>
-        );
-    }, [content, type, codeComponent]);
-
-    return <div className="markdown-content max-w-none space-y-4">{renderedContent}</div>;
+    return (
+        <ReactMarkdown
+            remarkPlugins={remarkPlugins}
+            rehypePlugins={[rehypeRaw, [rehypeSanitize, schema], rehypeKatex]}
+            components={components}
+        >
+            {content}
+        </ReactMarkdown>
+    );
 }

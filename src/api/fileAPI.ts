@@ -36,7 +36,37 @@ export interface CreateFolderRequest {
     path: string;
 }
 
-const API_BASE_URL = "http://localhost:3001";
+/** Frontmatter the viewer knows how to put in a title block. */
+export interface DocumentFrontmatter {
+    title?: string;
+    description?: string;
+    author?: string;
+    date?: string;
+    tags?: string[];
+    [key: string]: unknown;
+}
+
+/** Shape returned by GET /api/files/content */
+export interface DocumentContent {
+    path: string;
+    content: string;
+    frontmatter?: DocumentFrontmatter;
+    size?: number;
+    lastModified?: string;
+}
+
+/** Shape returned by POST /api/files/upload */
+export interface UploadResult {
+    uploaded: Array<{ originalName: string; filename: string; path: string; size: number }>;
+    errors: Array<{ filename: string; error: string }>;
+    totalFiles: number;
+    successCount: number;
+    errorCount: number;
+}
+
+// Relative by default, so the built app talks to whatever origin serves it.
+// The Vite dev server proxies /api to the file service on :3001.
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "";
 
 class FileAPI {
     /**
@@ -61,25 +91,17 @@ class FileAPI {
     /**
      * Get file content
      */
-    static async getFileContent(filePath: string): Promise<{ path: string; content: string }> {
-        // Convert path to kebab-case to match the file system structure
-        const kebabCasePath = filePath
-            .toLowerCase()
-            .replace(/\s+/g, "-")
-            .replace(/[^a-z0-9._/-]/g, "")
-            .replace(/_+/g, "-")
-            .replace(/-+/g, "-")
-            .replace(/\/+/g, "/")
-            .replace(/^-+/, "")
-            .replace(/-+$/, "");
-
-        const response = await fetch(`${API_BASE_URL}/api/files/content?path=${encodeURIComponent(kebabCasePath)}`);
+    static async getFileContent(filePath: string): Promise<DocumentContent> {
+        // The path comes from the file tree the server itself produced, so it is
+        // sent through unchanged. Rewriting it here used to break every file
+        // whose name contained a capital letter.
+        const response = await fetch(`${API_BASE_URL}/api/files/content?path=${encodeURIComponent(filePath)}`);
 
         if (!response.ok) {
             throw new Error(`Failed to fetch file content: ${response.statusText}`);
         }
 
-        const result: ApiResponse<{ path: string; content: string }> = await response.json();
+        const result: ApiResponse<DocumentContent> = await response.json();
 
         if (!result.success) {
             throw new Error(result.error ?? "Failed to get file content");
@@ -171,7 +193,7 @@ class FileAPI {
     /**
      * Upload multiple files
      */
-    static async uploadFiles(files: File[], targetPath = "", createFolders = true): Promise<any> {
+    static async uploadFiles(files: File[], targetPath = "", createFolders = true): Promise<UploadResult> {
         const formData = new FormData();
 
         files.forEach(file => {
@@ -191,13 +213,13 @@ class FileAPI {
             throw new Error(errorResult.error ?? `Failed to upload files: ${response.statusText}`);
         }
 
-        const result: ApiResponse = await response.json();
+        const result: ApiResponse<UploadResult> = await response.json();
 
         if (!result.success) {
             throw new Error(result.error ?? "Failed to upload files");
         }
 
-        return result.data;
+        return result.data!;
     }
 
     /**

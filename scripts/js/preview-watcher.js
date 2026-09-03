@@ -92,14 +92,9 @@ function watchDirectory(dir) {
                         } else {
                             console.log(`🗑️  File deleted: ${filename}`);
                             // Optionally remove preview file
-                            const previewPath = path.join(
-                                PREVIEWS_DIR,
-                                filename.replace(/\.(md|mdx)$/, ".svg"),
-                            );
+                            const previewPath = path.join(PREVIEWS_DIR, filename.replace(/\.(md|mdx)$/, ".svg"));
                             fs.unlink(previewPath, () => {
-                                console.log(
-                                    `🗑️  Preview deleted: ${previewPath}`,
-                                );
+                                console.log(`🗑️  Preview deleted: ${previewPath}`);
                             });
                         }
                     });
@@ -117,9 +112,7 @@ function watchDirectory(dir) {
 watchDirectory(CONTENT_DIR);
 
 console.log("\n🎯 Preview watcher is running!");
-console.log(
-    "📝 Create or edit any .md or .mdx file to see automatic preview generation",
-);
+console.log("📝 Create or edit any .md or .mdx file to see automatic preview generation");
 console.log("🛑 Press Ctrl+C to stop\n");
 
 // Keep the process alive

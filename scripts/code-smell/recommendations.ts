@@ -4,6 +4,9 @@
 
 import type { CodeSmell } from "./types";
 
+/** Above this many maintainability findings, the report escalates to critical. */
+const MAINTAINABILITY_CRITICAL = 15;
+
 export function generateRecommendations(smells: CodeSmell[]): string[] {
     const recommendations: string[] = [];
     const categories = smells.reduce(
@@ -11,12 +14,12 @@ export function generateRecommendations(smells: CodeSmell[]): string[] {
             acc[smell.category] = (acc[smell.category] || 0) + 1;
             return acc;
         },
-        {} as Record<string, number>,
+        {} as Record<string, number>
     );
 
     if (categories["Complexity Issues"] > 10) {
         recommendations.push(
-            "🔴 HIGH PRIORITY: Consider breaking down complex functions into smaller, more focused functions.",
+            "🔴 HIGH PRIORITY: Consider breaking down complex functions into smaller, more focused functions."
         );
         recommendations.push("💡 Use the Single Responsibility Principle to reduce complexity.");
     }
@@ -36,7 +39,7 @@ export function generateRecommendations(smells: CodeSmell[]): string[] {
         recommendations.push("💡 Ensure all hook dependencies are properly declared.");
     }
 
-    if (categories["Maintainability Issues"] > 15) {
+    if (categories["Maintainability Issues"] > MAINTAINABILITY_CRITICAL) {
         recommendations.push("🔴 CRITICAL: Focus on code maintainability improvements.");
         recommendations.push("💡 Remove unused variables, replace magic numbers with constants.");
     }

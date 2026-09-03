@@ -42,17 +42,12 @@ interface SiteStatistics {
     }>;
 }
 
-const generatePreview = async (
-    filePath: string,
-    _content: string,
-): Promise<string | null> => {
+const generatePreview = async (filePath: string, _content: string): Promise<string | null> => {
     try {
         // Create a simple preview URL based on the file path
         const previewFileName = filePath.replace(/\.(md|mdx)$/, ".png");
         const previewUrl = `/api/previews/${encodeURIComponent(previewFileName)}`;
-        console.log(
-            `📸 Preview URL generated for: ${filePath} -> ${previewUrl}`,
-        );
+        console.log(`📸 Preview URL generated for: ${filePath} -> ${previewUrl}`);
         return previewUrl;
     } catch (error) {
         console.error("Failed to generate preview URL:", error);
@@ -81,21 +76,15 @@ const processDirectoryEntry = async (
     entry: DirectoryEntry,
     dirPath: string,
     relativePath: string,
-    currentDepth: number,
+    currentDepth: number
 ): Promise<FileItem> => {
     const fullPath = path.join(dirPath, entry.name);
-    const itemRelativePath = path
-        .join(relativePath, entry.name)
-        .replace(/\\/g, "/");
+    const itemRelativePath = path.join(relativePath, entry.name).replace(/\\/g, "/");
 
     if (entry.isDirectory()) {
         const children =
             currentDepth < SERVER_CONFIG.MAX_FOLDER_DEPTH
-                ? await scanDirectory(
-                    fullPath,
-                    itemRelativePath,
-                    currentDepth + 1,
-                )
+                ? await scanDirectory(fullPath, itemRelativePath, currentDepth + 1)
                 : [];
 
         return {
@@ -116,10 +105,7 @@ const processDirectoryEntry = async (
             const content = await fs.readFile(fullPath, "utf-8");
             previewUrl = await generatePreview(itemRelativePath, content);
         } catch (error) {
-            console.error(
-                `Failed to read file for preview: ${fullPath}`,
-                error,
-            );
+            console.error(`Failed to read file for preview: ${fullPath}`, error);
         }
     }
 
@@ -135,17 +121,11 @@ const processDirectoryEntry = async (
     };
 };
 
-export const scanDirectory = async (
-    dirPath: string,
-    relativePath = "",
-    currentDepth = 0,
-): Promise<FileItem[]> => {
+export const scanDirectory = async (dirPath: string, relativePath = "", currentDepth = 0): Promise<FileItem[]> => {
     const items: FileItem[] = [];
 
     if (currentDepth > SERVER_CONFIG.MAX_FOLDER_DEPTH) {
-        console.warn(
-            `Maximum folder depth (${SERVER_CONFIG.MAX_FOLDER_DEPTH}) exceeded at path: ${relativePath}`,
-        );
+        console.warn(`Maximum folder depth (${SERVER_CONFIG.MAX_FOLDER_DEPTH}) exceeded at path: ${relativePath}`);
         return items;
     }
 
@@ -155,15 +135,9 @@ export const scanDirectory = async (
         for (const entry of entries) {
             try {
                 // Skip hidden files and system files
-                if (entry.name.startsWith(".") || entry.name.startsWith("_"))
-                    continue;
+                if (entry.name.startsWith(".") || entry.name.startsWith("_")) continue;
 
-                const item = await processDirectoryEntry(
-                    entry,
-                    dirPath,
-                    relativePath,
-                    currentDepth,
-                );
+                const item = await processDirectoryEntry(entry, dirPath, relativePath, currentDepth);
                 items.push(item);
             } catch (error) {
                 console.error(`Error processing entry ${entry.name}:`, error);
@@ -181,9 +155,7 @@ export const scanDirectory = async (
     });
 };
 
-export const calculateSiteStatistics = (
-    fileStructure: FileItem[],
-): SiteStatistics => {
+export const calculateSiteStatistics = (fileStructure: FileItem[]): SiteStatistics => {
     let totalDocuments = 0;
     let totalFolders = 0;
     const documentsByType = { md: 0, mdx: 0 };
@@ -232,9 +204,7 @@ export const calculateSiteStatistics = (
         documentsByFolder.push({ folder, count });
     });
 
-    const sortedFolders = [...documentsByFolder].sort(
-        (a, b) => b.count - a.count,
-    );
+    const sortedFolders = [...documentsByFolder].sort((a, b) => b.count - a.count);
     const popularFolders = sortedFolders.slice(0, 5).map(item => ({
         folder: item.folder,
         count: item.count,

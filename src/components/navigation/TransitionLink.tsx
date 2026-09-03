@@ -68,7 +68,7 @@ export const TransitionLink: React.FC<TransitionLinkProps> = ({
                 transitionName,
                 respectReducedMotion,
                 debug: process.env.NODE_ENV === "development",
-            },
+            }
         );
     };
 

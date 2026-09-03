@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Button } from "@/components/ui/button";
 
 interface SidebarFolderControlsProps {
@@ -9,29 +7,25 @@ interface SidebarFolderControlsProps {
     onCollapseAll: () => void;
 }
 
-/**
- * Folder controls component for the sidebar
- * Provides expand/collapse all functionality for folders
- */
-export const SidebarFolderControls: React.FC<SidebarFolderControlsProps> = ({
+export function SidebarFolderControls({
     searchTerm,
     hasFiles,
     onExpandAll,
     onCollapseAll,
-}) => {
+}: SidebarFolderControlsProps) {
     if (searchTerm || !hasFiles) return null;
 
     return (
-        <div className="border-border flex items-center justify-between border-b px-4 py-2">
-            <span className="text-muted-foreground text-xs font-medium">FOLDERS</span>
-            <div className="flex items-center gap-1">
-                <Button variant="ghost" size="sm" onClick={onExpandAll} className="h-6 px-2 text-xs">
-                    Expand All
-                </Button>
-                <Button variant="ghost" size="sm" onClick={onCollapseAll} className="h-6 px-2 text-xs">
-                    Collapse All
-                </Button>
-            </div>
+        <div className="border-rule flex items-center gap-1 border-b px-3 py-1.5">
+            <span className="text-ink-dim mr-auto text-[0.625rem] font-semibold tracking-[0.14em] uppercase">
+                Plates
+            </span>
+            <Button variant="ghost" size="sm" onClick={onExpandAll} className="h-6 px-1.5">
+                Open
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onCollapseAll} className="h-6 px-1.5">
+                Close
+            </Button>
         </div>
     );
-};
+}

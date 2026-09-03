@@ -50,7 +50,7 @@ export const MoveItemDialog: React.FC<MoveItemDialogProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-md w-full max-h-[80vh]">
+            <DialogContent className="max-h-[80vh] w-full max-w-md">
                 <DialogHeader>
                     <DialogTitle>Move "{itemName}"</DialogTitle>
                     <DialogDescription>Select a destination folder for "{itemName}"</DialogDescription>

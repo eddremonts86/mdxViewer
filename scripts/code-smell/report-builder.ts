@@ -14,7 +14,7 @@ export function buildReport(smells: CodeSmell[]): SmellReport {
             acc[smell.category] = (acc[smell.category] || 0) + 1;
             return acc;
         },
-        {} as Record<string, number>,
+        {} as Record<string, number>
     );
 
     const sortedSmells = smells.slice().sort((a, b) => {

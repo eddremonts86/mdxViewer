@@ -84,18 +84,18 @@ export class Logger {
         const prefix = `[${timestamp}] ${levelStr}:`;
 
         switch (entry.level) {
-        case LogLevel.ERROR:
-            console.error(prefix, entry.message, entry.context ?? "", entry.error ?? "");
-            break;
-        case LogLevel.WARN:
-            console.warn(prefix, entry.message, entry.context ?? "");
-            break;
-        case LogLevel.INFO:
-            console.warn(prefix, entry.message, entry.context ?? ""); // Use warn as info is not allowed
-            break;
-        case LogLevel.DEBUG:
-            console.warn(prefix, entry.message, entry.context ?? ""); // Use warn as debug is not allowed
-            break;
+            case LogLevel.ERROR:
+                console.error(prefix, entry.message, entry.context ?? "", entry.error ?? "");
+                break;
+            case LogLevel.WARN:
+                console.warn(prefix, entry.message, entry.context ?? "");
+                break;
+            case LogLevel.INFO:
+                console.warn(prefix, entry.message, entry.context ?? ""); // Use warn as info is not allowed
+                break;
+            case LogLevel.DEBUG:
+                console.warn(prefix, entry.message, entry.context ?? ""); // Use warn as debug is not allowed
+                break;
         }
     }
 

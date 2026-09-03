@@ -52,20 +52,12 @@ async function getAllMarkdownFiles(dir, basePath = "") {
 
         for (const entry of entries) {
             const fullPath = path.join(dir, entry.name);
-            const relativePath = basePath
-                ? `${basePath}/${entry.name}`
-                : entry.name;
+            const relativePath = basePath ? `${basePath}/${entry.name}` : entry.name;
 
             if (entry.isDirectory()) {
-                const subFiles = await getAllMarkdownFiles(
-                    fullPath,
-                    relativePath,
-                );
+                const subFiles = await getAllMarkdownFiles(fullPath, relativePath);
                 files.push(...subFiles);
-            } else if (
-                entry.isFile() &&
-                (entry.name.endsWith(".md") || entry.name.endsWith(".mdx"))
-            ) {
+            } else if (entry.isFile() && (entry.name.endsWith(".md") || entry.name.endsWith(".mdx"))) {
                 files.push({
                     name: entry.name,
                     path: fullPath,
@@ -129,7 +121,7 @@ function createSVGPreview(title, type, folder, content) {
             line
                 .trim()
                 .substring(0, PREVIEW_LINE_MAX_LENGTH)
-                .replace(/[<>&"']/g, ""),
+                .replace(/[<>&"']/g, "")
         );
 
     const badgeColor = type === "mdx" ? "#10b981" : "#3b82f6";
@@ -150,11 +142,11 @@ function createSVGPreview(title, type, folder, content) {
         <text x="${FOLDER_X}" y="${FOLDER_Y}" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">📁 ${folder}</text>
         <text x="${TYPE_X}" y="${TYPE_Y}" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Type: ${type === "mdx" ? "MDX Interactive" : "Markdown Document"}</text>
         ${lines
-        .map(
-            (line, i) =>
-                `<text x="${TEXT_X}" y="${PREVIEW_BASE_Y_POSITION + i * PREVIEW_LINE_HEIGHT}" font-family="Arial, sans-serif" font-size="11" fill="#374151">${line}</text>`,
-        )
-        .join("")}
+            .map(
+                (line, i) =>
+                    `<text x="${TEXT_X}" y="${PREVIEW_BASE_Y_POSITION + i * PREVIEW_LINE_HEIGHT}" font-family="Arial, sans-serif" font-size="11" fill="#374151">${line}</text>`
+            )
+            .join("")}
         <rect x="0" y="0" width="${SVG_WIDTH}" height="${SVG_HEIGHT}" fill="none" stroke="#e5e7eb" stroke-width="1"/>
     </svg>`;
 }
@@ -166,26 +158,19 @@ async function generatePreview(file) {
 
         // Read file content
         const content = await fs.readFile(file.path, "utf8");
-        const title = file.name
-            .replace(/\.(md|mdx)$/, "")
-            .replace(/[-_]/g, " ");
+        const title = file.name.replace(/\.(md|mdx)$/, "").replace(/[-_]/g, " ");
         const type = file.name.endsWith(".mdx") ? "mdx" : "md";
 
         // Sanitize folder path to match kebab-case structure
-        const sanitizedFolderPath =
-            file.folder === "root" ? "" : sanitizeFolderPath(file.folder);
+        const sanitizedFolderPath = file.folder === "root" ? "" : sanitizeFolderPath(file.folder);
 
         // Ensure preview directory exists with correct nested structure
-        const previewDir = sanitizedFolderPath
-            ? path.join(PREVIEWS_DIR, sanitizedFolderPath)
-            : PREVIEWS_DIR;
+        const previewDir = sanitizedFolderPath ? path.join(PREVIEWS_DIR, sanitizedFolderPath) : PREVIEWS_DIR;
 
         await fs.mkdir(previewDir, { recursive: true });
 
         // Sanitize filename
-        const sanitizedFilename = sanitizeFilename(
-            file.name.replace(/\.(md|mdx)$/, ""),
-        );
+        const sanitizedFilename = sanitizeFilename(file.name.replace(/\.(md|mdx)$/, ""));
         const svgFilename = `${sanitizedFilename}.svg`;
 
         // Generate SVG
@@ -197,10 +182,7 @@ async function generatePreview(file) {
 
         return true;
     } catch (error) {
-        console.error(
-            `❌ Failed to generate preview for ${file.relativePath}:`,
-            error.message,
-        );
+        console.error(`❌ Failed to generate preview for ${file.relativePath}:`, error.message);
         return false;
     }
 }
@@ -235,9 +217,7 @@ async function main() {
 
         // Generate previews for each folder
         for (const [folder, folderFiles] of Object.entries(filesByFolder)) {
-            console.log(
-                `\n📂 Processing folder: ${folder} (${folderFiles.length} files)`,
-            );
+            console.log(`\n📂 Processing folder: ${folder} (${folderFiles.length} files)`);
 
             for (const file of folderFiles) {
                 const success = await generatePreview(file);

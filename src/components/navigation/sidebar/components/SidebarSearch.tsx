@@ -18,17 +18,15 @@ export const SidebarSearch: React.FC<SidebarSearchProps> = ({
     onSearchChange,
     onClearSearch,
     resultsCount,
-}) => {
-    return (
-        <div className="border-border border-b p-4">
-            <SearchInput
-                searchTerm={searchTerm}
-                onSearchChange={onSearchChange}
-                onClearSearch={onClearSearch}
-                resultsCount={resultsCount}
-                hasResults={resultsCount > 0}
-                isTyping={false}
-            />
-        </div>
-    );
-};
+}) => (
+    <div className="border-border border-b p-4">
+        <SearchInput
+            searchTerm={searchTerm}
+            onSearchChange={onSearchChange}
+            onClearSearch={onClearSearch}
+            resultsCount={resultsCount}
+            hasResults={resultsCount > 0}
+            isTyping={false}
+        />
+    </div>
+);
