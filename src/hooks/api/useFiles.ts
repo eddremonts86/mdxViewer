@@ -20,6 +20,7 @@ export const fileKeys = {
     list: () => [...fileKeys.lists()] as const,
     content: (path: string) => [...fileKeys.all, "content", path] as const,
     trash: () => ["trash"] as const,
+    health: () => ["health"] as const,
 } as const;
 
 /**
@@ -56,6 +57,18 @@ export function useFileContent(filePath: string, enabled = true) {
             }
             return failureCount < 2;
         },
+    });
+}
+
+/**
+ * What the service reports about itself. Read once and kept: an operator does
+ * not change `MDX_EXECUTE` while someone is reading.
+ */
+export function useServiceHealth() {
+    return useQuery({
+        queryKey: fileKeys.health(),
+        queryFn: FileAPI.getHealth,
+        staleTime: Infinity,
     });
 }
 

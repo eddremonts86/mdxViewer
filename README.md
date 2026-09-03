@@ -57,6 +57,7 @@ Without Docker: `pnpm run build && pnpm start`.
 | `CONTENT_DIR`      | `public/content`        | The folder this instance charts               |
 | `ALLOWED_ORIGINS`  | `http://localhost:5173` | Comma-separated; the dev client only          |
 | `MAX_FOLDER_DEPTH` | `10`                    | How deep the content tree may nest            |
+| `MDX_EXECUTE`      | `false`                 | Compile `.mdx` and run its components         |
 
 ## Scripts
 
@@ -105,8 +106,12 @@ These are recorded rather than hidden:
 - **There is no authentication.** Every path is now confined to the content folder and
   covered by tests, but anyone who can reach the service can read, write and delete
   inside that folder. Put it behind your own auth before exposing it.
-- **MDX is not compiled.** `.mdx` files render through the same Markdown pipeline as
-  `.md`; JSX inside them does not execute. The UI does not claim otherwise.
+- **MDX is not compiled unless you say so.** Set `MDX_EXECUTE=true` and `.mdx` documents are
+  compiled and their components run. Leave it off — the default — and they render as Markdown
+  and say their components were not run. Turn it on only where you trust the content folder:
+  there is no authentication on uploads, so a compiled document is JavaScript in every
+  reader's session. A compiled document may not import; it gets a fixed component vocabulary
+  and whatever it defines itself.
 - **The trash never empties itself.** A delete moves the item to `public/trash`, beside the
   content folder, and it waits there until someone restores it or deletes it for good. There
   is no retention policy and no size cap.

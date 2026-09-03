@@ -8,12 +8,11 @@ import {
     DocumentError,
     DocumentLoader,
     DocumentWelcome,
-    NotExecutedNotice,
     PlateActions,
+    PlateBody,
     PlateEditor,
     TitleBlock,
 } from "@/components/document";
-import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { useFileContent } from "@/hooks/api/useFiles";
 import { asText } from "@/utils/frontmatter";
 import { readMdxSource } from "@/utils/mdxSource";
@@ -127,11 +126,7 @@ export function DocumentPage() {
                     frontmatter={frontmatter}
                 />
 
-                {hasProgram ? <NotExecutedNotice /> : null}
-
-                <div className="plate-prose mt-8">
-                    <MarkdownRenderer content={prose} type={type} />
-                </div>
+                <PlateBody content={content} prose={prose} type={type} hasProgram={hasProgram} />
             </div>
 
             <aside className="border-rule shrink-0 border-t px-5 py-6 sm:px-8 xl:sticky xl:top-0 xl:max-h-screen xl:w-[16rem] xl:self-start xl:overflow-y-auto xl:border-t-0 xl:border-l xl:px-5">

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { parseHeadings } from "../../../src/utils/headingUtils";
-import { readMdxSource } from "../../../src/utils/mdxSource";
+import { readMdxSource, stripMdxImports } from "../../../src/utils/mdxSource";
 
 describe("readMdxSource", () => {
     it("leaves plain markdown untouched", () => {
@@ -75,5 +75,41 @@ describe("parseHeadings", () => {
     it("still reads headings after a fence closes", () => {
         const md = ["```js", "# not a heading", "```", "", "### After The Fence"].join("\n");
         expect(parseHeadings(md).map(heading => heading.title)).toEqual(["After The Fence"]);
+    });
+});
+
+describe("stripMdxImports", () => {
+    it("removes imports and reports where they pointed", () => {
+        const mdx = [
+            'import { Button } from "@/components/ui/button";',
+            'import React from "react";',
+            "",
+            "# Title",
+            "",
+            "<Button>Press</Button>",
+        ].join("\n");
+
+        const { source, removed } = stripMdxImports(mdx);
+        expect(removed).toEqual(["@/components/ui/button", "react"]);
+        expect(source).not.toMatch(/^import/m);
+        expect(source).toContain("<Button>Press</Button>");
+    });
+
+    it("keeps what the document defines itself", () => {
+        // An export is the document declaring its own component. That is the
+        // point of MDX and it reaches nothing outside the file, so it stays.
+        const mdx = ["export const Counter = () => <span>0</span>;", "", "<Counter />"].join("\n");
+
+        const { source, removed } = stripMdxImports(mdx);
+        expect(removed).toEqual([]);
+        expect(source).toContain("export const Counter");
+    });
+
+    it("leaves an import inside a fenced block alone", () => {
+        const mdx = ["```ts", 'import { Button } from "./button";', "```"].join("\n");
+
+        const { source, removed } = stripMdxImports(mdx);
+        expect(removed).toEqual([]);
+        expect(source).toContain('import { Button } from "./button";');
     });
 });

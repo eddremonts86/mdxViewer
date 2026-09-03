@@ -102,3 +102,48 @@ export function readMdxSource(content: string): MdxSource {
 
     return { prose, hasProgram };
 }
+
+/**
+ * Remove an MDX document's `import` statements, keeping everything else.
+ *
+ * This is the stripper for the compiling path, and it is deliberately narrower
+ * than `readMdxSource`. An `import` is the one construct that reaches outside
+ * the document — at a URL, at a bundle, at anything the reader's browser can
+ * fetch — so it goes. `export const Counter = …` stays, because that is the
+ * document defining its own component, which is the whole point of MDX.
+ *
+ * Returns the source and whether anything was removed, so the reader can be told
+ * that a component the document imported will not be there.
+ */
+export function stripMdxImports(content: string): { source: string; removed: string[] } {
+    const lines = content.split("\n");
+    const kept: string[] = [];
+    const removed: string[] = [];
+    let cursor = 0;
+    let insideFence = false;
+
+    while (cursor < lines.length) {
+        const line = lines[cursor];
+
+        if (/^\s*(```|~~~)/.test(line)) {
+            insideFence = !insideFence;
+            kept.push(line);
+            cursor += 1;
+            continue;
+        }
+
+        if (!insideFence && /^\s*import\s/.test(line)) {
+            const end = endOfBlock(lines, cursor);
+            const statement = lines.slice(cursor, end + 1).join(" ");
+            const from = /from\s+["']([^"']+)["']/.exec(statement);
+            removed.push(from ? from[1] : statement.trim());
+            cursor = end + 1;
+            continue;
+        }
+
+        kept.push(line);
+        cursor += 1;
+    }
+
+    return { source: kept.join("\n"), removed };
+}

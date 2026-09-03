@@ -35,9 +35,11 @@ Two mechanisms, both confirmed as the product's reason to exist:
   reorganize them. Docusaurus and static site generators only read; Obsidian and Notion take
   ownership of the format and the vault.
 - **MDX with live React components.** Documentation that executes components inside the page,
-  not a screenshot of a component. **Not implemented today** — the renderer treats `.mdx` exactly
-  like `.md` (react-markdown, no compilation). Recording it here makes it a commitment the design
-  must leave room for, not a claim the product may currently make in UI or marketing copy.
+  not a screenshot of a component. Implemented, and **off unless the operator turns it on**
+  (`MDX_EXECUTE=true`). There is no authentication on the upload endpoint, so executing whatever
+  sits in the content folder is safe only where the operator trusts that folder; the product
+  states the trade and lets them decide rather than deciding for them. With it off — the
+  default — `.mdx` renders as Markdown and says its components were not run.
 
 ## Operating Context
 
@@ -76,7 +78,9 @@ react-router-dom, Express 5 + multer on the API. Node 22 in CI.
   save) but not merged: the loser chooses between reloading and overwriting.
 - Deployment target for the Express API.
 - Real read/usage measurement behind the statistics surface.
-- MDX compilation (see Positioning).
+- MDX compilation with an untrusted content folder. A compiled document may not import, and
+  gets a fixed component vocabulary plus whatever it defines itself, but its expressions do
+  run. Nothing here sandboxes them.
 - Full-text search across document contents; search matches filenames only.
 
 ## Brand Commitments

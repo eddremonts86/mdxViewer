@@ -57,6 +57,14 @@ export interface DocumentContent {
     lastModified?: string;
 }
 
+/** What GET /api/health reports about the running service. */
+export interface ServiceHealth {
+    status: string;
+    contentPath: string;
+    /** Whether the operator has allowed `.mdx` documents to be compiled and run. */
+    mdxExecute: boolean;
+}
+
 /** One deleted document or folder, waiting to be restored or purged. */
 export interface TrashEntry {
     id: string;
@@ -150,6 +158,20 @@ class FileAPI {
 
         if (!response.ok || !result.success) {
             throw new Error(result.error ?? `Failed to save document: ${response.statusText}`);
+        }
+
+        return result.data!;
+    }
+
+    /**
+     * What the running service reports about itself
+     */
+    static async getHealth(): Promise<ServiceHealth> {
+        const response = await fetch(`${API_BASE_URL}/api/health`);
+        const result: ApiResponse<ServiceHealth> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Failed to read service health: ${response.statusText}`);
         }
 
         return result.data!;

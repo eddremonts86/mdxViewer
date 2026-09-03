@@ -192,10 +192,22 @@ single `bash` block does not pull TypeScript's. A ```mermaid fence is drawn as a
 diagram, with Mermaid imported only when one is present. A blockquote opening
 `[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` or `[!CAUTION]` becomes a callout.
 
-MDX is **not compiled**. `.mdx` files render through the same Markdown pipeline
-as `.md`; `readMdxSource()` in `src/utils/mdxSource.ts` removes their imports,
-exports and JSX so the source is not printed as prose, and the viewer prints a
-"Not executed" notice instead.
+MDX is compiled **only when the operator allows it**. `GET /api/health` reports
+`mdxExecute`, set by `MDX_EXECUTE=true` on the service, and the client follows it.
+
+With it off — the default — `.mdx` renders through the same Markdown pipeline as
+`.md`; `readMdxSource()` in `src/utils/mdxSource.ts` removes imports, exports and
+JSX so the source is not printed as prose, and the viewer prints a "Not executed"
+notice.
+
+With it on, the document is compiled with `@mdx-js/mdx` and its components run.
+`stripMdxImports()` removes every `import` first, so a document cannot reach a URL
+or a bundle; in exchange it is given a vocabulary by name — `Alert`, `Badge`,
+`Button`, `Card` and their parts — and keeps whatever it defines itself. A
+document that will not compile prints why and falls back to the Markdown reading.
+
+The reason for the switch: there is no authentication on the upload endpoint, so
+compiling is only safe where the content folder is trusted.
 
 ## There is no export API
 

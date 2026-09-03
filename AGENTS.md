@@ -96,8 +96,15 @@ overlapping ones totalling ~1,400 lines, three of which nothing imported.
 `PRODUCT.md` records them as commitments, not features. The UI must not say
 otherwise, and neither must seeded content:
 
-- **MDX is not compiled.** `.mdx` renders through the Markdown pipeline; JSX does
-  not execute. The viewer says "Not executed" and omits the source.
+- **MDX compiles only when the operator allows it.** `MDX_EXECUTE` is off by
+  default and the client reads it from `/api/health`, never from a build flag.
+  Do not default it on and do not add a path that compiles without it: uploads
+  are unauthenticated, so this is the difference between running the operator's
+  documentation and running a stranger's script. Off, the viewer says "Not
+  executed" and omits the source.
+- **Imports in a compiled document.** They are stripped before compiling, so a
+  document cannot reach a URL or a bundle. Adding a resolver would undo the only
+  structural limit on what a compiled document can touch.
 - **No PDF export.** The Print control is `window.print()` with a real print
   stylesheet.
 - **No authentication.** Paths are confined to the content folder; anyone who can

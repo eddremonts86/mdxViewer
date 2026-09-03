@@ -1,7 +1,6 @@
 import path from "path";
 import { defineConfig } from "vite";
 
-import mdx from "@mdx-js/rollup";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 
@@ -19,10 +18,10 @@ export default defineConfig({
     plugins: [
         react(),
         tailwindcss(),
-        mdx({
-            remarkPlugins: [],
-            rehypePlugins: [],
-        }),
+        // @mdx-js/rollup used to sit here compiling nothing: there is not one
+        // `.mdx` file in `src/`. The documents this app renders live in the
+        // content folder and are fetched at runtime, so they are compiled at
+        // runtime too — see src/components/markdown/MdxDocument.tsx.
     ],
     resolve: {
         alias: {

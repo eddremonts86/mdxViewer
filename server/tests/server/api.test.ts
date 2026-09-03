@@ -388,3 +388,14 @@ describe("the trash", () => {
         expect(names).not.toContain("trash");
     });
 });
+
+describe("compiling MDX is the operator's decision", () => {
+    it("health reports it off unless the operator says otherwise", async () => {
+        const response = await request(app).get("/api/health").expect(200);
+
+        // The default matters: the upload endpoint has no authentication, so a
+        // service that executed uploaded documents out of the box would hand
+        // anyone who can reach it a script in every reader's session.
+        expect(response.body.data.mdxExecute).toBe(false);
+    });
+});

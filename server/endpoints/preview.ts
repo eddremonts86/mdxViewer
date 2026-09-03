@@ -218,6 +218,7 @@ export const getHealth = (_req: Request, res: Response<ApiResponse>) => {
             status: "ok",
             timestamp: new Date().toISOString(),
             contentPath: SERVER_CONFIG.CONTENT_PATH,
+            mdxExecute: SERVER_CONFIG.MDX_EXECUTE,
         },
         message: "Server is healthy",
     });

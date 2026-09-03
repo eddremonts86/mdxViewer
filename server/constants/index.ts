@@ -56,6 +56,17 @@ export const SERVER_CONFIG = {
         ? path.resolve(process.env.CONTENT_DIR)
         : path.join(__dirname, "../../public/content"),
     MAX_FOLDER_DEPTH,
+    /**
+     * Whether `.mdx` documents are compiled and their components executed.
+     *
+     * Off unless the operator says otherwise, and that is the whole point. There
+     * is no authentication on the upload endpoint, so with this on, anyone who
+     * can reach the service can put JavaScript into every reader's session. It
+     * is safe to turn on only where the content folder is trusted — a repository
+     * the team controls, or a deployment behind the operator's own auth. The
+     * client reads it from /api/health rather than deciding for itself.
+     */
+    MDX_EXECUTE: process.env.MDX_EXECUTE === "true",
     FILE_SIZE_LIMIT: FILE_SIZE_LIMIT_MB * BYTES_PER_KILOBYTE * BYTES_PER_KILOBYTE, // Convert MB to bytes
     JSON_LIMIT: "50mb",
     MAX_UPLOAD_FILES: 50,
