@@ -81,7 +81,7 @@ six are not, so they are the whole list:
 ```text
 src/lib/atlas.ts          File → catalogued object: magnitude, plate, position
 src/lib/highlighter.ts    Shiki, with two themes built from the product's tokens
-src/components/atlas/     The chart layer
+src/components/atlas/     The chart layer (deck.gl; skyLayers.ts holds the layers)
 src/components/ui/        shadcn primitives, re-cut for this world
 src/pages/                One file per surface
 src/api/fileAPI.ts        The only client for the file service
@@ -202,6 +202,17 @@ the scar.
   `/` and filtered for empty segments becomes `etc/passwd.md`, which is contained
   and therefore looks safe — and is not what the sender asked for. The import
   endpoint refuses a leading separator outright; a test pins it.
+- **A display name is not an identity.** `AtlasObject.folder` is humanised for
+  labels — "Ai Os" — while `folderPath` is what is on disk — "ai-os". Filtering,
+  hues and depth all key off the path. Keying off the label made clicking a
+  folder in the index chart nothing at all, silently, because the two spellings
+  never met.
+- **Nothing that happens every frame may re-render the chart.** The view lives in
+  deck.gl, not in React state; only a crossed depth level and a hover are allowed
+  through. A controlled `viewState` re-rendered the component sixty times a
+  second and held the 95th percentile at 40fps whether the plate was drawn on a
+  canvas or on the GPU. Measure with the frame-time probe before believing a
+  renderer is the bottleneck — it usually is not.
 - **Empty files pass every check.** Three `scripts/js/*.js` files were 0 bytes and
   three `package.json` scripts ran them. `ls -la` before believing a script exists.
 

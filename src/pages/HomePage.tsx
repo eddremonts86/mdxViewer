@@ -51,7 +51,7 @@ function MagnitudeKey({ objects }: { objects: AtlasObject[] }) {
  * collection, not one level of it.
  */
 const inFolder = (object: AtlasObject, folder: string): boolean =>
-    object.folder === folder || object.folder.startsWith(`${folder}/`);
+    object.folderPath === folder || object.folderPath.startsWith(`${folder}/`);
 
 /** The region of the plate a set of objects occupies, for the chart to frame. */
 function regionOf(objects: AtlasObject[]) {
@@ -215,13 +215,15 @@ export function HomePage() {
                         <PlateLabel reading={`${plates.length}`}>Plates</PlateLabel>
                         <ul className="space-y-1.5">
                             {plates.map(plate => {
-                                const charted = plate.folder === folder;
+                                const charted = plate.folderPath === folder;
                                 return (
                                     <li key={plate.plate}>
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                setParams(charted ? {} : { folder: plate.folder }, { replace: true })
+                                                setParams(charted ? {} : { folder: plate.folderPath }, {
+                                                    replace: true,
+                                                })
                                             }
                                             aria-pressed={charted}
                                             className="focus-visible:outline-mark flex w-full items-baseline gap-3 text-left focus-visible:outline focus-visible:outline-offset-2"

@@ -114,6 +114,7 @@ interface RowButtonProps {
 
 function RowButton({ item, isFolder, isExpanded, hasChildren, isDrawn }: RowButtonProps) {
     const tree = useTree();
+    const isCharted = isFolder && tree.chartedFolder === item.path;
 
     /**
      * Up and down walk the rows the way the tree pattern says they should.
@@ -160,6 +161,7 @@ function RowButton({ item, isFolder, isExpanded, hasChildren, isDrawn }: RowButt
             role="treeitem"
             aria-expanded={isFolder ? isExpanded : undefined}
             aria-selected={isDrawn}
+            aria-current={isCharted ? "true" : undefined}
             onClick={() => tree.onItemClick(item)}
             onKeyDown={onKeyDown}
             className="focus-visible:outline-mark flex min-w-0 flex-1 items-center gap-2 py-[5px] text-left focus-visible:outline focus-visible:outline-offset-[-2px]"
@@ -170,7 +172,13 @@ function RowButton({ item, isFolder, isExpanded, hasChildren, isDrawn }: RowButt
 
             <RowMark item={item} />
 
-            <span className={cn("min-w-0 flex-1 truncate", rowLabelClass(isFolder, isDrawn))}>{item.name}</span>
+            <span className={cn("min-w-0 flex-1 truncate", rowLabelClass(isFolder, isDrawn || isCharted))}>
+                {item.name}
+            </span>
+
+            {/* The charted folder is marked in the index, so what the chart is
+                showing is answerable without looking at the chart. */}
+            {isCharted ? <span className="bg-mark h-1 w-1 shrink-0 rounded-full" aria-hidden="true" /> : null}
         </button>
     );
 }

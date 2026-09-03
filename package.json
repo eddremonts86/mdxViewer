@@ -28,6 +28,9 @@
         "code-smell-report": "tsx scripts/code-smell-detector.ts"
     },
     "dependencies": {
+        "@deck.gl/core": "9.3.11",
+        "@deck.gl/layers": "9.3.11",
+        "@deck.gl/react": "9.3.11",
         "@fontsource/archivo": "^5.3.0",
         "@fontsource/bodoni-moda": "^5.3.0",
         "@fontsource/jetbrains-mono": "^5.2.6",

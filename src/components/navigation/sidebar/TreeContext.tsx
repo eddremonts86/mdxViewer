@@ -15,6 +15,8 @@ export interface TreeState {
     expandedFolders: Set<string>;
     onToggleFolder: (path: string) => void;
     onItemClick: (item: FileItem) => void;
+    /** The folder the chart is currently showing, so a row can say it is the one. */
+    chartedFolder: string | null;
 
     onCreateFile: (parentPath: string) => void;
     onCreateFolder: (parentPath: string) => void;

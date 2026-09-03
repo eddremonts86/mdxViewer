@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import type { FileItem } from "@/api/fileAPI";
 import { CreateDocumentDialog } from "@/components/dialogs/CreateDocumentDialog";
@@ -74,6 +74,10 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     const { toast } = useToast();
     const [searchTerm, setSearchTerm] = useState("");
     const [importing, setImporting] = useState(false);
+    // The charted folder lives in the URL, so the index and the chart cannot
+    // disagree about which one it is.
+    const [params] = useSearchParams();
+    const charted = params.get("folder");
 
     const moveItemMutation = useMoveItem();
     const actions = useSidebarActions(refetch);
@@ -115,15 +119,28 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             };
         });
 
+    /**
+     * Clicking a folder charts it.
+     *
+     * It also opens it, because that is what a tree row does — but the reason the
+     * chart is the same click is that a folder is a place in the collection, and
+     * picking one should be one gesture rather than a menu. Clicking the folder
+     * that is already charted lets the whole collection back in.
+     */
     const handleFileClick = (item: FileItem) => {
         if (isSelectionModeActive) {
             toggleFileSelection(item.path);
-        } else if (item.type === "file") {
+            return;
+        }
+
+        if (item.type === "file") {
             navigate(`/document/${item.path}`);
             onOpenChange(false);
-        } else {
-            toggleFolder(item.path);
+            return;
         }
+
+        toggleFolder(item.path);
+        navigate(charted === item.path ? "/" : `/?folder=${encodeURIComponent(item.path)}`);
     };
 
     const handleMoveToFolder = (targetPath: string) => {
@@ -225,6 +242,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         expandedFolders={expandedFolders}
                         onToggleFolder={toggleFolder}
                         onItemClick={handleFileClick}
+                        chartedFolder={charted}
                         onCreateFile={openCreateDialog}
                         onCreateFolder={actions.openFolderDialog}
                         onMoveItem={openMoveDialog}

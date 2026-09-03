@@ -158,6 +158,12 @@ components:
 
 **Creative North Star: "The Observer's Plate"**
 
+_The chart became three-dimensional on 2026-09-03, at the owner's direction. The third
+axis is not an effect: it is the folder tree's own depth, one step back per level, so
+turning the collection shows how deeply it nests. Coming in past the overview, the levels
+the eye is not at recede rather than vanish — the depth is something moved through, not a
+picture. Everything below still holds; where it does not, the amendment says so._
+
 A documentation set is a sky: a fixed field of objects that someone has to find their
 way around in the dark. MDXViewer charts it. The collection is drawn as a chart with a
 ruled graticule, every document is a catalogued object with a designation and a
@@ -231,6 +237,16 @@ where you are, what you selected, and what you are about to change — nothing e
 Document content, headings, and prose are never amber. Amber covers under 10% of any
 screen; its scarcity is what makes the reticle mean something.
 
+**The Plate Hue Rule.** _Amended 2026-09-03, by the product owner._ The chart carries
+one hue per folder, derived from the folder's path on disk so it is the same colour in
+every session, and spaced by the golden angle so neighbours in the tree never land on
+neighbouring hues. Saturation and lightness come from the rendition, never from the
+hash, so the set reads as one palette rather than as confetti. This is the one place
+the system spends colour on content, and it is spending it on **identity**: which
+folder this belongs to. Size still carries the quantity. Everywhere outside the chart —
+prose, code, callouts, interface — the one-signal rule stands unchanged, and amber
+remains the observer's alone even inside the chart.
+
 The one amber mark that lands on content is the search match, and it is the reticle
 case rather than an exception to it: the document is not emphasising itself, the
 instrument is showing what the observer asked for, the way the reticle sits over a
@@ -247,6 +263,11 @@ weight — is encoded as diameter or scale on the fixed six-step magnitude ramp 
 single unit of color is spent on it. The ramp is log2 anchored at 1 KiB: under 1 KiB is
 magnitude 5, 32 KiB and over is magnitude 0. Color may reinforce a ranking; it may never
 be the only channel carrying one.
+
+On the chart the whole ramp scales with the camera, which does not weaken it: scaling
+every radius by one factor leaves the ratios between them exactly on the ramp, and the
+ratio is what the ramp encodes. Drawing the points at a fixed pixel size was tried and
+cut — it made a scene with depth read as a sheet of stickers.
 
 ## Typography
 
@@ -337,9 +358,14 @@ Emitted light is the one sanctioned exception to No-Shadow and it is spent twice
 radial bloom on magnitude 0–2 objects, and a 10px `shadowBlur` on the reticle. Both are
 drawn on the canvas, not in CSS.
 
-Motion is one authored moment, not five: an overlay is the only thing here that appears
-rather than simply being there, so the scrim washes in over 120ms and the plate settles
-0.5% of a scale over 140ms — once, and nowhere else. The five borrowed primitives arrived
+Motion is one authored moment per surface, not five. An overlay is the only thing in the
+interface that appears rather than simply being there, so the scrim washes in over 120ms
+and the plate settles 0.5% of a scale over 140ms — once, and nowhere else.
+
+The chart is the exception and says why: it is navigated rather than looked at, so it
+carries the motion of an instrument being moved — inertial drag, pinch and wheel from
+deck.gl's own controller, and a 620ms flight when the collection is narrowed to a folder.
+None of it is idle; nothing on the chart moves unless someone moves it. The five borrowed primitives arrived
 carrying scattered `animate-in` / `zoom-in-95` / `slide-in-from-*` classes that generated
 no CSS at all, because the plugin behind them was only ever registered in the Tailwind v3
 config this project no longer has. They were removed rather than revived.
@@ -375,8 +401,12 @@ element.
 - **Magnitude dot:** a filled circle on the six-step ramp, Stardust in the dark
   rendition and Night Sky in the light one. A document modified in the last 7 days wears
   a 1px amber ring — the atlas convention for a variable object.
-- **Reticle:** the active object's mark. A 1px amber circle with four ticks and a soft
-  radial glow. Exactly one reticle per screen.
+- **Reticle:** the active object's mark. A 1px amber circle, billboarded so it faces the
+  reader at any camera angle. Exactly one reticle per screen.
+- **Plate scale:** four square hairline controls on the chart's corner — in, out, turn,
+  and the whole collection — with a live readout of the scale and the angle beside them.
+  The readout is written to the DOM by the render loop rather than by React, because it
+  changes on every frame of a zoom.
 - **Buttons:** square (2px), tracked capital label. Primary is an amber fill on
   Night Sky text. Secondary is a hairline with Glow Amber text. Both carry a small
   compass-star glyph on the primary action only.

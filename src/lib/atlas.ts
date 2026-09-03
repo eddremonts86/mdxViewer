@@ -24,8 +24,16 @@ export interface AtlasObject {
     path: string;
     /** Title as catalogued: the filename, humanised. */
     name: string;
-    /** Folder holding it; "" for the root plate. */
+    /**
+     * Folder holding it, as it is *shown*: humanised names joined by "/".
+     * For labels only — two different folders can humanise to the same words.
+     */
     folder: string;
+    /**
+     * The same folder as it is on disk. This is the identity: what a filter
+     * matches, what a hue is derived from, what the index and the chart agree on.
+     */
+    folderPath: string;
     /** Plate this object belongs to; folders are plates, root is plate 0. */
     plate: number;
     /** 1-based index of the object within its plate. */
@@ -99,12 +107,17 @@ function humanise(filename: string): string {
 }
 
 /** Depth-first walk of the API's file tree, files only. */
-function collectFiles(items: FileItem[], folder = "", into: { folder: string; file: FileItem }[] = []) {
+function collectFiles(
+    items: FileItem[],
+    folder = "",
+    folderPath = "",
+    into: { folder: string; folderPath: string; file: FileItem }[] = []
+) {
     for (const item of items) {
         if (item.type === "folder") {
-            collectFiles(item.children ?? [], folder ? `${folder}/${item.name}` : item.name, into);
+            collectFiles(item.children ?? [], folder ? `${folder}/${item.name}` : item.name, item.path, into);
         } else if (item.extension === ".md" || item.extension === ".mdx") {
-            into.push({ folder, file: item });
+            into.push({ folder, folderPath, file: item });
         }
     }
     return into;
@@ -126,7 +139,7 @@ export function chartCollection(files: FileItem[]): AtlasObject[] {
     const perPlate = new Map<string, number>();
 
     return found
-        .map(({ folder, file }) => {
+        .map(({ folder, folderPath, file }) => {
             const plate = plates.indexOf(folder);
             const index = (perPlate.get(folder) ?? 0) + 1;
             perPlate.set(folder, index);
@@ -145,6 +158,7 @@ export function chartCollection(files: FileItem[]): AtlasObject[] {
                 path: file.path,
                 name: humanise(file.originalName ?? file.name),
                 folder,
+                folderPath,
                 plate,
                 index,
                 designation: `PLATE ${String(plate).padStart(2, "0")} · OBJ ${String(index).padStart(2, "0")}`,
@@ -163,7 +177,10 @@ export function chartCollection(files: FileItem[]): AtlasObject[] {
 
 export interface Plate {
     plate: number;
+    /** The folder as it is shown. */
     folder: string;
+    /** The folder as it is on disk: what charting it filters on. */
+    folderPath: string;
     count: number;
     /** Mean position of the plate's objects: where its constellation sits. */
     centroidY: number;
@@ -171,7 +188,10 @@ export interface Plate {
 
 /** Plate names in chart order, so a legend can label the constellations. */
 export function platesOf(objects: AtlasObject[]): Plate[] {
-    const byPlate = new Map<number, { plate: number; folder: string; count: number; sumY: number }>();
+    const byPlate = new Map<
+        number,
+        { plate: number; folder: string; folderPath: string; count: number; sumY: number }
+    >();
     for (const object of objects) {
         const entry = byPlate.get(object.plate);
         if (entry) {
@@ -181,13 +201,20 @@ export function platesOf(objects: AtlasObject[]): Plate[] {
             byPlate.set(object.plate, {
                 plate: object.plate,
                 folder: object.folder || "root",
+                folderPath: object.folderPath,
                 count: 1,
                 sumY: object.y,
             });
         }
     }
     return [...byPlate.values()]
-        .map(({ plate, folder, count, sumY }) => ({ plate, folder, count, centroidY: sumY / count }))
+        .map(({ plate, folder, folderPath, count, sumY }) => ({
+            plate,
+            folder,
+            folderPath,
+            count,
+            centroidY: sumY / count,
+        }))
         .sort((first, second) => first.plate - second.plate);
 }
 
