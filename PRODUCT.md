@@ -111,7 +111,10 @@ react-router-dom, Express 5 + multer on the API. Node 22 in CI.
 
 No external standard has been mandated. Two product-specific needs are established:
 
-- The file tree is the primary navigation for every audience and must be operable by keyboard,
-  including the move and delete paths that are drag-and-drop only today.
-- The product is read in light and dark, chosen by the user; both must be legible, which the
-  current implementation does not guarantee (theme utilities follow the OS, not the toggle).
+- The file tree is the primary navigation for every audience and must be operable by keyboard.
+  It is: arrows walk the rows and open and close a folder, Home and End jump the ends, and
+  every row's actions menu — move and delete included — is a real focusable control, not a
+  drag-and-drop-only path.
+- The product is read in light and dark, chosen by the user, and both are legible. The
+  `dark` variant is bound to the toggle's own class rather than the OS, which is what made
+  the toggle control nothing before.

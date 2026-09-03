@@ -106,7 +106,36 @@ interface RowButtonProps {
 function RowButton({ item, isFolder, isExpanded, hasChildren, isDrawn }: RowButtonProps) {
     const tree = useTree();
 
+    /**
+     * Up and down walk the rows the way the tree pattern says they should.
+     *
+     * Tab was the only way through before, and a row holds three focusables, so
+     * reaching the last of 76 documents took some 200 presses. Focus moves through
+     * the rendered rows in DOM order, which is the order they are read in.
+     */
+    const moveFocus = (event: React.KeyboardEvent, step: number | "first" | "last") => {
+        const rows = event.currentTarget.closest('[role="tree"]')?.querySelectorAll<HTMLElement>('[role="treeitem"]');
+        if (!rows?.length) return;
+
+        const here = Array.from(rows).indexOf(event.currentTarget as HTMLElement);
+        const next =
+            step === "first"
+                ? 0
+                : step === "last"
+                  ? rows.length - 1
+                  : Math.min(Math.max(here + step, 0), rows.length - 1);
+
+        if (next === here) return;
+        event.preventDefault();
+        rows[next].focus();
+    };
+
     const onKeyDown = (event: React.KeyboardEvent) => {
+        if (event.key === "ArrowDown") return moveFocus(event, 1);
+        if (event.key === "ArrowUp") return moveFocus(event, -1);
+        if (event.key === "Home") return moveFocus(event, "first");
+        if (event.key === "End") return moveFocus(event, "last");
+
         if (!isFolder) return;
         const wantsOpen = event.key === "ArrowRight" && !isExpanded;
         const wantsClose = event.key === "ArrowLeft" && isExpanded;
