@@ -2,7 +2,7 @@
  * TanStack Query hooks for file management with improved error handling
  */
 
-import { type CreateFileRequest, type CreateFolderRequest, FileAPI } from "@/api/fileAPI";
+import { type CreateFileRequest, type CreateFolderRequest, FileAPI, type SaveFileRequest } from "@/api/fileAPI";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -73,6 +73,24 @@ export function useCreateFile() {
         onError: (_error: APIError) => {
             // Error handling for file creation failure
             // Using structured error handling instead of console
+        },
+    });
+}
+
+/**
+ * Hook to save a document's text.
+ *
+ * Invalidates both the document and the file list: a save changes the size and
+ * mtime the chart plots the document by, so the sky has to be redrawn too.
+ */
+export function useSaveFile() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (request: SaveFileRequest) => FileAPI.saveFileContent(request),
+        onSuccess: (_data, request) => {
+            queryClient.invalidateQueries({ queryKey: fileKeys.content(request.path) });
+            queryClient.invalidateQueries({ queryKey: fileKeys.list() });
         },
     });
 }

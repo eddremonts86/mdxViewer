@@ -33,14 +33,14 @@ same order. CI runs on Linux on purpose: that is where a case-mismatched import
 fails and macOS does not.
 
 What passing means today: **0 lint errors**, 60 warnings (all `no-console`, in
-`server/` and `scripts/`, where console output is the interface), and 32 tests.
+`server/` and `scripts/`, where console output is the interface), and 45 tests.
 Do not raise the error count. Warnings are a budget, not a target — if you add
 one, say why.
 
 ## Rules the tooling cannot check
 
 Everything else is enforced by ESLint, Prettier, TypeScript or the tests. These
-five are not, so they are the whole list:
+six are not, so they are the whole list:
 
 1. **English only** in code, comments, commits, and interface copy. The product
    shipped a panel labelled "Índice de Contenido" for months; that is the failure
@@ -53,10 +53,14 @@ five are not, so they are the whole list:
    turns request strings into paths; a `path.join` on user input is how
    `?path=../../../etc/hosts` used to work. Server tests cover the vectors — add
    to them rather than trusting a review.
-4. **Destructive actions get real surfaces that state their reach.** Not
+4. **A write never destroys an edit its author never saw.** The save endpoint compares the
+   mtime the editor loaded and returns 409 on a mismatch; overwriting is a separate,
+   explicit choice the author makes. Several people share one instance and there is no
+   locking, so this is the only thing standing between them.
+5. **Destructive actions get real surfaces that state their reach.** Not
    `window.confirm`. Deleting three folders means deleting the 27 documents
    inside them, and the dialog says so.
-5. **A stock shadcn component inside this world is a lapse.** The primitives in
+6. **A stock shadcn component inside this world is a lapse.** The primitives in
    `src/components/ui/` have been re-cut — 2/3px radii, no shadows, tracked
    capital labels, one accent hue. `DESIGN.md` → Do's and Don'ts is the list.
 

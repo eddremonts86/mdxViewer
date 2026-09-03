@@ -6,7 +6,7 @@ import type { Request, Response } from "express";
 import { promises as fs } from "fs";
 import path from "path";
 
-import { ERRORS, HTTP_STATUS } from "../constants/index.js";
+import { ERRORS, FILE_CONFIG, HTTP_STATUS } from "../constants/index.js";
 import type { ApiResponse } from "../types/index.js";
 import { logOperation, logServerError } from "../utils/logger.js";
 import {
@@ -97,6 +97,112 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error: error instanceof Error ? error.message : "Failed to create file",
+        });
+    }
+};
+
+/**
+ * What a save is allowed to write to, or the reason it is not.
+ *
+ * Split out from the handler because these are six independent refusals and
+ * ESLint was right that reading them inline made one function too branchy.
+ */
+type SaveTarget = { fullPath: string; mtime: Date } | { status: number; error: string };
+
+const resolveSaveTarget = async (relativePath: unknown, content: unknown): Promise<SaveTarget> => {
+    if (typeof relativePath !== "string" || !relativePath) {
+        return { status: HTTP_STATUS.BAD_REQUEST, error: ERRORS.FILE_PATH_REQUIRED };
+    }
+
+    if (typeof content !== "string") {
+        return { status: HTTP_STATUS.BAD_REQUEST, error: "Content must be a string" };
+    }
+
+    const fullPath = resolveInsideContent(relativePath);
+    if (!fullPath || !(await realPathInsideContent(fullPath))) {
+        logServerError("Refused a path outside the content folder", new Error(relativePath));
+        return { status: HTTP_STATUS.FORBIDDEN, error: ERRORS.OUTSIDE_CONTENT };
+    }
+
+    // This edits a document that exists; creating one is POST /api/files/create.
+    let current;
+    try {
+        current = await fs.stat(fullPath);
+    } catch {
+        return { status: HTTP_STATUS.NOT_FOUND, error: ERRORS.FILE_NOT_FOUND };
+    }
+
+    if (current.isDirectory()) {
+        return { status: HTTP_STATUS.BAD_REQUEST, error: ERRORS.PATH_IS_DIRECTORY };
+    }
+
+    const extension = path.extname(fullPath).toLowerCase();
+    const editable: readonly string[] = FILE_CONFIG.ALLOWED_EXTENSIONS;
+    if (!editable.includes(extension)) {
+        return { status: HTTP_STATUS.BAD_REQUEST, error: `Cannot edit ${extension || "a file with no extension"}` };
+    }
+
+    return { fullPath, mtime: current.mtime };
+};
+
+/**
+ * Overwrite a document's text
+ * PUT /api/files/content
+ *
+ * Saves the file exactly as the author typed it, frontmatter included. The editor
+ * sends raw text rather than a parsed object on purpose: re-serialising YAML would
+ * reorder keys and reflow values the author never touched, and the folder is the
+ * source of truth.
+ */
+export const saveFileContent = async (req: Request, res: Response<ApiResponse>) => {
+    try {
+        const { path: relativePath, content, lastModified } = req.body;
+
+        logOperation("Saving file content", { relativePath });
+
+        const target = await resolveSaveTarget(relativePath, content);
+        if ("error" in target) {
+            return res.status(target.status).json({ success: false, error: target.error });
+        }
+
+        // Several readers share one instance and there is no locking. If the file
+        // moved on since the editor loaded it, refuse: silently overwriting work
+        // its author never saw is the one failure this endpoint must not have.
+        if (typeof lastModified === "string" && target.mtime.toISOString() !== lastModified) {
+            return res.status(HTTP_STATUS.CONFLICT).json({
+                success: false,
+                error: "This document changed on disk since you opened it. Reload to see the current version.",
+            });
+        }
+
+        // Write beside the target and rename, so an interrupted save cannot leave
+        // a half-written document where a whole one was.
+        const temporaryPath = `${target.fullPath}.${process.pid}.tmp`;
+        try {
+            await fs.writeFile(temporaryPath, content, "utf8");
+            await fs.rename(temporaryPath, target.fullPath);
+        } catch (writeError) {
+            await fs.rm(temporaryPath, { force: true });
+            throw writeError;
+        }
+
+        const saved = await fs.stat(target.fullPath);
+        logOperation(`File saved: ${relativePath}`);
+
+        res.json({
+            success: true,
+            data: {
+                path: relativePath,
+                size: saved.size,
+                lastModified: saved.mtime.toISOString(),
+            },
+            message: "Document saved",
+        });
+    } catch (error) {
+        logServerError("Failed to save file:", error instanceof Error ? error : new Error(String(error)));
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            error: error instanceof Error ? error.message : "Failed to save file",
         });
     }
 };

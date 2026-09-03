@@ -17,6 +17,7 @@ what the product is and is not.
 | `/`           | The chart. Every document plotted by size, folders drawn and named.  |
 | `/docs`       | The catalogue. Plate cards or a register, filtered by name and type. |
 | `/document/*` | The document plate: a title block from frontmatter, prose, contents. |
+|               | **Edit** opens the source beside a live preview and writes the file. |
 | `/statistics` | The survey. Measurements taken from the content folder.              |
 
 ## Getting started
@@ -106,6 +107,9 @@ These are recorded rather than hidden:
   `.md`; JSX inside them does not execute. The UI does not claim otherwise.
 - **No trash.** A delete is `fs.rm`; the confirmation states how many documents go, but
   nothing comes back.
+- **No merge on a concurrent edit.** The editor sends the mtime it loaded and the service
+  refuses a stale save with 409, so nobody's work disappears silently — but resolving it is
+  a choice between reloading and overwriting, not a merge.
 - **Reads and readers are not counted**, so the survey reports file facts only.
 
 ## Contributing

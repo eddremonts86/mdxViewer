@@ -20,3 +20,27 @@ export function formatFrontmatterDate(value: string): string {
     const iso = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
     return iso ? `${iso[1]}.${iso[2]}.${iso[3]}` : value;
 }
+
+/**
+ * Remove a leading frontmatter block from raw file text.
+ *
+ * The editor works on whole files, so its live preview has to drop the YAML the
+ * way the server's parser does. This only finds the block's end and slices —
+ * parsing the YAML client-side would mean shipping a second parser to disagree
+ * with the first one.
+ */
+export function splitFrontmatter(raw: string): { frontmatter: string | null; body: string } {
+    if (!raw.startsWith("---")) return { frontmatter: null, body: raw };
+
+    const afterOpen = raw.indexOf("\n");
+    if (afterOpen === -1) return { frontmatter: null, body: raw };
+
+    const close = raw.indexOf("\n---", afterOpen);
+    if (close === -1) return { frontmatter: null, body: raw };
+
+    const endOfLine = raw.indexOf("\n", close + 1);
+    return {
+        frontmatter: raw.slice(0, endOfLine === -1 ? raw.length : endOfLine),
+        body: endOfLine === -1 ? "" : raw.slice(endOfLine + 1).replace(/^\n/, ""),
+    };
+}

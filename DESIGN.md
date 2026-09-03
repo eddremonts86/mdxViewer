@@ -384,6 +384,13 @@ element.
   toast all came from shadcn and were all re-cut to 2/3px radii with no shadow, panel
   tone and tracked capital labels. The toast's stock green `success` variant was removed;
   success is the amber mark on a panel, because the system has one signal hue.
+- **Editor:** the plate open for correction. A hairline band names the file, then two
+  panes split by a vertical rule — the source in a Night Sky well set in mono, the live
+  preview in the reading typeset beside it. The eyebrow over the source reads the file's
+  measured size, and reads `Unsaved` in amber the moment the text diverges: the amber is
+  the observer's mark for what is about to change, so it belongs there and nowhere else on
+  the surface. From 1280px up the panes fill the field and scroll inside themselves; below
+  that they stack. A refused save appears as the amber-left panel, not a browser dialog.
 - **Not-executed notice:** an MDX document that defines components carries a hairline
   amber-left panel above the prose saying the components were not run. The component
   source is removed rather than printed as body copy.

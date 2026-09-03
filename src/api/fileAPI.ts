@@ -50,8 +50,20 @@ export interface DocumentFrontmatter {
 export interface DocumentContent {
     path: string;
     content: string;
+    /** The file as it sits on disk, frontmatter included. What the editor edits. */
+    raw?: string;
     frontmatter?: DocumentFrontmatter;
     size?: number;
+    lastModified?: string;
+}
+
+export interface SaveFileRequest {
+    path: string;
+    content: string;
+    /**
+     * The stamp the editor loaded. The service refuses with 409 if the file moved
+     * on since, rather than overwriting an edit its author never saw.
+     */
     lastModified?: string;
 }
 
@@ -105,6 +117,29 @@ class FileAPI {
 
         if (!result.success) {
             throw new Error(result.error ?? "Failed to get file content");
+        }
+
+        return result.data!;
+    }
+
+    /**
+     * Overwrite a document's text
+     */
+    static async saveFileContent(
+        params: SaveFileRequest
+    ): Promise<{ path: string; size: number; lastModified: string }> {
+        const response = await fetch(`${API_BASE_URL}/api/files/content`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(params),
+        });
+
+        const result: ApiResponse<{ path: string; size: number; lastModified: string }> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Failed to save document: ${response.statusText}`);
         }
 
         return result.data!;

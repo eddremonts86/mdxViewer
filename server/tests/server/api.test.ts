@@ -167,3 +167,91 @@ describe("file management inside the folder still works", () => {
         expect(response.status).toBe(409);
     });
 });
+
+describe("saving a document", () => {
+    const load = (filePath: string) =>
+        request(app)
+            .get("/api/files/content")
+            .query({ path: filePath })
+            .expect(200)
+            .then(response => response.body.data);
+
+    it("writes the text back exactly, frontmatter included", async () => {
+        const loaded = await load("docs/intro.md");
+        const edited = `${loaded.raw}\nA line the author added.\n`;
+
+        await request(app)
+            .put("/api/files/content")
+            .send({ path: "docs/intro.md", content: edited, lastModified: loaded.lastModified })
+            .expect(200);
+
+        const onDisk = await fs.readFile(path.join(contentDir, "docs", "intro.md"), "utf8");
+        expect(onDisk).toBe(edited);
+
+        // Frontmatter survives the round trip rather than being re-serialised.
+        const reloaded = await load("docs/intro.md");
+        expect(reloaded.frontmatter.title).toBe("Intro");
+        expect(reloaded.raw.startsWith("---\ntitle: Intro\n---")).toBe(true);
+    });
+
+    it("refuses a save whose file moved on since it was loaded", async () => {
+        const loaded = await load("docs/second.md");
+
+        // Someone else writes between the load and the save.
+        await new Promise(resolve => setTimeout(resolve, 10));
+        await fs.writeFile(path.join(contentDir, "docs", "second.md"), "# Second, by someone else\n");
+
+        const response = await request(app)
+            .put("/api/files/content")
+            .send({ path: "docs/second.md", content: "# Mine\n", lastModified: loaded.lastModified })
+            .expect(409);
+        expect(response.body.error).toMatch(/changed on disk/i);
+
+        // The other author's work is still there.
+        const onDisk = await fs.readFile(path.join(contentDir, "docs", "second.md"), "utf8");
+        expect(onDisk).toBe("# Second, by someone else\n");
+    });
+
+    it("saves without a stamp, for a caller that does not track one", async () => {
+        await request(app)
+            .put("/api/files/content")
+            .send({ path: "docs/second.md", content: "# Overwritten deliberately\n" })
+            .expect(200);
+    });
+
+    it.each(BODY_ESCAPES)("refuses to write outside the content folder: %s", async escape => {
+        const response = await request(app).put("/api/files/content").send({ path: escape, content: "owned" });
+        expect(response.status).toBe(403);
+        expect(await fs.readFile(outsideMarker, "utf8")).toBe("secret");
+    });
+
+    it("refuses to write through a traversal that names a real file", async () => {
+        const escape = `../${path.basename(outsideMarker)}`;
+        await request(app).put("/api/files/content").send({ path: escape, content: "owned" }).expect(403);
+        expect(await fs.readFile(outsideMarker, "utf8")).toBe("secret");
+    });
+
+    it("will not create a document, only edit one", async () => {
+        await request(app)
+            .put("/api/files/content")
+            .send({ path: "docs/not-there.md", content: "# Hello\n" })
+            .expect(404);
+    });
+
+    it("refuses a folder and an extension the reader cannot render", async () => {
+        await request(app).put("/api/files/content").send({ path: "docs", content: "x" }).expect(400);
+
+        await fs.writeFile(path.join(contentDir, "config.json"), "{}\n");
+        await request(app).put("/api/files/content").send({ path: "config.json", content: "{}" }).expect(400);
+    });
+
+    it("requires a path and string content", async () => {
+        await request(app).put("/api/files/content").send({ content: "x" }).expect(400);
+        await request(app).put("/api/files/content").send({ path: "docs/intro.md", content: 42 }).expect(400);
+    });
+
+    it("leaves no temporary file behind", async () => {
+        const entries = await fs.readdir(path.join(contentDir, "docs"));
+        expect(entries.filter(name => name.endsWith(".tmp"))).toEqual([]);
+    });
+});

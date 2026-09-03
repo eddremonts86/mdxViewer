@@ -28,6 +28,7 @@ The file service. Every response is `{ success, data?, error?, message? }`.
 | `POST`   | `/api/files/upload`           | Multipart; `.md`, `.mdx`, `.txt` only     |
 | `DELETE` | `/api/files`                  | `{ paths: string[] }` — recursive, no trash |
 | `POST`   | `/api/files/move`             | `{ sourcePath, targetPath }`              |
+| `PUT`    | `/api/files/content`          | `{ path, content, lastModified? }` — overwrite |
 | `GET`    | `/api/previews/**`            | A document's preview image, any depth      |
 
 ### Paths are confined to the content folder
@@ -62,6 +63,25 @@ Frontmatter is parsed on the server, so the viewer never prints YAML as prose:
 }
 ```
 
+### Saving a document
+
+`PUT /api/files/content` writes the text exactly as given, frontmatter included. It edits an
+existing document only — creating one is `POST /api/files/create` — and it refuses anything
+but `.md`, `.mdx` and `.txt`.
+
+Send back the `lastModified` the read returned. If the file changed on disk in between, the
+save is refused rather than applied:
+
+```bash
+curl -X PUT localhost:3001/api/files/content -H 'Content-Type: application/json' \
+  -d '{"path":"docs/introduction.md","content":"…","lastModified":"1999-01-01T00:00:00.000Z"}'
+# 409 {"success":false,"error":"This document changed on disk since you opened it. …"}
+```
+
+Omitting `lastModified` skips the comparison and overwrites — that is what the editor's
+"Overwrite anyway" does. The write itself goes to a temporary file and is renamed into
+place, so an interrupted save cannot leave a truncated document.
+
 ## The client
 
 `src/api/fileAPI.ts` is the only client. Its base URL is relative, so the built
@@ -78,10 +98,16 @@ await FileAPI.createFolder({ name: "release-notes", path: "" });
 await FileAPI.uploadFiles(files, "docs"); // UploadResult
 await FileAPI.deleteItems(["docs/notes.md"]);
 await FileAPI.moveItem({ sourcePath: "docs/notes.md", targetPath: "" });
+await FileAPI.saveFileContent({ path: "docs/notes.md", content: raw, lastModified });
 ```
 
 Types it exports: `FileItem`, `ApiResponse<T>`, `CreateFileRequest`,
-`CreateFolderRequest`, `DocumentFrontmatter`, `DocumentContent`, `UploadResult`.
+`CreateFolderRequest`, `SaveFileRequest`, `DocumentFrontmatter`, `DocumentContent`,
+`UploadResult`.
+
+`DocumentContent.raw` is the file as it sits on disk; `content` is the same file with its
+frontmatter split off. The editor works on `raw` so a save cannot reformat YAML the author
+never touched.
 
 ## Hooks
 
@@ -95,6 +121,7 @@ import {
     useCreateFile,
     useCreateFolder,
     useDeleteFiles,
+    useSaveFile,
     useUploadFiles,
     useMoveItem,
 } from "@/hooks/api/useFiles";

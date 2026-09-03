@@ -57,7 +57,9 @@ Two mechanisms, both confirmed as the product's reason to exist:
 - Visual previews of every document, used in collection views.
 - A statistics surface describing the collection. Must be driven by real data; the numbers shown
   today are hardcoded fiction (12,489 views, 573 documents against a real 76).
-- An in-app document editor. Does not exist yet; the visual architecture must reserve a place for it.
+- An in-app document editor. Edits the file's raw text, frontmatter included, with a live
+  preview beside it. A save is refused with 409 when the file changed on disk since it was
+  opened, and the author is told rather than silently overwriting the other edit.
 
 **Also present:** document viewer with table of contents, filename search, folder tree navigation,
 light/dark theme, GFM tables, KaTeX math, syntax-highlighted code.
@@ -68,7 +70,8 @@ react-router-dom, Express 5 + multer on the API. Node 22 in CI.
 
 **Undecided / not yet true — do not present as working:**
 
-- Authentication, permissions and multi-user conflict handling.
+- Authentication and permissions. Concurrent writes are detected (the editor refuses a stale
+  save) but not merged: the loser chooses between reloading and overwriting.
 - Deployment target for the Express API.
 - Real read/usage measurement behind the statistics surface.
 - MDX compilation (see Positioning).

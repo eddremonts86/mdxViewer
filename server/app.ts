@@ -26,6 +26,7 @@ import {
     getPreview,
     getStatistics,
     moveFiles,
+    saveFileContent,
     uploadFiles,
 } from "./endpoints/index.js";
 import { resolveInsideContent, sanitizeUploadName } from "./utils/validation.js";
@@ -135,6 +136,10 @@ app.delete("/api/files", (req, res) => {
 
 app.post("/api/files/move", (req, res) => {
     moveFiles(req, res);
+});
+
+app.put("/api/files/content", (req, res) => {
+    saveFileContent(req, res);
 });
 
 // 🎯 UNIVERSAL PREVIEW SOLUTION - Handles ALL nesting levels and URL encoding

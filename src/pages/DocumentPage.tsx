@@ -1,13 +1,19 @@
-import { Link, useParams } from "react-router-dom";
-
-import { ArrowLeft, Printer } from "lucide-react";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 
 import type { DocumentFrontmatter } from "@/api/fileAPI";
 import { PlateLabel } from "@/components/atlas";
 import { TableOfContents } from "@/components/content/TableOfContents";
-import { DocumentError, DocumentLoader, DocumentWelcome, TitleBlock } from "@/components/document";
+import {
+    DocumentError,
+    DocumentLoader,
+    DocumentWelcome,
+    NotExecutedNotice,
+    PlateActions,
+    PlateEditor,
+    TitleBlock,
+} from "@/components/document";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
-import { Button } from "@/components/ui/button";
 import { useFileContent } from "@/hooks/api/useFiles";
 import { asText } from "@/utils/frontmatter";
 import { readMdxSource } from "@/utils/mdxSource";
@@ -66,53 +72,62 @@ function readPlate(filePath: string, content: string, frontmatter: DocumentFront
     };
 }
 
+/**
+ * The catch-all route hands back the path with its own prefix still attached on
+ * some entries, so it is stripped in one place rather than at each use.
+ */
+function documentPathFromSlug(slug: string | undefined): string {
+    const path = slug ?? "";
+    return path.startsWith("document/") ? path.slice("document/".length) : path;
+}
+
+function asDate(stamp: string | undefined): Date | null {
+    return stamp ? new Date(stamp) : null;
+}
+
 export function DocumentPage() {
     const { "*": slug } = useParams();
-    const filePath = slug?.startsWith("document/") ? slug.slice("document/".length) : slug;
+    const filePath = documentPathFromSlug(slug);
 
-    const { data, isLoading, error } = useFileContent(filePath ?? "", Boolean(filePath));
+    const { data, isLoading, error } = useFileContent(filePath, Boolean(filePath));
+    const [editing, setEditing] = useState(false);
 
     if (!filePath) return <DocumentWelcome />;
     if (isLoading) return <DocumentLoader message="Exposing the plate…" />;
     if (error || !data) return <DocumentError message={error?.message} />;
 
-    const { content, frontmatter = {}, size = 0, lastModified } = data;
+    const { content, raw, frontmatter = {}, size = 0, lastModified } = data;
     const { folder, type, title, prose, hasProgram } = readPlate(filePath, content, frontmatter);
+
+    // The table of contents of a document you are rewriting is noise, so the
+    // editor takes the whole field.
+    if (editing && raw !== undefined) {
+        return (
+            <PlateEditor
+                filePath={filePath}
+                source={raw}
+                stamp={lastModified}
+                type={type}
+                onClose={() => setEditing(false)}
+            />
+        );
+    }
 
     return (
         <article className="flex flex-col xl:flex-row">
             <div className="min-w-0 flex-1 px-5 py-6 sm:px-8">
-                <div className="print-hide flex items-center justify-between gap-3">
-                    <Button asChild variant="ghost" size="sm" className="-ml-2">
-                        <Link to="/">
-                            <ArrowLeft className="h-3.5 w-3.5" />
-                            Chart
-                        </Link>
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => window.print()}>
-                        <Printer className="h-3.5 w-3.5" />
-                        Print
-                    </Button>
-                </div>
+                <PlateActions onEdit={raw === undefined ? undefined : () => setEditing(true)} />
 
                 <TitleBlock
                     title={title}
                     folder={folder}
                     type={type}
                     size={size}
-                    modified={lastModified ? new Date(lastModified) : null}
+                    modified={asDate(lastModified)}
                     frontmatter={frontmatter}
                 />
 
-                {hasProgram ? (
-                    <p className="border-mark bg-mark-soft/60 text-ink mt-6 border-l px-4 py-3 text-[0.8125rem] leading-relaxed">
-                        <span className="text-mark-read mr-2 text-[0.625rem] font-semibold tracking-[0.14em] uppercase">
-                            Not executed
-                        </span>
-                        This document defines React components. They are not compiled or run — the reader shows its
-                        Markdown only, and the component source has been left out rather than printed as prose.
-                    </p>
-                ) : null}
+                {hasProgram ? <NotExecutedNotice /> : null}
 
                 <div className="plate-prose mt-8">
                     <MarkdownRenderer content={prose} type={type} />

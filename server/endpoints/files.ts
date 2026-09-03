@@ -97,6 +97,10 @@ export const getFileContent = async (req: Request, res: Response<ApiResponse>) =
             data: {
                 path: filePath,
                 content,
+                // The editor saves whole files, so it needs the text as it sits on
+                // disk. Rebuilding it from `content` + `frontmatter` would reformat
+                // YAML the author never touched.
+                raw,
                 frontmatter: data,
                 size: stats.size,
                 lastModified: stats.mtime.toISOString(),
