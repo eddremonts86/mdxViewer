@@ -1,5 +1,14 @@
-ignoredBuiltDependencies:
-  - '@tailwindcss/oxide'
-  - canvas
-  - core-js
-  - esbuild
+# Which dependencies may run install scripts, in pnpm 11's own format — a map,
+# which is what `pnpm approve-builds` writes. This file previously used
+# `ignoredBuiltDependencies` with a list of names: pnpm 11 reads neither that key
+# nor a list, so the setting did nothing and `pnpm install --frozen-lockfile`
+# failed outright with ERR_PNPM_IGNORED_BUILDS. That is why the Docker build in
+# the README never completed.
+allowBuilds:
+    # Native binaries that genuinely need their install script: Tailwind's oxide
+    # engine and esbuild each link a platform-specific artefact.
+    "@tailwindcss/oxide": true
+    esbuild: true
+    # canvas is not used by the app, and core-js's script only prints a message.
+    canvas: false
+    core-js: false

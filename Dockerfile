@@ -36,6 +36,13 @@ COPY tsconfig*.json ./
 # The default content folder ships with the image; mount over it to replace it.
 COPY --from=build /app/public ./public
 
+# Everything under public/ is written to at runtime — documents are created,
+# uploaded, moved and edited, and a delete moves the item into public/trash. The
+# service does not run as root, so these have to belong to it, and the trash has
+# to exist before the first delete rather than being created into a directory
+# nobody can write.
+RUN mkdir -p ./public/trash ./public/content && chown -R mdx:mdx ./public
+
 USER mdx
 
 # API_PORT is what the service reads; PORT is honoured too for hosts that inject it.
