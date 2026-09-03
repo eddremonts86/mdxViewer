@@ -33,7 +33,7 @@ same order. CI runs on Linux on purpose: that is where a case-mismatched import
 fails and macOS does not.
 
 What passing means today: **0 lint errors**, 60 warnings (all `no-console`, in
-`server/` and `scripts/`, where console output is the interface), and 30 tests.
+`server/` and `scripts/`, where console output is the interface), and 32 tests.
 Do not raise the error count. Warnings are a budget, not a target — if you add
 one, say why.
 
@@ -91,8 +91,11 @@ otherwise, and neither must seeded content:
   reach the service can write inside it.
 - **Reads and readers are not counted.**
 
-Five files under `public/content` still claim the first two. That is content, not
-code, so it is the owner's call — but do not add a sixth.
+Thirteen files under `public/content` claimed the first two and were corrected on
+2026-09-03. Product docs were rewritten, `api/reference.md` replaced, MDX fixtures
+annotated with their JSX intact, and the two development logs left as written with
+a dated correction note. Do not add a fourteenth: `grep -rn "PDF\|se ejecutan\|export"`
+over `public/content` before seeding a document.
 
 ## Traps this repo has already fallen into
 
@@ -122,6 +125,10 @@ the scar.
   reports every element of a named constant array — refusing the fix it asks for.
   Its ignore list once held forty arbitrary integers added one at a time to
   silence it; that is the state to avoid.
+- **One tsconfig project per file.** `tsconfig.node.json` includes `server/**/*`
+  with `lib: ES2022`; `tsconfig.test.json` includes `**/*.test.ts` with DOM. A
+  server test importing a `src/` module that touches `document` compiled twice and
+  failed in the project without DOM. Tests are excluded from the node project.
 - **Empty files pass every check.** Three `scripts/js/*.js` files were 0 bytes and
   three `package.json` scripts ran them. `ls -la` before believing a script exists.
 

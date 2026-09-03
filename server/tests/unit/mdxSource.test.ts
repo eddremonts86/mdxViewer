@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { parseHeadings } from "../../../src/utils/headingUtils";
 import { readMdxSource } from "../../../src/utils/mdxSource";
 
 describe("readMdxSource", () => {
@@ -52,5 +53,27 @@ describe("readMdxSource", () => {
         const md = "<div>kept as html</div>\n\nText { not an interpolation } here.";
         const { hasProgram } = readMdxSource(md);
         expect(hasProgram).toBe(false);
+    });
+});
+
+describe("parseHeadings", () => {
+    it("ignores a # inside a fenced block", () => {
+        const md = [
+            "# Real Heading",
+            "",
+            "```bash",
+            "curl localhost/api",
+            '# {"success":false,"error":"Path is outside the content folder"}',
+            "```",
+            "",
+            "## Also Real",
+        ].join("\n");
+
+        expect(parseHeadings(md).map(heading => heading.title)).toEqual(["Real Heading", "Also Real"]);
+    });
+
+    it("still reads headings after a fence closes", () => {
+        const md = ["```js", "# not a heading", "```", "", "### After The Fence"].join("\n");
+        expect(parseHeadings(md).map(heading => heading.title)).toEqual(["After The Fence"]);
     });
 });

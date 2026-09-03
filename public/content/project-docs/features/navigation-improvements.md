@@ -29,7 +29,7 @@
 
 -   ✅ Soporte completo para **archivos .md y .mdx**
 -   ✅ Preservación de **formato Markdown** estándar
--   ✅ Integración perfecta con **componentes React**
+-   ✅ Integración con el contenido de archivos `.mdx` (los componentes React no se ejecutan: MDX no se compila)
 -   ✅ Manejo de **frontmatter YAML**
 
 ## 🚀 NUEVAS FUNCIONALIDADES
@@ -90,7 +90,7 @@
 
 ### **2. Test MDX Avanzado** (`mdx-navigation-test.mdx`)
 
--   Componentes React interactivos
+-   Componentes React en el origen de los `.mdx`, sin ejecutarse
 -   Navegación desde componentes
 -   Estado compartido entre componentes
 -   Integración completa MD + React + Navegación

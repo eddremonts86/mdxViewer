@@ -77,16 +77,24 @@ export const scrollToHeading = (elementId: string, headerOffset = 80): void => {
  * @returns Array of heading objects with level, title, and id
  */
 export const parseHeadings = (content: string): Array<{ level: number; title: string; id: string }> => {
-    const headingRegex = /^(#{1,6})\s+(.+)$/gm;
     const headings: Array<{ level: number; title: string; id: string }> = [];
+    // A `#` inside a fenced block is a comment, not a heading. Scanning the
+    // whole document with one regex put shell and JSON comments in the table of
+    // contents — the API reference gained an entry reading `{"success":false…}`.
+    let insideFence = false;
 
-    let match;
-    while ((match = headingRegex.exec(content)) !== null) {
-        const level = match[1].length;
+    for (const line of content.split("\n")) {
+        if (/^\s*(```|~~~)/.test(line)) {
+            insideFence = !insideFence;
+            continue;
+        }
+        if (insideFence) continue;
+
+        const match = /^(#{1,6})\s+(.+)$/.exec(line);
+        if (!match) continue;
+
         const title = match[2].trim();
-        const id = generateHeadingId(title);
-
-        headings.push({ level, title, id });
+        headings.push({ level: match[1].length, title, id: generateHeadingId(title) });
     }
 
     return headings;

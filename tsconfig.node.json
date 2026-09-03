@@ -22,5 +22,7 @@
         "noUncheckedSideEffectImports": true,
         "forceConsistentCasingInFileNames": true
     },
-    "include": ["vite.config.ts", "vitest.config.ts", "server/**/*", "scripts/**/*.ts", "code-smell-detector.ts"]
+    "include": ["vite.config.ts", "vitest.config.ts", "server/**/*", "scripts/**/*.ts", "code-smell-detector.ts"],
+    "// exclude": "Test files belong to tsconfig.test.json, which has DOM and vitest globals. Owning them here too compiled a src/ module that uses `document` against lib ES2022.",
+    "exclude": ["server/tests/**/*.test.ts"]
 }

@@ -1,200 +1,146 @@
 ---
 title: "API Reference"
-description: "Complete API documentation"
+description: "The HTTP endpoints, the client, and the hooks that exist"
 author: "Development Team"
-date: "2025-06-21"
+date: "2026-09-03"
 tags: ["api", "reference", "documentation"]
 ---
 
 # API Reference
 
-This document provides a comprehensive reference for the MDX Viewer API.
+Everything below was checked against the code. The previous version of this page
+documented `DocumentViewer`, `exportToPDF`, `exportToHTML`, `printDocument`,
+`FileSystemAPI` and `useFileSystem` — six things that no longer exist, and in
+some cases never worked as described.
 
-## Core Components
+## HTTP endpoints
 
-### DocumentViewer
+The file service. Every response is `{ success, data?, error?, message? }`.
 
-The main component for displaying documents.
+| Method   | Path                          | What it does                              |
+| -------- | ----------------------------- | ----------------------------------------- |
+| `GET`    | `/api/health`                 | Liveness, plus the content path in use    |
+| `GET`    | `/api/statistics`             | Counts computed by walking the folder     |
+| `GET`    | `/api/files`                  | The whole tree: folders, files, sizes      |
+| `GET`    | `/api/files/content?path=`    | One document, frontmatter split out        |
+| `POST`   | `/api/files/create`           | `{ name, type: "md" \| "mdx", path, content? }` |
+| `POST`   | `/api/folders/create`         | `{ name, path }`                          |
+| `POST`   | `/api/files/upload`           | Multipart; `.md`, `.mdx`, `.txt` only     |
+| `DELETE` | `/api/files`                  | `{ paths: string[] }` — recursive, no trash |
+| `POST`   | `/api/files/move`             | `{ sourcePath, targetPath }`              |
+| `GET`    | `/api/previews/**`            | A document's preview image, any depth      |
 
-```typescript
-interface DocumentViewerProps {
-    slug: string;
-}
+### Paths are confined to the content folder
 
-function DocumentViewer({ slug }: DocumentViewerProps): JSX.Element;
+Every `path` in a request is resolved and then checked for containment inside the
+content root, and symlinks are followed for anything that already exists. A path
+that lands outside returns **403**:
+
+```bash
+curl "http://localhost:3001/api/files/content?path=../../package.json"
+# {"success":false,"error":"Path is outside the content folder"}
 ```
 
-**Props:**
+There is no authentication. Anyone who can reach the service can read, write and
+delete **inside** that folder.
 
--   `slug`: String - The document identifier for routing
+### Reading a document
 
-**Example:**
+Frontmatter is parsed on the server, so the viewer never prints YAML as prose:
 
-```tsx
-<DocumentViewer slug="docs/introduction" />
-```
-
-### MarkdownRenderer
-
-Component for rendering Markdown and MDX content.
-
-```typescript
-interface MarkdownRendererProps {
-    content: string;
-    type: "md" | "mdx";
-}
-
-function MarkdownRenderer({
-    content,
-    type,
-}: MarkdownRendererProps): JSX.Element;
-```
-
-**Props:**
-
--   `content`: String - The markdown/MDX content to render
--   `type`: 'md' | 'mdx' - The type of content
-
-## Utility Functions
-
-### Export Functions
-
-#### exportToPDF(element, options)
-
-Exports an HTML element to PDF.
-
-```typescript
-interface ExportOptions {
-    filename?: string;
-    format?: "a4" | "letter";
-    orientation?: "portrait" | "landscape";
-}
-
-async function exportToPDF(
-    element: HTMLElement,
-    options?: ExportOptions
-): Promise<void>;
-```
-
-**Parameters:**
-
--   `element`: HTMLElement - The DOM element to export
--   `options`: ExportOptions - Optional export configuration
-
-**Example:**
-
-```typescript
-const contentElement = document.getElementById("content");
-await exportToPDF(contentElement, {
-    filename: "my-document.pdf",
-    format: "a4",
-    orientation: "portrait",
-});
-```
-
-#### exportToHTML(element, title)
-
-Exports content as HTML file.
-
-```typescript
-function exportToHTML(element: HTMLElement, title?: string): void;
-```
-
-#### printDocument()
-
-Optimizes and prints the current document.
-
-```typescript
-function printDocument(): void;
-```
-
-## Navigation
-
-### File Structure
-
-Documents are organized in a hierarchical structure:
-
-```
-src/content/
-├── docs/           # Documentation files
-├── examples/       # Example and demo files
-├── guides/         # Tutorial and guide files
-└── api/           # API reference files
-```
-
-### URL Routing
-
-The application uses dynamic routing based on file paths:
-
--   `/docs/introduction` → `src/content/docs/introduction.md`
--   `/examples/demo` → `src/content/examples/demo.mdx`
--   `/guides/setup` → `src/content/guides/setup.md`
-
-## Theming
-
-### CSS Variables
-
-The application uses CSS custom properties for theming:
-
-```css
-:root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --muted: 210 40% 96%;
-    --border: 214.3 31.8% 91.4%;
-}
-
-.dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --muted: 222.2 84% 11%;
-    --border: 217.2 32.6% 17.5%;
+```jsonc
+// GET /api/files/content?path=docs/introduction.md
+{
+    "success": true,
+    "data": {
+        "path": "docs/introduction.md",
+        "content": "\n# Introduction to MDX Viewer\n\nWelcome…",
+        "frontmatter": { "title": "Introduction to MDX Viewer", "tags": ["guide"] },
+        "size": 2678,
+        "lastModified": "2026-06-26T10:09:00.000Z"
+    }
 }
 ```
 
-### Theme Toggle
+## The client
 
-Use the `useTheme` hook to control themes:
+`src/api/fileAPI.ts` is the only client. Its base URL is relative, so the built
+app talks to whatever origin serves it; set `VITE_API_URL` when the service lives
+somewhere else.
 
-```typescript
-const { theme, setTheme } = useTheme();
+```ts
+import { FileAPI } from "@/api/fileAPI";
 
-// Toggle between light and dark
-setTheme(theme === "light" ? "dark" : "light");
+await FileAPI.getFileList(); // FileItem[]
+await FileAPI.getFileContent("docs/introduction.md"); // DocumentContent
+await FileAPI.createFile({ name: "notes", type: "md", path: "docs" });
+await FileAPI.createFolder({ name: "release-notes", path: "" });
+await FileAPI.uploadFiles(files, "docs"); // UploadResult
+await FileAPI.deleteItems(["docs/notes.md"]);
+await FileAPI.moveItem({ sourcePath: "docs/notes.md", targetPath: "" });
 ```
 
-## Error Handling
+Types it exports: `FileItem`, `ApiResponse<T>`, `CreateFileRequest`,
+`CreateFolderRequest`, `DocumentFrontmatter`, `DocumentContent`, `UploadResult`.
 
-### Document Not Found
+## Hooks
 
-When a document is not found, the application displays a 404 message:
+`src/hooks/api/useFiles.ts` wraps the client in TanStack Query. Mutations
+invalidate the file list on success, so the tree and the chart refresh together.
 
-```typescript
-if (!document) {
-    return (
-        <div className="text-center">
-            <h2>Document not found</h2>
-            <p>The document you are looking for does not exist.</p>
-        </div>
-    );
-}
+```ts
+import {
+    useFiles,
+    useFileContent,
+    useCreateFile,
+    useCreateFolder,
+    useDeleteFiles,
+    useUploadFiles,
+    useMoveItem,
+} from "@/hooks/api/useFiles";
+
+const { data: files, isLoading, error } = useFiles();
+const { data: document } = useFileContent("docs/introduction.md");
 ```
 
-### Loading States
+## The chart layer
 
-Documents show loading indicators during fetch:
+`src/lib/atlas.ts` turns a `FileItem` tree into catalogued objects. Every value
+is computed from something the filesystem reports:
 
-```typescript
-if (loading) {
-    return (
-        <div className="flex items-center justify-center">
-            <div className="animate-spin w-8 h-8 border-4 border-primary"></div>
-            <p>Loading document...</p>
-        </div>
-    );
-}
+```ts
+import { chartCollection, formatMagnitude, magnitudeFromSize } from "@/lib/atlas";
+
+const objects = chartCollection(files); // AtlasObject[]
 ```
+
+| Function                  | What it gives                                                     |
+| ------------------------- | ----------------------------------------------------------------- |
+| `chartCollection(files)`  | Objects with designation, magnitude, plate and chart position      |
+| `magnitudeFromSize(size)` | 0–5 on a log2 ramp anchored at 1 KiB; 32 KiB and over is 0         |
+| `formatMagnitude(size)`   | The ramp printed as an integer, or `—` for a 0-byte file           |
+| `platesOf(objects)`       | One entry per folder: count and where its constellation sits       |
+| `formatSize`, `formatEpoch` | Tabular figures for bytes and dates                             |
+
+An object's position is a pure function of its path, so the same document lands
+in the same place every time the sky is drawn.
+
+## Rendering
+
+`MarkdownRenderer` takes `content` and renders it. Raw HTML is allowed and then
+filtered with `rehype-sanitize`, because documents arrive through the upload
+endpoint — unsanitised output would let any uploaded file run script in a
+reader's session.
+
+MDX is **not compiled**. `.mdx` files render through the same Markdown pipeline
+as `.md`; `readMdxSource()` in `src/utils/mdxSource.ts` removes their imports,
+exports and JSX so the source is not printed as prose, and the viewer prints a
+"Not executed" notice instead.
+
+## There is no export API
+
+`exportToPDF`, `exportToHTML` and `printDocument` were documented here and are
+gone. Printing is `window.print()` against a real `@media print` stylesheet: the
+shell is dropped, height caps are lifted, the light rendition is forced onto
+white, and external links print their URL beside them. Use the browser's
+"Print to PDF" for a file.
