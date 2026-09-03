@@ -30,16 +30,7 @@ jobs:
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
-            - name: Check formatting
-              run: pnpm run format:check
-
-            - name: Lint
-              run: pnpm run lint
-
-            - name: Typecheck and build
-              run: pnpm run build
-
-            # The whole suite runs in process against a temporary content
-            # folder, so CI needs nothing listening on a port.
-            - name: Tests
-              run: pnpm run test:unit
+            # One command, the same one AGENTS.md tells a contributor to run,
+            # so the instruction and the gate can never disagree.
+            - name: Verify
+              run: pnpm run verify

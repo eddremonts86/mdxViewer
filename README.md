@@ -12,12 +12,12 @@ what the product is and is not.
 
 ## Surfaces
 
-| Route        | What it is                                                             |
-| ------------ | ---------------------------------------------------------------------- |
-| `/`          | The chart. Every document plotted by size, folders drawn and named.     |
-| `/docs`      | The catalogue. Plate cards or a register, filtered by name and type.    |
-| `/document/*`| The document plate: a title block from frontmatter, prose, contents.    |
-| `/statistics`| The survey. Measurements taken from the content folder.                 |
+| Route         | What it is                                                           |
+| ------------- | -------------------------------------------------------------------- |
+| `/`           | The chart. Every document plotted by size, folders drawn and named.  |
+| `/docs`       | The catalogue. Plate cards or a register, filtered by name and type. |
+| `/document/*` | The document plate: a title block from frontmatter, prose, contents. |
+| `/statistics` | The survey. Measurements taken from the content folder.              |
 
 ## Getting started
 
@@ -49,27 +49,29 @@ docker run -p 3001:3001 -v /path/to/your/docs:/app/public/content mdxviewer
 
 Without Docker: `pnpm run build && pnpm start`.
 
-| Variable          | Default              | What it does                                  |
-| ----------------- | -------------------- | --------------------------------------------- |
-| `API_PORT`        | `3001`               | Port the service binds (`PORT` also honoured) |
-| `CONTENT_DIR`     | `public/content`     | The folder this instance charts               |
-| `ALLOWED_ORIGINS` | `http://localhost:5173` | Comma-separated; the dev client only       |
-| `MAX_FOLDER_DEPTH`| `10`                 | How deep the content tree may nest            |
+| Variable           | Default                 | What it does                                  |
+| ------------------ | ----------------------- | --------------------------------------------- |
+| `API_PORT`         | `3001`                  | Port the service binds (`PORT` also honoured) |
+| `CONTENT_DIR`      | `public/content`        | The folder this instance charts               |
+| `ALLOWED_ORIGINS`  | `http://localhost:5173` | Comma-separated; the dev client only          |
+| `MAX_FOLDER_DEPTH` | `10`                    | How deep the content tree may nest            |
 
 ## Scripts
 
-| Script                | What it does                                              |
-| --------------------- | --------------------------------------------------------- |
-| `pnpm run dev`        | Client and file service together                          |
-| `pnpm run build`      | `tsc -b` then `vite build`                                |
-| `pnpm run lint`       | ESLint (formatting is Prettier's job, not ESLint's)       |
-| `pnpm run format`     | Prettier over `src`, `server` and `scripts`               |
-| `pnpm run test:unit`  | Vitest, once — in process, against a temp folder          |
-| `pnpm start`          | Production: the service serving the built client           |
-| `pnpm run generate:previews-safe` | Regenerate the SVG document previews          |
+| Script                            | What it does                                        |
+| --------------------------------- | --------------------------------------------------- |
+| `pnpm run dev`                    | Client and file service together                    |
+| `pnpm run build`                  | `tsc -b` then `vite build`                          |
+| `pnpm run lint`                   | ESLint (formatting is Prettier's job, not ESLint's) |
+| `pnpm run format`                 | Prettier over `src`, `server` and `scripts`         |
+| `pnpm run test:run`               | Vitest, once — in process, against a temp folder    |
+| `pnpm run verify`                 | Format, lint, build, tests — exactly what CI runs   |
+| `pnpm start`                      | Production: the service serving the built client    |
+| `pnpm run generate:previews-safe` | Regenerate the SVG document previews                |
 
-CI runs formatting, lint and the build on Linux — on purpose, because that is where a
-case-mismatched import fails and macOS does not.
+CI runs `pnpm run verify` on Linux — one command, the same one you run locally, on the
+platform where a case-mismatched import actually fails. Contributor instructions live in
+[`AGENTS.md`](AGENTS.md).
 
 ## Project structure
 
@@ -108,8 +110,8 @@ These are recorded rather than hidden:
 
 ## Contributing
 
-Run `pnpm run format && pnpm run lint && pnpm run build` before opening a pull request;
-CI runs the same three. Interface copy, code and commits are English.
+Run `pnpm run verify` before opening a pull request; CI runs that exact command.
+[`AGENTS.md`](AGENTS.md) is the single set of instructions — read it first.
 
 ## License
 
