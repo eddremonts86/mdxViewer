@@ -8,13 +8,16 @@ import { DocumentLoader } from "@/components/document";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFiles } from "@/hooks/api/useFiles";
+import { useEffectiveTheme } from "@/hooks/useMarkdownTheme";
 import { type AtlasObject, chartCollection, formatEpoch, formatMagnitude, formatSize, platesOf } from "@/lib/atlas";
+import { buildGraph, type Graph } from "@/lib/graph";
+import { plateColour } from "@/lib/plateColour";
 import { cn } from "@/lib/utils";
 
 type Layout = "plates" | "register";
 type Kind = "all" | "md" | "mdx";
 
-function PlateCard({ object, neighbours }: { object: AtlasObject; neighbours: AtlasObject[] }) {
+function PlateCard({ object, graph }: { object: AtlasObject; graph: Graph }) {
     const [marked, setMarked] = useState(false);
 
     return (
@@ -27,7 +30,7 @@ function PlateCard({ object, neighbours }: { object: AtlasObject; neighbours: At
             className="border-rule bg-panel/45 rounded-panel hover:border-rule-bright focus-visible:outline-mark group flex border transition-colors focus-visible:outline focus-visible:outline-offset-2"
         >
             <div className="border-rule bg-sky/60 aspect-square w-[7.5rem] shrink-0 border-r p-1">
-                <PlatePreview object={object} neighbours={neighbours} marked={marked} />
+                <PlatePreview graph={graph} path={object.path} marked={marked} />
             </div>
 
             <div className="flex min-w-0 flex-1 flex-col justify-between p-4">
@@ -52,7 +55,7 @@ function PlateCard({ object, neighbours }: { object: AtlasObject; neighbours: At
     );
 }
 
-function RegisterRow({ object }: { object: AtlasObject }) {
+function RegisterRow({ object, rendition }: { object: AtlasObject; rendition: "dark" | "light" }) {
     return (
         <Link
             to={`/document/${object.path}`}
@@ -63,7 +66,13 @@ function RegisterRow({ object }: { object: AtlasObject }) {
             </span>
             <MagnitudeDot magnitude={object.magnitude} variable={object.variable} />
             <span className="text-ink min-w-0 flex-1 truncate font-serif text-[0.9375rem] italic">{object.name}</span>
-            <span className="text-ink-dim hidden min-w-0 flex-1 truncate text-[0.75rem] sm:block">
+            {/* The folder's hue, the same one the chart and the cards use. */}
+            <span className="text-ink-dim hidden min-w-0 flex-1 items-center gap-2 truncate text-[0.75rem] sm:flex">
+                <span
+                    aria-hidden="true"
+                    className="inline-block h-1.5 w-1.5 shrink-0 rounded-full"
+                    style={{ background: plateColour(object.folderPath, rendition) }}
+                />
                 {object.folder || "root"}
             </span>
             <span className="text-ink-dim figures w-14 shrink-0 text-right text-[0.6875rem] font-medium">
@@ -82,18 +91,13 @@ export function DocumentsListPage() {
     const [kind, setKind] = useState<Kind>("all");
     const [term, setTerm] = useState("");
 
+    const rendition = useEffectiveTheme() === "dark" ? "dark" : "light";
     const objects = useMemo(() => chartCollection(files ?? []), [files]);
     const plates = useMemo(() => platesOf(objects), [objects]);
 
-    const neighboursOf = useMemo(() => {
-        const groups = new Map<number, AtlasObject[]>();
-        for (const object of objects) {
-            const group = groups.get(object.plate);
-            if (group) group.push(object);
-            else groups.set(object.plate, [object]);
-        }
-        return groups;
-    }, [objects]);
+    // The same settled collection the chart draws, so a card is a cut of it and
+    // not a second, differently-shaped picture of the same folder.
+    const graph = useMemo(() => buildGraph(objects), [objects]);
 
     const shown = useMemo(() => {
         const needle = term.trim().toLowerCase();
@@ -237,10 +241,10 @@ export function DocumentsListPage() {
                     }
                 />
             ) : layout === "plates" ? (
-                <ul className="mt-4 grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
+                <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                     {shown.map(object => (
                         <li key={object.path}>
-                            <PlateCard object={object} neighbours={neighboursOf.get(object.plate) ?? []} />
+                            <PlateCard object={object} graph={graph} />
                         </li>
                     ))}
                 </ul>
@@ -260,7 +264,7 @@ export function DocumentsListPage() {
                     <ul>
                         {shown.map(object => (
                             <li key={object.path}>
-                                <RegisterRow object={object} />
+                                <RegisterRow object={object} rendition={rendition} />
                             </li>
                         ))}
                     </ul>

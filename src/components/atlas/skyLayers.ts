@@ -1,5 +1,6 @@
 import { type AtlasObject, radiusForMagnitude } from "@/lib/atlas";
 import type { Graph, GraphNode } from "@/lib/graph";
+import { plateHue } from "@/lib/plateColour";
 
 import { LineLayer, PathLayer, ScatterplotLayer, TextLayer } from "@deck.gl/layers";
 
@@ -54,25 +55,6 @@ export function rgba(hex: string, alpha = 1): Rgba {
         parseInt(full.slice(4, 6), 16),
         Math.round(alpha * 255),
     ];
-}
-
-const GOLDEN_ANGLE = 137.508;
-
-/**
- * A folder's own hue.
- *
- * Taken from the path so it is stable — the same folder is the same colour in
- * every session, on every machine — and spaced by the golden angle so two
- * folders next to each other in the tree never land on neighbouring hues.
- * Saturation and lightness come from the rendition, not from the hash, so the
- * set reads as one palette rather than as confetti.
- */
-export function plateHue(folder: string): number {
-    let hash = 0;
-    for (let index = 0; index < folder.length; index++) {
-        hash = (Math.imul(hash, 31) + folder.charCodeAt(index)) >>> 0;
-    }
-    return ((hash % 360) * GOLDEN_ANGLE) % 360;
 }
 
 /** HSL to the byte array deck.gl wants. */

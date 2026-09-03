@@ -1,11 +1,14 @@
-import { type AtlasObject, radiusForMagnitude } from "@/lib/atlas";
+import { useEffectiveTheme } from "@/hooks/useMarkdownTheme";
+import { radiusForMagnitude } from "@/lib/atlas";
+import type { Graph, GraphNode } from "@/lib/graph";
+import { plateColour } from "@/lib/plateColour";
 import { cn } from "@/lib/utils";
 
 interface PlatePreviewProps {
-    /** The object this plate is cut around. */
-    object: AtlasObject;
-    /** Its plate-mates, drawn as the surrounding constellation. */
-    neighbours: AtlasObject[];
+    /** The settled collection, so a card shows the same layout the chart does. */
+    graph: Graph;
+    /** Path of the document this plate is cut around. */
+    path: string;
     /** True only for the card under the pointer: amber is the observer's mark,
         and forty of them at once would mean nothing. */
     marked?: boolean;
@@ -13,37 +16,43 @@ interface PlatePreviewProps {
 }
 
 const VIEW = 100;
+const PAD = 16;
 
 /**
- * A chart plate cut around one object: its own folder's constellation, with the
- * object itself ringed. Every point is a real sibling file, so the plate says
- * something true about where the document sits — which a screenshot thumbnail
- * of rendered prose never did.
+ * The document's own folder, cut into a small square.
+ *
+ * This used to draw the ring layout and a line through the folder's documents in
+ * catalogue order — the same meaningless polyline the chart carried, reproduced
+ * once per card. It is the chart's own figure now: the folder's hub with its
+ * documents on spokes, in the folder's hue, the document itself ringed. Every
+ * mark is a real sibling file, which a screenshot thumbnail never was.
  */
-export function PlatePreview({ object, neighbours, marked = false, className }: PlatePreviewProps) {
-    const group = neighbours.length > 0 ? neighbours : [object];
+export function PlatePreview({ graph, path, marked = false, className }: PlatePreviewProps) {
+    const rendition = useEffectiveTheme() === "dark" ? "dark" : "light";
 
-    // Re-frame the plate's own objects into this small square.
-    const xs = group.map(item => item.x);
-    const ys = group.map(item => item.y);
+    const self = graph.nodes.find(node => node.id === path);
+    if (!self) return <svg viewBox={`0 0 ${VIEW} ${VIEW}`} className={cn("block h-full w-full", className)} />;
+
+    const hub = graph.nodes.find(node => node.kind === "folder" && node.folderPath === self.folderPath) ?? null;
+    const siblings = graph.nodes.filter(node => node.kind === "document" && node.folderPath === self.folderPath);
+    const shown = [...(hub ? [hub] : []), ...siblings];
+
+    // Re-frame the folder's own corner of the collection into this square.
+    const xs = shown.map(node => node.x);
+    const ys = shown.map(node => node.y);
     const minX = Math.min(...xs);
-    const maxX = Math.max(...xs);
     const minY = Math.min(...ys);
-    const maxY = Math.max(...ys);
-    const spanX = Math.max(0.001, maxX - minX);
-    const spanY = Math.max(0.001, maxY - minY);
-    const pad = 18;
-    const project = (item: AtlasObject) => ({
-        cx: pad + ((item.x - minX) / spanX) * (VIEW - pad * 2),
-        cy: pad + ((item.y - minY) / spanY) * (VIEW - pad * 2),
+    const spanX = Math.max(0.0005, Math.max(...xs) - minX);
+    const spanY = Math.max(0.0005, Math.max(...ys) - minY);
+    const span = Math.max(spanX, spanY);
+    const project = (node: GraphNode) => ({
+        cx: PAD + ((node.x - minX) / span) * (VIEW - PAD * 2) + ((span - spanX) / span) * (VIEW - PAD * 2) * 0.5,
+        cy: PAD + ((node.y - minY) / span) * (VIEW - PAD * 2) + ((span - spanY) / span) * (VIEW - PAD * 2) * 0.5,
     });
 
-    const ordered = [...group].sort((first, second) => first.index - second.index);
-    const line = ordered
-        .map(project)
-        .map((point, position) => `${position === 0 ? "M" : "L"}${point.cx.toFixed(1)} ${point.cy.toFixed(1)}`)
-        .join(" ");
-    const self = project(object);
+    const hue = plateColour(self.folderPath, rendition);
+    const centre = hub ? project(hub) : project(self);
+    const here = project(self);
 
     return (
         <svg
@@ -52,48 +61,62 @@ export function PlatePreview({ object, neighbours, marked = false, className }: 
             aria-hidden="true"
             focusable="false"
         >
-            <g className="text-rule" stroke="currentColor" strokeWidth="0.5" opacity="0.6">
-                <line x1="0" y1={VIEW / 2} x2={VIEW} y2={VIEW / 2} strokeDasharray="1.5 3" />
-                <line x1={VIEW / 2} y1="0" x2={VIEW / 2} y2={VIEW} strokeDasharray="1.5 3" />
-            </g>
+            {/* Spokes: every one of them means the same thing the chart's do — is inside. */}
+            {hub
+                ? siblings.map(node => {
+                      const point = project(node);
+                      return (
+                          <line
+                              key={node.id}
+                              x1={centre.cx}
+                              y1={centre.cy}
+                              x2={point.cx}
+                              y2={point.cy}
+                              stroke={hue}
+                              strokeWidth="0.5"
+                              opacity="0.35"
+                          />
+                      );
+                  })
+                : null}
 
-            {ordered.length > 1 ? (
-                <path
-                    d={line}
+            {hub ? (
+                <circle
+                    cx={centre.cx}
+                    cy={centre.cy}
+                    r={4 + Math.min(6, Math.sqrt(hub.weight) * 1.2)}
                     fill="none"
-                    className="text-figure"
-                    stroke="currentColor"
-                    strokeWidth="0.6"
-                    strokeDasharray="1 2.5"
-                    opacity="0.55"
+                    stroke={hue}
+                    strokeWidth="0.7"
+                    opacity="0.8"
                 />
             ) : null}
 
-            {ordered.map(item => {
-                const point = project(item);
-                const isSelf = item.path === object.path;
+            {siblings.map(node => {
+                const point = project(node);
+                const isSelf = node.id === path;
                 return (
                     <circle
-                        key={item.path}
+                        key={node.id}
                         cx={point.cx}
                         cy={point.cy}
-                        r={radiusForMagnitude(item.magnitude) * 0.62}
-                        className={isSelf && marked ? "text-mark" : "text-star"}
-                        fill="currentColor"
-                        opacity={isSelf ? 1 : 0.4}
+                        r={radiusForMagnitude(node.object?.magnitude ?? 5) * 0.62}
+                        fill={hue}
+                        opacity={isSelf ? 1 : 0.45}
                     />
                 );
             })}
 
+            {/* The document this card is about, ringed. Amber only under the eye. */}
             <circle
-                cx={self.cx}
-                cy={self.cy}
-                r={radiusForMagnitude(object.magnitude) * 0.62 + 4}
-                className={marked ? "text-mark" : "text-star"}
+                cx={here.cx}
+                cy={here.cy}
+                r={radiusForMagnitude(self.object?.magnitude ?? 5) * 0.62 + 4}
                 fill="none"
-                stroke="currentColor"
-                strokeWidth="0.7"
-                opacity={marked ? 1 : 0.5}
+                className={marked ? "text-mark" : undefined}
+                stroke={marked ? "currentColor" : hue}
+                strokeWidth="0.8"
+                opacity={marked ? 1 : 0.7}
             />
         </svg>
     );

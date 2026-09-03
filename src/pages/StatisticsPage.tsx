@@ -4,7 +4,9 @@ import { Link } from "react-router-dom";
 import { DataGrid, EmptyPlate, MagnitudeDot, PlateLabel } from "@/components/atlas";
 import { DocumentLoader } from "@/components/document";
 import { useFiles } from "@/hooks/api/useFiles";
+import { useEffectiveTheme } from "@/hooks/useMarkdownTheme";
 import { type AtlasObject, chartCollection, formatEpoch, formatSize, MAGNITUDE_RADIUS, platesOf } from "@/lib/atlas";
+import { plateColour } from "@/lib/plateColour";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const RECENT_DAYS = 7;
@@ -50,6 +52,7 @@ function MagnitudeDistribution({ objects }: { objects: AtlasObject[] }) {
 export function StatisticsPage() {
     const { data: files, isLoading, error } = useFiles();
 
+    const rendition = useEffectiveTheme() === "dark" ? "dark" : "light";
     const objects = useMemo(() => chartCollection(files ?? []), [files]);
     const plates = useMemo(() => platesOf(objects), [objects]);
 
@@ -151,6 +154,14 @@ export function StatisticsPage() {
                                             <span className="text-ink-dim figures mr-2 text-[0.6875rem]">
                                                 {String(plate.plate).padStart(2, "0")}
                                             </span>
+                                            {/* The hue is the folder's identity on the
+                                                chart; the survey names the same folders
+                                                and had been calling them all one colour. */}
+                                            <span
+                                                aria-hidden="true"
+                                                className="mr-2 inline-block h-1.5 w-1.5 rounded-full align-middle"
+                                                style={{ background: plateColour(plate.folderPath, rendition) }}
+                                            />
                                             {plate.folder}
                                         </td>
                                         <td className="text-ink figures py-1.5 text-right text-[0.75rem] font-medium">
