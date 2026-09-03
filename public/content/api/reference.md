@@ -27,6 +27,7 @@ The file service. Every response is `{ success, data?, error?, message? }`.
 | `POST`   | `/api/files/create`           | `{ name, type: "md" \| "mdx", path, content? }` |
 | `POST`   | `/api/folders/create`         | `{ name, path }`                          |
 | `POST`   | `/api/files/upload`           | Multipart; `.md`, `.mdx`, `.txt` only     |
+| `POST`   | `/api/import`                 | A folder of documents, structure intact   |
 | `DELETE` | `/api/files`                  | `{ paths: string[] }` — moves to the trash |
 | `POST`   | `/api/files/move`             | `{ sourcePath, targetPath }`              |
 | `PUT`    | `/api/files/content`          | `{ path, content, lastModified? }` — overwrite |
@@ -86,6 +87,30 @@ Omitting `lastModified` skips the comparison and overwrites — that is what the
 "Overwrite anyway" does. The write itself goes to a temporary file and is renamed into
 place, so an interrupted save cannot leave a truncated document.
 
+### Importing a folder
+
+`POST /api/import` takes `{ path?, documents: [{ path, content }] }` — JSON, not multipart,
+because `.md` and `.mdx` are text and the relative path is then an ordinary field rather than
+something inferred from the order of a form.
+
+It is not the upload endpoint with paths added. Upload's guarantee is "one destination
+folder, one safe filename", and its sanitiser reduces a name to a single segment on purpose.
+An import walks a tree, so it vets **every segment of every path** with the same rules, then
+resolves the result inside the content root anyway.
+
+```jsonc
+{
+    "imported": [{ "path": "handbook/guides/setup.md", "size": 34 }],
+    "skipped": [{ "path": "handbook/index.md", "reason": "Already exists" }],
+}
+```
+
+Nothing is overwritten: an import is not a save, so a taken name is skipped and reported. A
+leading `/` is refused rather than stripped. One request is bounded at 50 documents; the
+client batches a larger folder and reports progress — `src/lib/importFolder.ts` also decides
+what never gets sent at all (anything that is not `.md`/`.mdx`, and anything under
+`node_modules`, `.git`, `dist` and friends).
+
 ### The trash
 
 A delete no longer unlinks anything. It moves the item to `public/trash`, a sibling of the
@@ -137,6 +162,7 @@ await FileAPI.deleteItems(["docs/notes.md"]);
 await FileAPI.moveItem({ sourcePath: "docs/notes.md", targetPath: "" });
 await FileAPI.saveFileContent({ path: "docs/notes.md", content: raw, lastModified });
 await FileAPI.search("frontmatter"); // SearchHit[]
+await FileAPI.importDocuments([{ path: "handbook/index.md", content: "# Handbook" }]);
 await FileAPI.getTrash(); // TrashEntry[]
 await FileAPI.restoreFromTrash(entryId);
 await FileAPI.purgeTrash([entryId]); // permanent
@@ -144,7 +170,8 @@ await FileAPI.purgeTrash([entryId]); // permanent
 
 Types it exports: `FileItem`, `ApiResponse<T>`, `CreateFileRequest`,
 `CreateFolderRequest`, `SaveFileRequest`, `DocumentFrontmatter`, `DocumentContent`,
-`SearchHit`, `ServiceHealth`, `TrashEntry`, `UploadResult`.
+`ImportDocument`, `ImportResult`, `SearchHit`, `ServiceHealth`, `TrashEntry`,
+`UploadResult`.
 
 `DocumentContent.raw` is the file as it sits on disk; `content` is the same file with its
 frontmatter split off. The editor works on `raw` so a save cannot reformat YAML the author

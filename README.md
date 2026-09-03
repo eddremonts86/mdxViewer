@@ -42,7 +42,11 @@ touch. Saving sends the mtime it loaded and the service refuses with 409 if the 
 on, so a save cannot quietly overwrite an edit its author never saw; overwriting is a
 separate, explicit choice. The write goes to a temporary file and is renamed into place.
 
-**Organizing.** Create, upload, move by drag and drop, delete, multi-select. Deleting moves
+**Organizing.** Create, upload, import a whole folder, move by drag and drop, delete,
+multi-select. **Import a folder** takes every `.md` and `.mdx` inside it at any depth and
+keeps the structure; it says what it found and what it is leaving behind — images,
+`.DS_Store`, anything under `node_modules` — before it writes anything, and a document whose
+name is already taken is skipped and reported rather than overwritten. Deleting moves
 items to `public/trash` and the confirmation says so; restoring puts one back at the path
 it came from and refuses if something has since taken that name. The plate index is fully
 operable by keyboard: arrows walk the rows and open and close a folder, Home and End jump

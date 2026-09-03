@@ -57,6 +57,18 @@ export interface DocumentContent {
     lastModified?: string;
 }
 
+/** One document on its way in, with its path relative to the picked folder. */
+export interface ImportDocument {
+    path: string;
+    content: string;
+}
+
+/** What POST /api/import did with a batch. */
+export interface ImportResult {
+    imported: Array<{ path: string; size: number }>;
+    skipped: Array<{ path: string; reason: string }>;
+}
+
 /** One document that matched a search, with the line that matched it. */
 export interface SearchHit {
     path: string;
@@ -173,6 +185,27 @@ class FileAPI {
 
         if (!response.ok || !result.success) {
             throw new Error(result.error ?? `Failed to save document: ${response.statusText}`);
+        }
+
+        return result.data!;
+    }
+
+    /**
+     * Import a batch of documents, folder structure intact
+     *
+     * The service bounds one request, so a folder larger than that arrives in
+     * several calls — see `readImportableFolder` for the batching.
+     */
+    static async importDocuments(documents: ImportDocument[], targetPath = ""): Promise<ImportResult> {
+        const response = await fetch(`${API_BASE_URL}/api/import`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ path: targetPath, documents }),
+        });
+        const result: ApiResponse<ImportResult> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Import failed: ${response.statusText}`);
         }
 
         return result.data!;

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import type { FileItem } from "@/api/fileAPI";
 import { CreateDocumentDialog } from "@/components/dialogs/CreateDocumentDialog";
 import { DeleteDialog, type DeleteTarget } from "@/components/dialogs/DeleteDialog";
+import { ImportFolderDialog } from "@/components/dialogs/ImportFolderDialog";
 import { useFiles, useMoveItem } from "@/hooks/api/useFiles";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -72,6 +73,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
     const navigate = useNavigate();
     const { toast } = useToast();
     const [searchTerm, setSearchTerm] = useState("");
+    const [importing, setImporting] = useState(false);
 
     const moveItemMutation = useMoveItem();
     const actions = useSidebarActions(refetch);
@@ -174,6 +176,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         onCreateFile={() => openCreateDialog()}
                         onCreateFolder={() => actions.openFolderDialog("")}
                         onUpload={actions.pickAndUpload}
+                        onImportFolder={() => setImporting(true)}
                         onToggleSelectionMode={toggleSelectionMode}
                         onClose={() => onOpenChange(false)}
                         isSelectionModeActive={isSelectionModeActive}
@@ -238,6 +241,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                     />
                 </div>
             </aside>
+
+            <ImportFolderDialog open={importing} onOpenChange={setImporting} onImported={refetch} />
 
             <CreateDocumentDialog
                 open={isCreateDialogOpen}

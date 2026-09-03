@@ -23,7 +23,7 @@ requirements rather than nice-to-haves.
 
 A self-hosted workspace for a body of Markdown/MDX documentation: browse the whole collection,
 read individual documents, edit them in place, and change the collection itself — create,
-upload, move and delete files against a real directory on disk. Success is a team pointing it at their docs folder
+upload, import a folder, move and delete files against a real directory on disk. Success is a team pointing it at their docs folder
 and using it as the place where that documentation is read and maintained.
 
 ## Positioning
@@ -56,8 +56,8 @@ Two mechanisms, both confirmed as the product's reason to exist:
 
 **Confirmed capabilities — durable, the design must serve all four:**
 
-- File management: create file, create folder, upload, move by drag and drop, delete,
-  multi-select. A delete is recoverable: the item moves to a trash beside the content folder
+- File management: create file, create folder, upload, import a whole folder with its
+  structure intact, move by drag and drop, delete, multi-select. A delete is recoverable: the item moves to a trash beside the content folder
   and is restored to the path it came from, or removed for good on a second, separate ask.
 - Visual previews of every document, used in collection views.
 - A statistics surface describing the collection. Every figure is computed by walking the

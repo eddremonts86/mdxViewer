@@ -472,3 +472,125 @@ describe("searching the collection", () => {
         expect(hits).toEqual([]);
     });
 });
+
+describe("importing a folder", () => {
+    const importInto = (body: Record<string, unknown>) => request(app).post("/api/import").send(body);
+
+    it("brings a tree in with its structure intact", async () => {
+        const response = await importInto({
+            documents: [
+                { path: "handbook/index.md", content: "# Handbook\n" },
+                { path: "handbook/guides/setup.md", content: "# Setup\n" },
+                { path: "handbook/guides/deep/nested.mdx", content: "# Nested\n" },
+            ],
+        }).expect(200);
+
+        expect(response.body.data.imported.map((entry: { path: string }) => entry.path)).toEqual([
+            "handbook/index.md",
+            "handbook/guides/setup.md",
+            "handbook/guides/deep/nested.mdx",
+        ]);
+        expect(response.body.data.skipped).toEqual([]);
+
+        expect(await fs.readFile(path.join(contentDir, "handbook", "guides", "deep", "nested.mdx"), "utf8")).toBe(
+            "# Nested\n"
+        );
+    });
+
+    it("imports under a target folder when given one", async () => {
+        await importInto({
+            path: "docs",
+            documents: [{ path: "imported/note.md", content: "# Note\n" }],
+        }).expect(200);
+
+        await fs.access(path.join(contentDir, "docs", "imported", "note.md"));
+    });
+
+    it("skips a document whose destination is taken, and does not touch it", async () => {
+        await fs.writeFile(path.join(contentDir, "docs", "held.md"), "# Mine\n");
+
+        const response = await importInto({
+            path: "docs",
+            documents: [{ path: "held.md", content: "# Theirs\n" }],
+        }).expect(200);
+
+        expect(response.body.data.imported).toEqual([]);
+        expect(response.body.data.skipped[0]).toMatchObject({ path: "docs/held.md", reason: "Already exists" });
+        expect(await fs.readFile(path.join(contentDir, "docs", "held.md"), "utf8")).toBe("# Mine\n");
+    });
+
+    it("skips anything that is not a document", async () => {
+        const response = await importInto({
+            documents: [
+                { path: "mixed/readme.md", content: "# Readme\n" },
+                { path: "mixed/logo.png", content: "binary-ish" },
+                { path: "mixed/.DS_Store", content: "junk" },
+                { path: "mixed/no-extension", content: "junk" },
+            ],
+        }).expect(200);
+
+        expect(response.body.data.imported).toHaveLength(1);
+        expect(response.body.data.skipped.map((entry: { reason: string }) => entry.reason)).toEqual([
+            "Not a document: .png",
+            // `path.extname(".DS_Store")` is empty: a leading-dot file has no
+            // extension as far as Node is concerned.
+            "Not a document: no extension",
+            "Not a document: no extension",
+        ]);
+    });
+
+    it.each([
+        "../escaped.md",
+        "../../escaped.md",
+        "docs/../../escaped.md",
+        "handbook/../../escaped.md",
+        "/etc/passwd.md",
+    ])("refuses to write outside the content folder: %s", async escape => {
+        const response = await importInto({ documents: [{ path: escape, content: "owned" }] }).expect(200);
+
+        // Nothing lands, and the marker one level above the root is untouched.
+        expect(response.body.data.imported).toEqual([]);
+        expect(response.body.data.skipped).toHaveLength(1);
+        expect(await fs.readFile(outsideMarker, "utf8")).toBe("secret");
+    });
+
+    it("strips a control character from a name, and reports the name it used", async () => {
+        // Built rather than written out: a literal control character in source is
+        // invisible to whoever reads the test next.
+        const sneaky = `handbook/note${String.fromCharCode(1)}.md`;
+
+        const response = await importInto({ documents: [{ path: sneaky, content: "x" }] }).expect(200);
+
+        // Sanitised rather than refused, as uploads are — but the reported path is
+        // the one on disk, so a renamed document is never a silent surprise.
+        expect(response.body.data.imported[0].path).toBe("handbook/note.md");
+        await fs.access(path.join(contentDir, "handbook", "note.md"));
+    });
+
+    it("refuses a tree deeper than the limit", async () => {
+        const deep = `${Array.from({ length: 12 }, (_, index) => `level${index}`).join("/")}/too-deep.md`;
+
+        const response = await importInto({ documents: [{ path: deep, content: "x" }] }).expect(200);
+        expect(response.body.data.imported).toEqual([]);
+        expect(response.body.data.skipped[0].reason).toMatch(/depth/i);
+    });
+
+    it("refuses a target folder outside the content root", async () => {
+        await importInto({ path: "../..", documents: [{ path: "x.md", content: "x" }] }).expect(403);
+    });
+
+    it("bounds one request, so a big folder has to be batched", async () => {
+        const many = Array.from({ length: 51 }, (_, index) => ({
+            path: `bulk/doc-${index}.md`,
+            content: "x",
+        }));
+
+        await importInto({ documents: many }).expect(400);
+        await expect(fs.access(path.join(contentDir, "bulk"))).rejects.toThrow();
+    });
+
+    it("requires documents", async () => {
+        await importInto({}).expect(400);
+        await importInto({ documents: [] }).expect(400);
+    });
+});

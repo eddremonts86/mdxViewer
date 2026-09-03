@@ -26,6 +26,7 @@ import {
     getPreview,
     getStatistics,
     getTrash,
+    importDocuments,
     moveFiles,
     purgeTrashEntries,
     restoreTrashEntry,
@@ -136,6 +137,10 @@ app.post("/api/folders/create", (req, res) => {
 
 app.post("/api/files/upload", upload.array("files"), (req, res) => {
     uploadFiles(req, res);
+});
+
+app.post("/api/import", (req, res) => {
+    importDocuments(req, res);
 });
 
 app.delete("/api/files", (req, res) => {

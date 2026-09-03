@@ -394,6 +394,12 @@ element.
   tracked capitals — then the matching line with the query marked, and the line
   number with a count of the further matches in that document. The field keeps focus
   while the arrows move a drawn selection, so typing never stops.
+- **Import surface:** a plate dialog that reads someone's folder before it writes to
+  the collection, so it is ordered as a reading rather than a form: the count and
+  measured size on an eyebrow, where the tree will land, then what is being left
+  behind with a reason beside each entry — and only then the action. During the
+  import the action carries its own progress; afterwards the same plate becomes the
+  report. Nothing about it says "0 documents" before a folder is chosen.
 - **Trash row:** the deleted object as it was — magnitude dot, italic name — then the
   plate it fell out of, its size, the date it went, and the two actions. Restore is the
   hairline secondary; deleting for good only becomes an amber fill after the row has been

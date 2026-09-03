@@ -1,4 +1,4 @@
-import { FilePlus2, FolderPlus, Loader2, Upload, X } from "lucide-react";
+import { FilePlus2, FolderInput, FolderPlus, Loader2, Upload, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -7,17 +7,19 @@ interface SidebarHeaderProps {
     onCreateFile: () => void;
     onCreateFolder: () => void;
     onUpload: () => void;
+    onImportFolder: () => void;
     onToggleSelectionMode: () => void;
     onClose: () => void;
     isSelectionModeActive: boolean;
     isUploadPending: boolean;
 }
 
-/** The index's masthead: what this column is, and the three ways to add to it. */
+/** The index's masthead: what this column is, and the four ways to add to it. */
 export function SidebarHeader({
     onCreateFile,
     onCreateFolder,
     onUpload,
+    onImportFolder,
     onToggleSelectionMode,
     onClose,
     isSelectionModeActive,
@@ -49,6 +51,10 @@ export function SidebarHeader({
                     <Upload className="h-3.5 w-3.5" />
                 )}
                 <span className="sr-only">Upload files</span>
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onImportFolder} title="Import a folder">
+                <FolderInput className="h-3.5 w-3.5" />
+                <span className="sr-only">Import a folder</span>
             </Button>
             <Button
                 variant="ghost"

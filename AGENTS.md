@@ -59,7 +59,9 @@ six are not, so they are the whole list:
 3. **Every filesystem path goes through `resolveInsideContent()`.** The service
    turns request strings into paths; a `path.join` on user input is how
    `?path=../../../etc/hosts` used to work. Server tests cover the vectors — add
-   to them rather than trusting a review.
+   to them rather than trusting a review. A request carrying a whole *tree* vets
+   every segment as well — `importTree.ts` — because containment on the joined
+   path alone would let one bad segment through on a good-looking path.
 4. **A write never destroys an edit its author never saw.** The save endpoint compares the
    mtime the editor loaded and returns 409 on a mismatch; overwriting is a separate,
    explicit choice the author makes. Several people share one instance and there is no
@@ -85,6 +87,8 @@ src/pages/                One file per surface
 src/api/fileAPI.ts        The only client for the file service
 server/utils/trash.ts     Deleted items: move out, list, restore, purge
 server/utils/search.ts    Full-text search over the content folder
+server/endpoints/importTree.ts  A folder of documents in, one vetted segment at a time
+src/lib/importFolder.ts   Reads a picked folder, partitions it, sends it in batches
 server/app.ts             Routes, middleware, uploads
 server/start.ts           Binds the port
 public/content/           The documentation this instance charts
@@ -194,6 +198,10 @@ the scar.
   three primitives, `border-border/2-[48%]/2-[48%]` in the dialog and a trailing
   `data-[state=open]:sm:` in the toast. All inert, all read as mistakes, all
   survived several commits. Grep the `ui/` class lists after any such removal.
+- **An absolute path is refused, not reinterpreted.** `"/etc/passwd.md"` split on
+  `/` and filtered for empty segments becomes `etc/passwd.md`, which is contained
+  and therefore looks safe — and is not what the sender asked for. The import
+  endpoint refuses a leading separator outright; a test pins it.
 - **Empty files pass every check.** Three `scripts/js/*.js` files were 0 bytes and
   three `package.json` scripts ran them. `ls -la` before believing a script exists.
 

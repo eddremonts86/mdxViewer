@@ -152,11 +152,14 @@ const LAST_C0_CONTROL = 0x1f;
 const DELETE_CHARACTER = 0x7f;
 
 /**
- * Upload filenames arrive from the client and become real names on disk.
- * Reduce to a single path segment, drop control characters, and require an
- * extension this product actually serves.
+ * One path segment from the client, reduced to something safe, or null.
+ *
+ * Drops control characters, takes the basename so a segment can never carry a
+ * separator, and refuses `.` and `..`. Both the upload filename and the folder
+ * segments an imported tree walks go through this, because the control-character
+ * filter is exactly the part a second copy forgets.
  */
-export const sanitizeUploadName = (original: string): string | null => {
+const sanitizeSegment = (original: string): string | null => {
     const base = [...path.basename(original ?? "")]
         .filter(character => {
             const code = character.codePointAt(0) ?? 0;
@@ -166,8 +169,22 @@ export const sanitizeUploadName = (original: string): string | null => {
 
     if (!base || base === "." || base === "..") return null;
 
-    const allowed: readonly string[] = FILE_CONFIG.ALLOWED_EXTENSIONS;
-    if (!allowed.includes(path.extname(base).toLowerCase())) return null;
-
     return validateFileName(base).isValid ? base : null;
+};
+
+/** A folder name inside an imported tree: a safe segment, no extension needed. */
+export const sanitizeFolderName = (original: string): string | null => sanitizeSegment(original);
+
+/**
+ * Upload filenames arrive from the client and become real names on disk.
+ * Reduce to a single path segment, drop control characters, and require an
+ * extension this product actually serves.
+ */
+export const sanitizeUploadName = (original: string): string | null => {
+    const base = sanitizeSegment(original);
+
+    if (!base) return null;
+
+    const allowed: readonly string[] = FILE_CONFIG.ALLOWED_EXTENSIONS;
+    return allowed.includes(path.extname(base).toLowerCase()) ? base : null;
 };
