@@ -7,7 +7,18 @@ import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 
-import { createCodeComponent, H1, H2, H3, H4, H5, H6, Image, Link } from "@/components/markdown/MarkdownComponents";
+import {
+    Blockquote,
+    createCodeComponent,
+    H1,
+    H2,
+    H3,
+    H4,
+    H5,
+    H6,
+    Image,
+    Link,
+} from "@/components/markdown/MarkdownComponents";
 import { useEffectiveTheme } from "@/hooks/useMarkdownTheme";
 import type { MarkdownRendererProps } from "@/types/markdownIndex";
 
@@ -69,6 +80,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
             a: Link,
             img: Image,
             code: createCodeComponent(effectiveTheme),
+            blockquote: Blockquote,
         }),
         [effectiveTheme]
     );

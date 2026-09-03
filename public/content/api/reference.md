@@ -186,6 +186,12 @@ filtered with `rehype-sanitize`, because documents arrive through the upload
 endpoint — unsanitised output would let any uploaded file run script in a
 reader's session.
 
+Code fences are highlighted by Shiki against two themes built from this product's
+tokens, with the grammar for that one language fetched on demand — a document with a
+single `bash` block does not pull TypeScript's. A ```mermaid fence is drawn as a
+diagram, with Mermaid imported only when one is present. A blockquote opening
+`[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` or `[!CAUTION]` becomes a callout.
+
 MDX is **not compiled**. `.mdx` files render through the same Markdown pipeline
 as `.md`; `readMdxSource()` in `src/utils/mdxSource.ts` removes their imports,
 exports and JSX so the source is not printed as prose, and the viewer prints a

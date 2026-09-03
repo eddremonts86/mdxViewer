@@ -1,6 +1,8 @@
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { Children, cloneElement, isValidElement } from "react";
 
+import { Callout, type CalloutKind, isCalloutKind } from "@/components/markdown/Callout";
+import { CodeBlock } from "@/components/markdown/CodeBlock";
+import { MermaidDiagram } from "@/components/markdown/MermaidDiagram";
 import type { EffectiveTheme } from "@/types/markdown";
 import {
     extractLanguageFromClassName,
@@ -58,23 +60,51 @@ export const createCodeComponent =
             );
         }
 
-        return (
-            <SyntaxHighlighter
-                style={effectiveTheme === "dark" ? oneDark : oneLight}
-                language={language}
-                PreTag="div"
-                customStyle={{
-                    margin: 0,
-                    padding: "1rem 1.1rem",
-                    background: "var(--panel)",
-                    border: "1px solid var(--rule)",
-                    borderRadius: "var(--radius-panel)",
-                    fontSize: "0.8125rem",
-                    lineHeight: 1.62,
-                }}
-                codeTagProps={{ style: { fontFamily: "var(--font-code)" } }}
-            >
-                {String(children).replace(/\n$/, "")}
-            </SyntaxHighlighter>
-        );
+        const code = String(children).replace(/\n$/, "");
+
+        // A mermaid fence is a diagram, not a listing.
+        if (language.toLowerCase() === "mermaid") {
+            return <MermaidDiagram code={code} theme={effectiveTheme} />;
+        }
+
+        return <CodeBlock code={code} language={language} theme={effectiveTheme} />;
     };
+
+/**
+ * A blockquote that opens with `[!NOTE]` is a callout, not a quotation.
+ *
+ * The marker arrives as the first text node inside the first paragraph, so it is
+ * read and removed there rather than with another remark plugin — the pipeline
+ * already carries five.
+ */
+export const Blockquote = ({ children, ...props }: React.ComponentProps<"blockquote">) => {
+    const nodes = Children.toArray(children);
+    const first = nodes.find(node => isValidElement(node));
+
+    const marker = calloutMarker(first);
+    if (!marker) {
+        return <blockquote {...props}>{children}</blockquote>;
+    }
+
+    return <Callout kind={marker.kind}>{nodes.map(node => (node === first ? marker.rest : node))}</Callout>;
+};
+
+/** Reads `[!NOTE]` off the front of a paragraph, and gives back what is left of it. */
+function calloutMarker(node: unknown): { kind: CalloutKind; rest: React.ReactNode } | null {
+    if (!isValidElement<{ children?: React.ReactNode }>(node)) return null;
+
+    const parts = Children.toArray(node.props.children);
+    const [head] = parts;
+    if (typeof head !== "string") return null;
+
+    const match = /^\[!([A-Za-z]+)\]\s*\n?/.exec(head);
+    if (!match || !isCalloutKind(match[1])) return null;
+
+    const remainder = head.slice(match[0].length);
+    const rest = [remainder, ...parts.slice(1)].filter(part => part !== "");
+
+    return {
+        kind: match[1].toLowerCase() as CalloutKind,
+        rest: cloneElement(node, { children: rest }),
+    };
+}

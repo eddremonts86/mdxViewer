@@ -365,6 +365,55 @@
         padding: 0;
     }
 
+    /* A fenced block, whether Shiki has arrived yet or not. The wrapper owns the
+       frame so the two states cannot differ by a pixel; Shiki paints only the
+       spans inside. */
+    .plate-code {
+        position: relative;
+        border: 1px solid var(--rule);
+        border-radius: var(--radius-panel);
+        background: var(--panel);
+        overflow: hidden;
+    }
+
+    .plate-code pre {
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        overflow-x: auto;
+        padding: 1rem 1.1rem;
+        font-size: 0.8125rem;
+        line-height: 1.62;
+    }
+
+    .plate-code code {
+        font-family: var(--font-code);
+        display: block;
+        width: max-content;
+        min-width: 100%;
+    }
+
+    /* The fence's own label, set like every other label in the system. */
+    .plate-code[data-language]::before {
+        content: attr(data-language);
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 0.35em 0.7em;
+        font-family: var(--font-ui);
+        font-size: 0.5625rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+        border-left: 1px solid var(--rule);
+        border-bottom: 1px solid var(--rule);
+        border-bottom-left-radius: var(--radius-plate);
+        background: var(--plate);
+        pointer-events: none;
+    }
+
     .plate-prose hr {
         border: 0;
         height: 1px;
@@ -515,6 +564,7 @@
     }
 
     .plate-prose pre,
+    .plate-code,
     .plate-prose table,
     .plate-prose blockquote {
         break-inside: avoid;

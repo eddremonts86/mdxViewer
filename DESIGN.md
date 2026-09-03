@@ -396,6 +396,19 @@ element.
   the observer's mark for what is about to change, so it belongs there and nowhere else on
   the surface. From 1280px up the panes fill the field and scroll inside themselves; below
   that they stack. A refused save appears as the amber-left panel, not a browser dialog.
+- **Code block:** a panel inside a hairline with the fence's language set in the
+  corner as a tracked capital label on the raised tone. The syntax itself spends no
+  accent at all — the Red Flashlight Rule says content is never amber, and a string
+  literal is content — so code separates the way an engraved book separates it: body
+  ink for names and keywords, the secondary tone for literals, the hairline tone in
+  italic for comments, one bold weight for keywords. Plain text renders first and is
+  replaced when the grammar arrives, so nothing waits on a highlighter to be read.
+- **Callout:** a blockquote opening `[!NOTE]`. Kinds are told apart by label, mark
+  and the weight of the left rule — hairline for a note, full ink for a caution —
+  because the alternative is five hues in a system that has one.
+- **Diagram:** a `mermaid` fence, drawn with the product's own tokens rather than
+  the library's lavender defaults, framed like a plate. A diagram that will not
+  parse prints its parse error above its own source instead of vanishing.
 - **Not-executed notice:** an MDX document that defines components carries a hairline
   amber-left panel above the prose saying the components were not run. The component
   source is removed rather than printed as body copy.
