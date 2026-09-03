@@ -1,6 +1,7 @@
 import { type AtlasObject, radiusForMagnitude } from "@/lib/atlas";
+import type { Graph, GraphNode } from "@/lib/graph";
 
-import { PathLayer, ScatterplotLayer, TextLayer } from "@deck.gl/layers";
+import { LineLayer, PathLayer, ScatterplotLayer, TextLayer } from "@deck.gl/layers";
 
 /**
  * The plate, as deck.gl layers, in three dimensions.
@@ -124,55 +125,6 @@ export function levelPresence(level: number, focal: number | null): number {
     return Math.max(0.16, 1 - distance * 0.42);
 }
 
-export interface PlateGroup {
-    plate: number;
-    /** Shown on the chart. */
-    folder: string;
-    /** The folder on disk: what its hue and its depth are derived from. */
-    folderPath: string;
-    /** In catalogue order, which is the order the constellation is drawn in. */
-    objects: AtlasObject[];
-    cx: number;
-    cy: number;
-    minY: number;
-    maxY: number;
-}
-
-/** Objects grouped by plate, largest plate first, with the geometry a label needs. */
-export function byPlate(objects: AtlasObject[]): PlateGroup[] {
-    const groups = new Map<number, AtlasObject[]>();
-    for (const object of objects) {
-        const group = groups.get(object.plate);
-        if (group) group.push(object);
-        else groups.set(object.plate, [object]);
-    }
-
-    return [...groups.values()]
-        .map(group => {
-            let sumX = 0;
-            let sumY = 0;
-            let minY = 1;
-            let maxY = 0;
-            for (const object of group) {
-                sumX += object.x;
-                sumY += object.y;
-                minY = Math.min(minY, object.y);
-                maxY = Math.max(maxY, object.y);
-            }
-            return {
-                plate: group[0].plate,
-                folder: group[0].folder,
-                folderPath: group[0].folderPath,
-                objects: [...group].sort((first, second) => first.index - second.index),
-                cx: sumX / group.length,
-                cy: sumY / group.length,
-                minY,
-                maxY,
-            };
-        })
-        .sort((first, second) => second.objects.length - first.objects.length);
-}
-
 export interface Field {
     width: number;
     height: number;
@@ -186,11 +138,11 @@ export interface Field {
     focalLevel: number | null;
 }
 
-/** Normalised plate coordinates plus the folder's own depth. */
-const world = (field: Field, object: AtlasObject): [number, number, number] => [
-    object.x * field.width,
-    object.y * field.height,
-    depthOf(object.folderPath),
+/** A graph node in world units, at the depth its folder sits. */
+const place = (field: Field, node: GraphNode): [number, number, number] => [
+    node.x * field.width,
+    node.y * field.height,
+    depthOf(node.folderPath),
 ];
 
 const flat = (field: Field, nx: number, ny: number, z = 0): [number, number, number] => [
@@ -271,29 +223,75 @@ export function grid(field: Field, deepest: number) {
 }
 
 /**
- * Folder constellations: a path through each plate's objects in catalogue order,
- * which is the folder's own ordering made visible, drawn in the folder's hue.
+ * The edges, and the one thing they mean: **is inside**.
  *
- * The plate under the eye is drawn at full strength — the lines were always
- * there, and hovering asks which of these belong together.
+ * What was here before drew a line through each folder's documents in catalogue
+ * order — alphabetical, so the line said nothing and crossed the whole plate to
+ * say it. An edge now joins a document to the folder holding it, and a folder to
+ * its parent. The clusters that appear are the collection's real shape.
  */
-export function constellations(field: Field, groups: PlateGroup[], eyedPlate: number | null) {
-    const drawn = groups.filter(group => group.objects.length > 1);
+export function containment(field: Field, graph: Graph, eyedFolder: string | null) {
+    const at = new Map(graph.nodes.map(node => [node.id, node]));
+    const drawn = graph.edges
+        .map(edge => {
+            const source = at.get(edge.source);
+            const target = at.get(edge.target);
+            return source && target ? { source, target } : null;
+        })
+        .filter((edge): edge is { source: GraphNode; target: GraphNode } => edge !== null);
 
-    return new PathLayer<PlateGroup>({
-        id: "constellations",
+    return new LineLayer<(typeof drawn)[number]>({
+        id: "containment",
         data: drawn,
         pickable: false,
         widthUnits: "pixels",
-        getWidth: group => (group.plate === eyedPlate ? 1.5 : 1),
-        getPath: group => group.objects.map(object => world(field, object)),
-        getColor: group =>
+        getWidth: edge => (edge.source.folderPath === eyedFolder || edge.target.folderPath === eyedFolder ? 1.4 : 0.8),
+        getSourcePosition: edge => place(field, edge.source),
+        getTargetPosition: edge => place(field, edge.target),
+        // An edge is drawn in the hue of what it holds, so a branch reads as one
+        // family of colour rather than as grey wiring.
+        getColor: edge =>
             colourOf(
                 field.ink,
-                group.folder,
-                (group.plate === eyedPlate ? 0.85 : 0.3) * levelPresence(levelOf(group.folderPath), field.focalLevel)
+                edge.target.folderPath,
+                (edge.source.folderPath === eyedFolder || edge.target.folderPath === eyedFolder ? 0.7 : 0.22) *
+                    levelPresence(levelOf(edge.target.folderPath), field.focalLevel)
             ),
-        updateTriggers: { getColor: [eyedPlate, field.focalLevel], getWidth: eyedPlate },
+        updateTriggers: { getColor: [eyedFolder, field.focalLevel], getWidth: eyedFolder },
+    });
+}
+
+/**
+ * The folders themselves: the hubs the documents hang from.
+ *
+ * Drawn hollow, so a folder reads as a place rather than as a bigger document,
+ * and sized by how many documents sit at or under it — a folder's weight, which
+ * is a real count and not a decoration.
+ */
+export function hubs(field: Field, graph: Graph, eyedFolder: string | null) {
+    const folders = graph.nodes.filter(node => node.kind === "folder");
+
+    return new ScatterplotLayer<GraphNode>({
+        id: "hubs",
+        data: folders,
+        pickable: true,
+        billboard: true,
+        radiusUnits: "common",
+        radiusMinPixels: 3,
+        radiusMaxPixels: 40,
+        lineWidthUnits: "pixels",
+        filled: false,
+        stroked: true,
+        getPosition: node => place(field, node),
+        getRadius: node => 4 + Math.min(14, Math.sqrt(node.weight) * 2.4),
+        getLineWidth: node => (node.folderPath === eyedFolder ? 1.6 : 1),
+        getLineColor: node =>
+            colourOf(
+                field.ink,
+                node.folderPath,
+                (node.folderPath === eyedFolder ? 1 : 0.75) * levelPresence(levelOf(node.folderPath), field.focalLevel)
+            ),
+        updateTriggers: { getLineColor: [eyedFolder, field.focalLevel], getLineWidth: eyedFolder },
     });
 }
 
@@ -302,10 +300,10 @@ export function constellations(field: Field, groups: PlateGroup[], eyedPlate: nu
  * A wide, nearly transparent billboard rather than a radial gradient, which is
  * what a GPU draws for free.
  */
-export function blooms(field: Field, objects: AtlasObject[], activePath: string | null) {
-    const bright = objects.filter(object => object.magnitude <= 2);
+export function blooms(field: Field, documents: GraphNode[], activePath: string | null) {
+    const bright = documents.filter(node => (node.object?.magnitude ?? 5) <= 2);
 
-    return new ScatterplotLayer<AtlasObject>({
+    return new ScatterplotLayer<GraphNode>({
         id: "blooms",
         data: bright,
         pickable: false,
@@ -313,15 +311,16 @@ export function blooms(field: Field, objects: AtlasObject[], activePath: string 
         radiusUnits: "common",
         radiusMinPixels: 2,
         radiusMaxPixels: 140,
-        getPosition: object => world(field, object),
-        getRadius: object => radiusForMagnitude(object.magnitude) * 3.4,
-        getFillColor: object =>
-            object.path === activePath
+        getPosition: node => place(field, node),
+        getRadius: node => radiusForMagnitude(node.object?.magnitude ?? 5) * 3.4,
+        getFillColor: node =>
+            node.id === activePath
                 ? rgba(field.ink.mark, 0.22)
                 : colourOf(
                       field.ink,
-                      object.folder,
-                      (0.16 - object.magnitude * 0.035) * levelPresence(levelOf(object.folderPath), field.focalLevel)
+                      node.folderPath,
+                      (0.16 - (node.object?.magnitude ?? 5) * 0.035) *
+                          levelPresence(levelOf(node.folderPath), field.focalLevel)
                   ),
         updateTriggers: { getFillColor: [activePath, field.focalLevel] },
     });
@@ -330,16 +329,16 @@ export function blooms(field: Field, objects: AtlasObject[], activePath: string 
 /** The catalogued objects themselves, each in its folder's hue. */
 export function catalogue(
     field: Field,
-    objects: AtlasObject[],
+    documents: GraphNode[],
     activePath: string | null,
     handlers: {
         onHover: (object: AtlasObject | null) => void;
         onSelect?: (object: AtlasObject) => void;
     }
 ) {
-    return new ScatterplotLayer<AtlasObject>({
+    return new ScatterplotLayer<GraphNode>({
         id: "catalogue",
-        data: objects,
+        data: documents,
         // Picking happens on the GPU, so hovering a point costs one read of one
         // pixel however many thousand are plotted.
         pickable: true,
@@ -349,32 +348,32 @@ export function catalogue(
         radiusMaxPixels: 60,
         lineWidthUnits: "pixels",
         stroked: true,
-        getPosition: object => world(field, object),
+        getPosition: node => place(field, node),
         // Size is the measurement and colour is the identity: diameter stays the
         // file's own size on the fixed ramp whatever hue it is drawn in.
-        getRadius: object => radiusForMagnitude(object.magnitude),
-        getFillColor: object =>
-            object.path === activePath
+        getRadius: node => radiusForMagnitude(node.object?.magnitude ?? 5),
+        getFillColor: node =>
+            node.id === activePath
                 ? rgba(field.ink.mark)
-                : colourOf(field.ink, object.folderPath, levelPresence(levelOf(object.folderPath), field.focalLevel)),
+                : colourOf(field.ink, node.folderPath, levelPresence(levelOf(node.folderPath), field.focalLevel)),
         // A document modified in the last seven days wears a ring: the atlas
         // convention for a variable object.
-        getLineWidth: object => (object.variable || object.path === activePath ? 1 : 0),
+        getLineWidth: node => (node.object?.variable || node.id === activePath ? 1 : 0),
         getLineColor: rgba(field.ink.mark, 0.85),
-        onHover: info => handlers.onHover((info.object as AtlasObject | undefined) ?? null),
+        onHover: info => handlers.onHover((info.object as GraphNode | undefined)?.object ?? null),
         onClick: info => {
-            const object = info.object as AtlasObject | undefined;
-            if (object) handlers.onSelect?.(object);
+            const node = info.object as GraphNode | undefined;
+            if (node?.object) handlers.onSelect?.(node.object);
         },
         updateTriggers: { getFillColor: [activePath, field.focalLevel], getLineWidth: activePath },
     });
 }
 
 /** The reticle: exactly one per screen, on the object under the eye. */
-export function reticle(field: Field, object: AtlasObject | null) {
-    return new ScatterplotLayer<AtlasObject>({
+export function reticle(field: Field, node: GraphNode | null) {
+    return new ScatterplotLayer<GraphNode>({
         id: "reticle",
-        data: object ? [object] : [],
+        data: node ? [node] : [],
         pickable: false,
         billboard: true,
         radiusUnits: "common",
@@ -383,23 +382,23 @@ export function reticle(field: Field, object: AtlasObject | null) {
         lineWidthUnits: "pixels",
         filled: false,
         stroked: true,
-        getPosition: eyed => world(field, eyed),
-        getRadius: eyed => radiusForMagnitude(eyed.magnitude) + 7,
+        getPosition: eyed => place(field, eyed),
+        getRadius: eyed => radiusForMagnitude(eyed.object?.magnitude ?? 5) + 7,
         getLineWidth: 1,
         getLineColor: rgba(field.ink.mark),
     });
 }
 
 /** The object under the eye is named on the chart, not only in the rail. */
-export function eyedName(field: Field, object: AtlasObject | null) {
-    return new TextLayer<AtlasObject>({
+export function eyedName(field: Field, node: GraphNode | null) {
+    return new TextLayer<GraphNode>({
         id: "eyed-name",
-        data: object ? [object] : [],
+        data: node ? [node] : [],
         pickable: false,
         billboard: true,
-        getText: eyed => eyed.name,
-        getPosition: eyed => world(field, eyed),
-        getPixelOffset: eyed => [radiusForMagnitude(eyed.magnitude) + 14, 0],
+        getText: eyed => eyed.label,
+        getPosition: eyed => place(field, eyed),
+        getPixelOffset: eyed => [radiusForMagnitude(eyed.object?.magnitude ?? 5) + 14, 0],
         getSize: 12,
         sizeUnits: "pixels",
         getColor: rgba(field.ink.mark),
@@ -420,23 +419,45 @@ export function eyedName(field: Field, object: AtlasObject | null) {
  */
 export const NAMED_PLATES = 32;
 
-/** Constellation names, in their own hue, floating over their objects. */
-export function plateNames(field: Field, groups: PlateGroup[], names: Map<number, string>) {
-    // Already largest-first, so the first thirty-two are the ones worth naming.
-    const marks = groups
-        .slice(0, NAMED_PLATES)
-        .map(group => {
-            const name = names.get(group.plate);
-            if (!name) return null;
-            return {
-                text: (name.split("/").pop() ?? name).toUpperCase().split("").join(" "),
-                position: flat(field, group.cx, group.minY, depthOf(group.folderPath)),
-                folderPath: group.folderPath,
-            };
-        })
-        .filter(
-            (mark): mark is { text: string; position: [number, number, number]; folderPath: string } => mark !== null
-        );
+interface Box {
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+}
+
+const overlaps = (one: Box, other: Box) =>
+    one.left < other.right && one.right > other.left && one.top < other.bottom && one.bottom > other.top;
+
+/**
+ * Folder names, in their own hue, sitting on the hub they name.
+ *
+ * deck.gl will happily draw one label through another, and the dense middle of a
+ * settled graph is exactly where the heaviest folders land — so a name is
+ * dropped when its box would cross one already placed. An unreadable pile of
+ * lettering is worse than a name left off; the catalogue has all of them anyway.
+ */
+export function plateNames(field: Field, graph: Graph) {
+    const placed: Box[] = [];
+    const marks: { text: string; position: [number, number, number]; folderPath: string }[] = [];
+
+    for (const node of [...graph.nodes]
+        .filter(candidate => candidate.kind === "folder")
+        .sort((first, second) => second.weight - first.weight)) {
+        if (marks.length >= NAMED_PLATES) break;
+
+        const text = node.label.toUpperCase().split("").join(" ");
+        // 5px a character at 9px tracked capitals is close enough to reserve by.
+        const half = text.length * 2.6;
+        const centreX = node.x * field.width;
+        const centreY = node.y * field.height;
+        const box = { left: centreX - half, right: centreX + half, top: centreY - 22, bottom: centreY - 8 };
+
+        if (placed.some(other => overlaps(box, other))) continue;
+
+        placed.push(box);
+        marks.push({ text, position: place(field, node), folderPath: node.folderPath });
+    }
 
     return new TextLayer<(typeof marks)[number]>({
         id: "plate-names",

@@ -164,6 +164,15 @@ turning the collection shows how deeply it nests. Coming in past the overview, t
 the eye is not at recede rather than vanish — the depth is something moved through, not a
 picture. Everything below still holds; where it does not, the amendment says so._
 
+_The same day, the chart's **layout** was replaced. Documents used to sit on a ring —
+`0.5 + cos(angle) * 0.28` — with a line drawn through each folder's documents in
+catalogue order. That order is alphabetical, so the lines meant nothing and crossed the
+whole plate to say it, and on a wide screen the ring left the middle empty. The
+collection is laid out as the graph it already is: a folder is a hub, a document hangs
+from the folder holding it, a folder hangs from its parent, and the content folder is
+the root that makes it one tree instead of six drifting islands. **Every edge means one
+thing — is inside.** The clusters are the collection's real shape._
+
 A documentation set is a sky: a fixed field of objects that someone has to find their
 way around in the dark. MDXViewer charts it. The collection is drawn as a chart with a
 ruled graticule, every document is a catalogued object with a designation and a
@@ -317,8 +326,8 @@ corners — the marks a plate needs to be printed in register.
 - **Shell:** a fixed 15rem plate index on the left (the sidebar), a header band 3.5rem
   tall carrying the wordmark, four surface links, the search trigger and the theme control,
   and the working field filling the rest. The field scrolls; the index and band do not.
-- **Naming in place:** a constellation is labelled on the chart itself, in tracked
-  capitals above its objects, the way an atlas plate names what it shows. Lists carry
+- **Naming in place:** a folder is labelled on its own hub, in tracked capitals, the way
+  an atlas plate names what it shows. Lists carry
   the same information as a leading column of plate and object numbers. Both replace
   breadcrumbs as the primary answer to "where am I"; a separate ruled gutter of numbers
   beside the chart was tried and cut — the marks collided and repeated what the labels
@@ -401,6 +410,12 @@ element.
 - **Magnitude dot:** a filled circle on the six-step ramp, Stardust in the dark
   rendition and Night Sky in the light one. A document modified in the last 7 days wears
   a 1px amber ring — the atlas convention for a variable object.
+- **Hub:** a folder, drawn hollow so it reads as a place rather than as a bigger
+  document, in its own hue, sized by how many documents sit at or under it. Its name
+  rides on it in tracked capitals, and a name is dropped rather than drawn through
+  another — the catalogue holds all of them anyway.
+- **Edge:** a hairline in the hue of what it holds, so a branch reads as one family of
+  colour rather than as grey wiring. It brightens with the folder under the eye.
 - **Reticle:** the active object's mark. A 1px amber circle, billboarded so it faces the
   reader at any camera angle. Exactly one reticle per screen.
 - **Plate scale:** four square hairline controls on the chart's corner — in, out, turn,

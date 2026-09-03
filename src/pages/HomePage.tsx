@@ -53,19 +53,6 @@ function MagnitudeKey({ objects }: { objects: AtlasObject[] }) {
 const inFolder = (object: AtlasObject, folder: string): boolean =>
     object.folderPath === folder || object.folderPath.startsWith(`${folder}/`);
 
-/** The region of the plate a set of objects occupies, for the chart to frame. */
-function regionOf(objects: AtlasObject[]) {
-    if (objects.length === 0) return null;
-    const xs = objects.map(object => object.x);
-    const ys = objects.map(object => object.y);
-    return {
-        minX: Math.min(...xs),
-        maxX: Math.max(...xs),
-        minY: Math.min(...ys),
-        maxY: Math.max(...ys),
-    };
-}
-
 export function HomePage() {
     const { data: files, isLoading, error } = useFiles();
     const navigate = useNavigate();
@@ -79,9 +66,7 @@ export function HomePage() {
     // depending on what else was on screen. A constellation keeps its place.
     const all = useMemo(() => chartCollection(files ?? []), [files]);
     const objects = useMemo(() => (folder ? all.filter(object => inFolder(object, folder)) : all), [all, folder]);
-    const region = useMemo(() => (folder ? regionOf(objects) : null), [folder, objects]);
     const plates = useMemo(() => platesOf(all), [all]);
-    const plateNames = useMemo(() => new Map(plates.map(plate => [plate.plate, plate.folder])), [plates]);
     const recent = useMemo(
         () =>
             [...objects]
@@ -159,11 +144,9 @@ export function HomePage() {
                     <div className="flex min-h-[20rem] flex-1 px-5 pt-4 pb-6 sm:px-8 xl:min-h-0">
                         <SkyChart
                             objects={objects}
-                            plateNames={plateNames}
                             activePath={eyed?.path ?? null}
                             onHover={setEyed}
                             onSelect={object => navigate(`/document/${object.path}`)}
-                            focus={region}
                             className="relative flex-1"
                         />
                     </div>

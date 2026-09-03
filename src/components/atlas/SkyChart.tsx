@@ -4,19 +4,20 @@ import { Minus, Plus, RotateCcw, Scan } from "lucide-react";
 
 import {
     blooms,
-    byPlate,
     catalogue,
-    constellations,
+    containment,
     DEPTH_STEP,
     depthOf,
     eyedName,
     fieldStars,
     grid,
+    hubs,
     type Ink,
     plateNames,
     reticle,
 } from "@/components/atlas/skyLayers";
 import type { AtlasObject } from "@/lib/atlas";
+import { buildGraph } from "@/lib/graph";
 
 import { LinearInterpolator, OrbitView, type OrbitViewState } from "@deck.gl/core";
 import DeckGL from "@deck.gl/react";
@@ -25,16 +26,8 @@ interface SkyChartProps {
     objects: AtlasObject[];
     /** Path of the object currently under the eye, if any. */
     activePath?: string | null;
-    /** Folder name per plate number, drawn over its constellation. */
-    plateNames?: Map<number, string>;
     onHover?: (object: AtlasObject | null) => void;
     onSelect?: (object: AtlasObject) => void;
-    /**
-     * A region of the collection to bring the eye to. Set when it is narrowed to
-     * one folder: a constellation keeps its real place, so without this the
-     * reader would have to go looking for it.
-     */
-    focus?: { minX: number; maxX: number; minY: number; maxY: number } | null;
     className?: string;
 }
 
@@ -94,19 +87,11 @@ function readInk(element: HTMLElement): Ink {
  * one hue per folder, and **size stays the measurement** — diameter is file size
  * on the fixed magnitude ramp, in pixel units, so no camera angle can inflate it.
  */
-export function SkyChart({
-    objects,
-    activePath,
-    plateNames: names,
-    onHover,
-    onSelect,
-    focus,
-    className,
-}: SkyChartProps) {
+export function SkyChart({ objects, activePath, onHover, onSelect, className }: SkyChartProps) {
     const frameRef = useRef<HTMLDivElement>(null);
     const [size, setSize] = useState({ width: 0, height: 0 });
     const [ink, setInk] = useState<Ink | null>(null);
-    const [eyedPlate, setEyedPlate] = useState<number | null>(null);
+    const [eyedFolder, setEyedFolder] = useState<string | null>(null);
 
     /**
      * The view deck.gl is *given*, which changes only when something asks it to:
@@ -156,8 +141,16 @@ export function SkyChart({
         () => (ink && size.width > 0 ? { width: size.width, height: size.height, ink, focalLevel } : null),
         [ink, size.height, size.width, focalLevel]
     );
-    const groups = useMemo(() => byPlate(objects), [objects]);
-    const eyed = useMemo(() => objects.find(object => object.path === activePath) ?? null, [objects, activePath]);
+    /**
+     * The collection, settled. Laid out once per set of objects: a force layout is
+     * a property of the collection, not something to watch happen.
+     */
+    const graph = useMemo(
+        () => buildGraph(objects, size.height > 0 ? size.width / size.height : 1),
+        [objects, size.width, size.height]
+    );
+    const documents = useMemo(() => graph.nodes.filter(node => node.kind === "document"), [graph]);
+    const eyed = useMemo(() => documents.find(node => node.id === activePath) ?? null, [documents, activePath]);
     const deepest = useMemo(
         () => objects.reduce((least, object) => Math.min(least, depthOf(object.folder)), 0),
         [objects]
@@ -176,38 +169,22 @@ export function SkyChart({
     );
 
     /**
-     * Fly to a region. deck.gl interpolates the view itself, so the motion that
-     * would otherwise be a hand-written easing loop is a property of the state.
+     * Settle on the collection whenever the set changes.
+     *
+     * There is no region to fly to any more: narrowing to a folder re-runs the
+     * layout on just those documents, and a settled graph is normalised to fill
+     * the plate. The framing is the layout's, so this only has to bring the eye
+     * back to it.
      */
+    const settled = useMemo(() => graph.nodes.map(node => node.id).join("|"), [graph]);
     useEffect(() => {
-        if (size.width === 0) return;
-        if (!focus) {
-            setGiven(home(true));
-            return;
-        }
-
-        const spanX = Math.max(focus.maxX - focus.minX, 0.06) * size.width;
-        const spanY = Math.max(focus.maxY - focus.minY, 0.06) * size.height;
-        const fit = Math.min(size.width / spanX, size.height / spanY) * 0.6;
-
-        setGiven({
-            target: [
-                ((focus.minX + focus.maxX) / 2) * size.width,
-                ((focus.minY + focus.maxY) / 2) * size.height,
-                deepest / 2,
-            ],
-            zoom: Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.log2(fit))),
-            rotationX: REST_TILT,
-            rotationOrbit: 0,
-            transitionDuration: FLIGHT_MS,
-            transitionInterpolator: FLIGHT,
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- the box's values, not its identity
-    }, [focus?.minX, focus?.maxX, focus?.minY, focus?.maxY, home, size.width, size.height, deepest]);
+        if (size.width > 0) setGiven(home(true));
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- the set's identity
+    }, [settled, size.width, size.height]);
 
     const eyeOn = useCallback(
         (object: AtlasObject | null) => {
-            setEyedPlate(object?.plate ?? null);
+            setEyedFolder(object?.folderPath ?? null);
             onHover?.(object);
         },
         [onHover]
@@ -218,14 +195,15 @@ export function SkyChart({
         return [
             fieldStars(field),
             grid(field, deepest),
-            constellations(field, groups, eyedPlate),
-            ...(names ? [plateNames(field, groups, names)] : []),
-            blooms(field, objects, activePath ?? null),
-            catalogue(field, objects, activePath ?? null, { onHover: eyeOn, onSelect }),
+            containment(field, graph, eyedFolder),
+            hubs(field, graph, eyedFolder),
+            plateNames(field, graph),
+            blooms(field, documents, activePath ?? null),
+            catalogue(field, documents, activePath ?? null, { onHover: eyeOn, onSelect }),
             reticle(field, eyed),
             eyedName(field, eyed),
         ];
-    }, [field, groups, eyedPlate, names, objects, activePath, eyeOn, onSelect, eyed, deepest]);
+    }, [field, graph, documents, eyedFolder, activePath, eyeOn, onSelect, eyed, deepest]);
 
     /**
      * Everything a move reports.
