@@ -20,6 +20,7 @@ what the product is and is not.
 |               | **Edit** opens the source beside a live preview and writes the file. |
 | `/statistics` | The survey. Measurements taken from the content folder.              |
 | `/trash`      | Deleted documents, with where they came from. Restore or purge.      |
+|               | **⌘K** searches every document by name and by what is written inside. |
 
 ## Getting started
 

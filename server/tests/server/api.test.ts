@@ -399,3 +399,76 @@ describe("compiling MDX is the operator's decision", () => {
         expect(response.body.data.mdxExecute).toBe(false);
     });
 });
+
+describe("searching the collection", () => {
+    // `q` is the query parameter's real name, so it goes in the URL rather than
+    // through an options object where it reads as a one-letter identifier.
+    const search = (text: string) =>
+        request(app)
+            .get(`/api/search?q=${encodeURIComponent(text)}`)
+            .expect(200)
+            .then(response => response.body.data);
+
+    beforeAll(async () => {
+        await fs.writeFile(
+            path.join(contentDir, "docs", "haystack.md"),
+            ["# Haystack", "", "A first mention of needle here.", "", "And a second needle further down.", ""].join(
+                "\n"
+            )
+        );
+        await fs.writeFile(path.join(contentDir, "docs", "needle-by-name.md"), "# Nothing relevant inside\n");
+        await fs.writeFile(path.join(contentDir, "docs", "literal.md"), "Regex characters like .* and [!NOTE] here.\n");
+    });
+
+    it("finds a document by what is written inside it", async () => {
+        const { hits } = await search("second needle");
+        const hit = hits.find((entry: { path: string }) => entry.path === "docs/haystack.md");
+
+        expect(hit).toBeTruthy();
+        expect(hit.line).toBe(5);
+        expect(hit.excerpt).toContain("second needle");
+        // The client marks the match rather than searching the excerpt again.
+        expect(hit.excerpt.slice(hit.at, hit.at + hit.length)).toBe("second needle");
+    });
+
+    it("puts a name match above a body match", async () => {
+        const { hits } = await search("needle");
+        expect(hits[0].path).toBe("docs/needle-by-name.md");
+        expect(hits[0].inName).toBe(true);
+
+        const body = hits.find((entry: { path: string }) => entry.path === "docs/haystack.md");
+        expect(body.inName).toBe(false);
+        expect(body.more).toBe(1); // two lines mention it; one is the excerpt
+    });
+
+    it("ignores case", async () => {
+        const { hits } = await search("HAYSTACK");
+        expect(hits.some((entry: { path: string }) => entry.path === "docs/haystack.md")).toBe(true);
+    });
+
+    it("treats the query as text, not a pattern", async () => {
+        // `.*` compiled as a regular expression would match every document.
+        const wildcard = await search(".*");
+        expect(wildcard.hits.map((entry: { path: string }) => entry.path)).toEqual(["docs/literal.md"]);
+
+        const bracketed = await search("[!NOTE]");
+        expect(bracketed.hits.map((entry: { path: string }) => entry.path)).toEqual(["docs/literal.md"]);
+    });
+
+    it("answers an empty query with nothing, not an error", async () => {
+        expect(await search("")).toEqual({ query: "", hits: [] });
+        expect(await search("   ")).toEqual({ query: "", hits: [] });
+    });
+
+    it("refuses a query long enough to be a mistake", async () => {
+        await request(app)
+            .get(`/api/search?q=${"x".repeat(201)}`)
+            .expect(400);
+    });
+
+    it("never reaches outside the content folder", async () => {
+        // The marker file one level up says "secret" and must never be a result.
+        const { hits } = await search("secret");
+        expect(hits).toEqual([]);
+    });
+});

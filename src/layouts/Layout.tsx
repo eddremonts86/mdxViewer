@@ -4,7 +4,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { Menu } from "lucide-react";
 
 import { CompassStar } from "@/components/atlas";
-import { Sidebar } from "@/components/navigation";
+import { CommandPalette, Sidebar } from "@/components/navigation";
 import { ModeToggle } from "@/components/theme/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
@@ -74,6 +74,7 @@ export function Layout() {
                 </nav>
 
                 <div className="ml-auto flex shrink-0 items-center gap-1">
+                    <CommandPalette />
                     <ModeToggle />
                 </div>
             </header>

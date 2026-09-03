@@ -65,7 +65,8 @@ Two mechanisms, both confirmed as the product's reason to exist:
   preview beside it. A save is refused with 409 when the file changed on disk since it was
   opened, and the author is told rather than silently overwriting the other edit.
 
-**Also present:** document viewer with table of contents, filename search, folder tree navigation,
+**Also present:** document viewer with table of contents, full-text search over every document's
+contents (⌘K), filename filtering in the plate index, folder tree navigation,
 light/dark theme, GFM tables, KaTeX math, syntax-highlighted code.
 
 **Technical constraints:** React 19, TypeScript strict, Vite 6, Tailwind CSS v4 (CSS-first tokens —
@@ -81,7 +82,6 @@ react-router-dom, Express 5 + multer on the API. Node 22 in CI.
 - MDX compilation with an untrusted content folder. A compiled document may not import, and
   gets a fixed component vocabulary plus whatever it defines itself, but its expressions do
   run. Nothing here sandboxes them.
-- Full-text search across document contents; search matches filenames only.
 
 ## Brand Commitments
 

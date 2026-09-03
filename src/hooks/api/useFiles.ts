@@ -21,6 +21,7 @@ export const fileKeys = {
     content: (path: string) => [...fileKeys.all, "content", path] as const,
     trash: () => ["trash"] as const,
     health: () => ["health"] as const,
+    search: (query: string) => ["search", query] as const,
 } as const;
 
 /**
@@ -57,6 +58,23 @@ export function useFileContent(filePath: string, enabled = true) {
             }
             return failureCount < 2;
         },
+    });
+}
+
+/**
+ * Documents matching `query`.
+ *
+ * Results are kept for the session: a reader who types "trash", backspaces and
+ * types it again is asking the same question, and the answer only changes when
+ * the folder does — which every mutation here already invalidates.
+ */
+export function useSearch(query: string) {
+    return useQuery({
+        queryKey: fileKeys.search(query),
+        queryFn: () => FileAPI.search(query),
+        enabled: query.trim().length > 0,
+        staleTime: 60 * 1000,
+        placeholderData: previous => previous,
     });
 }
 

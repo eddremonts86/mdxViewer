@@ -22,6 +22,7 @@ The file service. Every response is `{ success, data?, error?, message? }`.
 | `GET`    | `/api/health`                 | Liveness, plus the content path in use    |
 | `GET`    | `/api/statistics`             | Counts computed by walking the folder     |
 | `GET`    | `/api/files`                  | The whole tree: folders, files, sizes      |
+| `GET`    | `/api/search?q=`              | Documents matching by name or by contents  |
 | `GET`    | `/api/files/content?path=`    | One document, frontmatter split out        |
 | `POST`   | `/api/files/create`           | `{ name, type: "md" \| "mdx", path, content? }` |
 | `POST`   | `/api/folders/create`         | `{ name, path }`                          |
@@ -103,6 +104,21 @@ out of the tree, the chart and the survey.
 if something has since taken that name — restoring never overwrites. `DELETE /api/trash` is
 the only unrecoverable call in this service.
 
+### Searching
+
+`GET /api/search?q=` reads every document in the content folder and returns the ones
+whose name or body contains the query. Each hit carries the matching line, its number,
+how many further matches the document holds, the document's measured size, and **where
+the match sits inside the excerpt** — the client marks it from that rather than
+searching the excerpt again, so the two can never disagree.
+
+The query is compared as text, never compiled to a regular expression: a search for
+`.*` finds those two characters. A name match sorts above a body match.
+
+It is a scan, so it is linear in the size of the collection — milliseconds for 76
+documents. A collection large enough to feel that wants an index keyed by mtime,
+behind the same function in `server/utils/search.ts`.
+
 ## The client
 
 `src/api/fileAPI.ts` is the only client. Its base URL is relative, so the built
@@ -120,6 +136,7 @@ await FileAPI.uploadFiles(files, "docs"); // UploadResult
 await FileAPI.deleteItems(["docs/notes.md"]);
 await FileAPI.moveItem({ sourcePath: "docs/notes.md", targetPath: "" });
 await FileAPI.saveFileContent({ path: "docs/notes.md", content: raw, lastModified });
+await FileAPI.search("frontmatter"); // SearchHit[]
 await FileAPI.getTrash(); // TrashEntry[]
 await FileAPI.restoreFromTrash(entryId);
 await FileAPI.purgeTrash([entryId]); // permanent
@@ -127,7 +144,7 @@ await FileAPI.purgeTrash([entryId]); // permanent
 
 Types it exports: `FileItem`, `ApiResponse<T>`, `CreateFileRequest`,
 `CreateFolderRequest`, `SaveFileRequest`, `DocumentFrontmatter`, `DocumentContent`,
-`TrashEntry`, `UploadResult`.
+`SearchHit`, `ServiceHealth`, `TrashEntry`, `UploadResult`.
 
 `DocumentContent.raw` is the file as it sits on disk; `content` is the same file with its
 frontmatter split off. The editor works on `raw` so a save cannot reformat YAML the author
@@ -146,6 +163,8 @@ import {
     useCreateFolder,
     useDeleteFiles,
     useSaveFile,
+    useSearch,
+    useServiceHealth,
     useTrash,
     useRestoreFromTrash,
     usePurgeTrash,

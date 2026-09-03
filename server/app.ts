@@ -30,6 +30,7 @@ import {
     purgeTrashEntries,
     restoreTrashEntry,
     saveFileContent,
+    searchDocuments,
     uploadFiles,
 } from "./endpoints/index.js";
 import { resolveInsideContent, sanitizeUploadName } from "./utils/validation.js";
@@ -114,6 +115,10 @@ app.get("/api/statistics", (req, res) => {
 
 app.get("/api/files", (req, res) => {
     getFiles(req, res);
+});
+
+app.get("/api/search", (req, res) => {
+    searchDocuments(req, res);
 });
 
 app.get("/api/files/content", (req, res) => {

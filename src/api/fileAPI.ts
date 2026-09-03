@@ -57,6 +57,21 @@ export interface DocumentContent {
     lastModified?: string;
 }
 
+/** One document that matched a search, with the line that matched it. */
+export interface SearchHit {
+    path: string;
+    name: string;
+    line: number | null;
+    excerpt: string;
+    /** Where the query sits inside `excerpt`; the client marks it rather than searching again. */
+    at: number;
+    length: number;
+    more: number;
+    /** The document's real size in bytes, measured by the server that read it. */
+    size: number;
+    inName: boolean;
+}
+
 /** What GET /api/health reports about the running service. */
 export interface ServiceHealth {
     status: string;
@@ -161,6 +176,20 @@ class FileAPI {
         }
 
         return result.data!;
+    }
+
+    /**
+     * Find documents by name and by what is written inside them
+     */
+    static async search(query: string): Promise<SearchHit[]> {
+        const response = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`);
+        const result: ApiResponse<{ hits: SearchHit[] }> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Search failed: ${response.statusText}`);
+        }
+
+        return result.data?.hits ?? [];
     }
 
     /**

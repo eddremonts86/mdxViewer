@@ -231,6 +231,12 @@ where you are, what you selected, and what you are about to change — nothing e
 Document content, headings, and prose are never amber. Amber covers under 10% of any
 screen; its scarcity is what makes the reticle mean something.
 
+The one amber mark that lands on content is the search match, and it is the reticle
+case rather than an exception to it: the document is not emphasising itself, the
+instrument is showing what the observer asked for, the way the reticle sits over a
+star without belonging to it. Syntax highlighting is the case that looks similar and
+is not — a string literal is the document's own text, so code spends no accent at all.
+
 **The Two Renditions Rule.** Dark is emitted light; light is pressed ink. Each has its
 own accent (Star Amber / Oxide Red) and its own hairline weight. Never derive one
 rendition by inverting the other, and never let a color's only definition live inside a
@@ -380,6 +386,12 @@ element.
   count set in figures and the amber fill on the confirming action. Never a browser
   dialog. It says where the objects go, because a delete moves them to the trash; the
   one action that does not come back asks a second time, in place, on its own row.
+- **Command palette:** ⌘K over a washed field, anchored high rather than centred so
+  the results grow downward into space that was already empty. A result reads as the
+  object it is — magnitude dot from the file's real size, italic name, its plate in
+  tracked capitals — then the matching line with the query marked, and the line
+  number with a count of the further matches in that document. The field keeps focus
+  while the arrows move a drawn selection, so typing never stops.
 - **Trash row:** the deleted object as it was — magnitude dot, italic name — then the
   plate it fell out of, its size, the date it went, and the two actions. Restore is the
   hairline secondary; deleting for good only becomes an amber fill after the row has been

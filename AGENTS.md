@@ -81,6 +81,7 @@ src/components/ui/        shadcn primitives, re-cut for this world
 src/pages/                One file per surface
 src/api/fileAPI.ts        The only client for the file service
 server/utils/trash.ts     Deleted items: move out, list, restore, purge
+server/utils/search.ts    Full-text search over the content folder
 server/app.ts             Routes, middleware, uploads
 server/start.ts           Binds the port
 public/content/           The documentation this instance charts
@@ -153,6 +154,10 @@ the scar.
   with `lib: ES2022`; `tsconfig.test.json` includes `**/*.test.ts` with DOM. A
   server test importing a `src/` module that touches `document` compiled twice and
   failed in the project without DOM. Tests are excluded from the node project.
+- **A search query is text, not a pattern.** `searchContent` compares with
+  `indexOf`, never a compiled regular expression: a reader looking for `.*` or
+  `[!NOTE]` should find those characters, not match everything or hang on a
+  backtrack. There are tests for both.
 - **Empty files pass every check.** Three `scripts/js/*.js` files were 0 bytes and
   three `package.json` scripts ran them. `ls -la` before believing a script exists.
 
