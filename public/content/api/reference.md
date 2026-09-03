@@ -219,7 +219,7 @@ const objects = chartCollection(files); // AtlasObject[]
 | `chartCollection(files)`  | Objects with designation, magnitude, plate and chart position      |
 | `magnitudeFromSize(size)` | 0–5 on a log2 ramp anchored at 1 KiB; 32 KiB and over is 0         |
 | `formatMagnitude(size)`   | The ramp printed as an integer, or `—` for a 0-byte file           |
-| `platesOf(objects)`       | One entry per folder: count and where its constellation sits       |
+| `platesOf(objects)`       | One entry per folder: its count and its own hue                    |
 | `formatSize`, `formatEpoch` | Tabular figures for bytes and dates                             |
 
 An object's position is a pure function of its path, so the same document lands

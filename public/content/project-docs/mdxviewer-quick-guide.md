@@ -54,7 +54,7 @@ The MDX viewer is organized as follows:
 
 -   **Tree Navigation**: Intuitive sidebar for exploring documents
 -   **Dual Rendering**: `.md` and `.mdx` are both read; `.mdx` renders as Markdown because MDX is not compiled, and its component source is left out rather than printed
--   **The Chart**: The whole collection plotted by file size, folders drawn as constellations
+-   **The Chart**: The whole collection plotted as a graph — documents sized by file size, hanging from the folder that holds them
 -   **Printing**: A real print stylesheet. No PDF or HTML export
 -   **Themes**: Dark and light mode with smooth transitions
 

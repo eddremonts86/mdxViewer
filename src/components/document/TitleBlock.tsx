@@ -1,6 +1,8 @@
 import type { DocumentFrontmatter } from "@/api/fileAPI";
 import { DataGrid } from "@/components/atlas";
+import { useEffectiveTheme } from "@/hooks/useMarkdownTheme";
 import { formatEpoch, formatMagnitude, formatSize } from "@/lib/atlas";
+import { plateColour } from "@/lib/plateColour";
 import { asTags, asText, formatFrontmatterDate } from "@/utils/frontmatter";
 
 interface TitleBlockProps {
@@ -18,6 +20,7 @@ interface TitleBlockProps {
  * to be printed into the prose as a paragraph of YAML.
  */
 export function TitleBlock({ title, folder, type, size, modified, frontmatter }: TitleBlockProps) {
+    const rendition = useEffectiveTheme() === "dark" ? "dark" : "light";
     const description = asText(frontmatter.description);
     const author = asText(frontmatter.author);
     const rawDate = asText(frontmatter.date);
@@ -25,7 +28,14 @@ export function TitleBlock({ title, folder, type, size, modified, frontmatter }:
 
     return (
         <header className="border-rule mt-4 border-b pb-6">
-            <p className="text-mark-read figures text-[0.625rem] font-semibold tracking-[0.16em] uppercase">
+            <p className="text-mark-read figures flex items-center gap-2 text-[0.625rem] font-semibold tracking-[0.16em] uppercase">
+                {/* The folder's own hue, the same one it has on the chart, in the
+                    catalogue, in the survey and in the trash. */}
+                <span
+                    aria-hidden="true"
+                    className="inline-block h-1.5 w-1.5 shrink-0 rounded-full"
+                    style={{ background: plateColour(folder, rendition) }}
+                />
                 {folder || "root"} · {type.toUpperCase()}
             </p>
             <h1 className="text-ink mt-2 max-w-[22ch] font-serif text-[2.125rem] leading-[1.06] font-semibold tracking-tight text-balance sm:text-[2.5rem]">

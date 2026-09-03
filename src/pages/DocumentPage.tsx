@@ -113,7 +113,7 @@ export function DocumentPage() {
     }
 
     return (
-        <article className="flex flex-col xl:flex-row">
+        <article className="mx-auto flex w-full max-w-[90rem] flex-col xl:flex-row">
             <div className="min-w-0 flex-1 px-5 py-6 sm:px-8">
                 <PlateActions onEdit={raw === undefined ? undefined : () => setEditing(true)} />
 

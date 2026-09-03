@@ -7,10 +7,12 @@ import { EmptyPlate, MagnitudeDot, PlateLabel } from "@/components/atlas";
 import { DocumentLoader } from "@/components/document";
 import { Button } from "@/components/ui/button";
 import { usePurgeTrash, useRestoreFromTrash, useTrash } from "@/hooks/api/useFiles";
+import { useEffectiveTheme } from "@/hooks/useMarkdownTheme";
 import { formatEpoch, formatSize, magnitudeFromSize } from "@/lib/atlas";
+import { plateColour } from "@/lib/plateColour";
 
 /** A deleted document reads as the object it was, plus where it fell out of. */
-function TrashRow({ entry }: { entry: TrashEntry }) {
+function TrashRow({ entry, rendition }: { entry: TrashEntry; rendition: "dark" | "light" }) {
     const restore = useRestoreFromTrash();
     const purge = usePurgeTrash();
     const [confirmingPurge, setConfirmingPurge] = useState(false);
@@ -26,7 +28,14 @@ function TrashRow({ entry }: { entry: TrashEntry }) {
 
                 <span className="text-ink min-w-0 flex-1 font-serif text-[0.9375rem] italic">{entry.name}</span>
 
-                <span className="text-ink-dim figures shrink-0 text-[0.6875rem] tracking-[0.06em]">
+                {/* The folder it came from, in the hue that folder has everywhere
+                    else. A thrown-away document still belongs somewhere. */}
+                <span className="text-ink-dim figures flex shrink-0 items-center gap-2 text-[0.6875rem] tracking-[0.06em]">
+                    <span
+                        aria-hidden="true"
+                        className="inline-block h-1.5 w-1.5 rounded-full"
+                        style={{ background: plateColour(folder, rendition) }}
+                    />
                     {folder === "" ? "ROOT" : folder.toUpperCase()}
                 </span>
                 <span className="text-ink-dim figures w-16 shrink-0 text-right text-[0.75rem]">
@@ -91,6 +100,7 @@ function TrashRow({ entry }: { entry: TrashEntry }) {
  */
 export function TrashPage() {
     const { data: entries, isLoading, error } = useTrash();
+    const rendition = useEffectiveTheme() === "dark" ? "dark" : "light";
 
     if (isLoading) return <DocumentLoader message="Reading the trash…" />;
 
@@ -117,17 +127,17 @@ export function TrashPage() {
     }
 
     return (
-        <section className="px-5 py-6 sm:px-8">
+        <section className="mx-auto w-full max-w-[72rem] px-5 py-6 sm:px-8">
             <PlateLabel reading={`${entries.length}`}>Trash</PlateLabel>
 
-            <p className="text-ink-dim mt-3 max-w-[60ch] text-[0.8125rem] leading-relaxed">
+            <p className="text-ink-dim mt-3 max-w-[68ch] text-[0.8125rem] leading-relaxed">
                 Deleted documents wait outside the content folder, so the chart and the survey no longer count them.
                 Restoring puts one back at the path it came from — and refuses if something has since taken that name.
             </p>
 
             <ul className="mt-6">
                 {entries.map(entry => (
-                    <TrashRow key={entry.id} entry={entry} />
+                    <TrashRow key={entry.id} entry={entry} rendition={rendition} />
                 ))}
             </ul>
         </section>
