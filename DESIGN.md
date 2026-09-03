@@ -208,7 +208,7 @@ share an ink.
   than emitted light. Reads 5.45:1 on chart paper, where Star Amber would fail at 2.94:1.
 - **Glow Amber** (#FFB36B): the amber that carries small text in the dark rendition —
   tracked capital labels, figure keys, link text. 10.74:1 on the night ground. Use it
-  wherever amber must be *read* rather than *noticed*.
+  wherever amber must be _read_ rather than _noticed_.
 
 ### Neutral
 
@@ -295,6 +295,12 @@ corners — the marks a plate needs to be printed in register.
   breadcrumbs as the primary answer to "where am I"; a separate ruled gutter of numbers
   beside the chart was tried and cut — the marks collided and repeated what the labels
   already said.
+- **The chart surface fits the viewport.** From 1280px up, the chart takes every pixel
+  the observer's rail and the register band do not need, the rail scrolls inside itself,
+  and the register stays in view without scrolling the page. Capping the chart's height
+  instead was tried and cut: the row is as tall as the rail's content, so a cap left dead
+  space below the chart — 372px of it on a 1181px viewport. Below 1280px the surface
+  stacks and the page scrolls normally, with the chart holding a 20rem floor.
 - **Rhythm:** the spacing scale is 2/4/8/16/24/40/64. One rhythm throughout, with more
   space above a heading than below it (24 above, 8 below).
 - **Measure:** interface text is unconstrained; document prose is capped at 66–72ch.

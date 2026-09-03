@@ -93,10 +93,10 @@ export function HomePage() {
     const eyedOrBrightest = eyed ?? objects[0];
 
     return (
-        <div className="flex min-h-full flex-col">
-            <div className="flex flex-1 flex-col xl:flex-row">
+        <div className="flex flex-col xl:h-full xl:min-h-0">
+            <div className="flex flex-1 flex-col xl:min-h-0 xl:flex-row">
                 {/* The chart field: the whole collection before any single document. */}
-                <section className="flex min-w-0 flex-1 flex-col">
+                <section className="flex min-w-0 flex-1 flex-col xl:min-h-0">
                     <header className="flex flex-wrap items-baseline gap-x-5 gap-y-1 px-5 pt-6 sm:px-8">
                         <h1 className="font-serif text-[1.75rem] leading-none font-semibold tracking-tight sm:text-[2.125rem]">
                             The Collection
@@ -113,7 +113,7 @@ export function HomePage() {
                         Skip the chart
                     </a>
 
-                    <div className="flex max-h-[min(34rem,55vh)] min-h-[20rem] flex-1 gap-0 px-5 pt-4 pb-6 sm:px-8">
+                    <div className="flex min-h-[20rem] flex-1 px-5 pt-4 pb-6 sm:px-8 xl:min-h-0">
                         <SkyChart
                             objects={objects}
                             plateNames={plateNames}
@@ -126,7 +126,7 @@ export function HomePage() {
                 </section>
 
                 {/* The observer's rail: what is under the eye, and the keys to read it. */}
-                <aside className="border-rule shrink-0 border-t px-5 py-6 sm:px-8 xl:w-[19rem] xl:border-t-0 xl:border-l xl:px-6">
+                <aside className="border-rule shrink-0 border-t px-5 py-6 sm:px-8 xl:min-h-0 xl:w-[19rem] xl:overflow-y-auto xl:border-t-0 xl:border-l xl:px-6">
                     <div className="space-y-3">
                         <PlateLabel reading={eyedOrBrightest.designation.split(" · ")[0]}>Under the eye</PlateLabel>
                         <div className="bg-panel/50 border-rule rounded-panel border p-4">
@@ -188,7 +188,7 @@ export function HomePage() {
             </div>
 
             {/* The register band: what moved most recently, in catalogue form. */}
-            <section id="register" className="border-rule border-t px-5 py-6 sm:px-8">
+            <section id="register" className="border-rule shrink-0 border-t px-5 py-6 sm:px-8">
                 <PlateLabel reading={`${recent.length} of ${objects.length}`}>Recently modified</PlateLabel>
                 <ul className="mt-4 grid gap-x-8 gap-y-px sm:grid-cols-2 xl:grid-cols-3">
                     {recent.map(object => (
