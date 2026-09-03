@@ -294,7 +294,8 @@ terminal node dot at its ends, and major regions carry registration ticks at the
 corners — the marks a plate needs to be printed in register.
 
 - **Shell:** a fixed 15rem plate index on the left (the sidebar), a header band 3.5rem
-  tall, and the working field filling the rest. The field scrolls; the index and band do not.
+  tall carrying the wordmark, four surface links, the search trigger and the theme control,
+  and the working field filling the rest. The field scrolls; the index and band do not.
 - **Naming in place:** a constellation is labelled on the chart itself, in tracked
   capitals above its objects, the way an atlas plate names what it shows. Lists carry
   the same information as a leading column of plate and object numbers. Both replace
@@ -312,9 +313,10 @@ corners — the marks a plate needs to be printed in register.
 - **Measure:** interface text is unconstrained; document prose is capped at 66–72ch.
 - **Responsive:** below 1280px the observer's rail moves under the chart; below 1024px
   the plate index becomes an overlay sheet over a dimmed field. Below
-  768px the header band keeps the plate title, the search trigger and the two observer
-  controls (theme, notices) and moves navigation into the index sheet — nothing in the
-  band is ever pushed out of the viewport. Wide tables, code blocks and the chart canvas
+  768px the header band keeps the plate title, the search trigger and the theme control,
+  and moves navigation into the index sheet — nothing in the band is ever pushed out of
+  the viewport. A notices control was described here before one existed; the band holds
+  exactly two observer controls, search and theme. Wide tables, code blocks and the chart canvas
   scroll inside their own region; the page body never scrolls sideways.
 
 ## Elevation & Depth
@@ -439,11 +441,15 @@ drawn set. The user always knows how wide the next action reaches before it fire
 **Do** rebuild every atom in this vocabulary — nav, buttons, inputs, dialogs, empty states.
 **Do** draw the constellation lines and contour texture on canvas, as the real technique.
 **Do** give both renditions the same care and their own accent ink.
+**Do** separate content by tone, weight and italic before reaching for colour — code and
+callouts are both differentiated that way, and both are legible for it.
 
 **Don't** ship a stock shadcn component inside this world; a default card or button is a lapse.
 **Don't** use amber for content, headings, or prose.
 **Don't** put body text over the figure layer.
-**Don't** add a second accent hue; the system has one signal and two renditions of it.
+**Don't** add a second accent hue; the system has one signal and two renditions of it. A
+syntax theme, a callout palette and a diagram library's defaults are each a whole palette
+arriving at once — the three places this system has had to refuse one.
 **Don't** use italic Bodoni for emphasis, or Archivo for a document title.
 **Don't** reach for `box-shadow`, gradients-as-decoration, or an icon tile where an
 authored mark belongs.

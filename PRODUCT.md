@@ -22,8 +22,8 @@ requirements rather than nice-to-haves.
 ## Product Purpose
 
 A self-hosted workspace for a body of Markdown/MDX documentation: browse the whole collection,
-read individual documents, and change the collection itself — create, upload, move, rename and
-delete files against a real directory on disk. Success is a team pointing it at their docs folder
+read individual documents, edit them in place, and change the collection itself — create,
+upload, move and delete files against a real directory on disk. Success is a team pointing it at their docs folder
 and using it as the place where that documentation is read and maintained.
 
 ## Positioning
@@ -48,8 +48,9 @@ Two mechanisms, both confirmed as the product's reason to exist:
   Project Docs and Tests.
 - Documents carry YAML frontmatter (`title`, `description`, `author`, `date`, `tags`).
 - Each document has a generated visual preview (SVG today, PNG when generated) used in list views.
-- Two processes: a Vite SPA and an Express file API. Deployment of both is required by the
-  audiences above and does not exist yet.
+- Two processes in development — a Vite SPA and an Express file API — and one in production:
+  the service serves the built client from a single origin. A Dockerfile ships it; the content
+  folder is a volume, not part of the image.
 
 ## Capabilities and Constraints
 
@@ -59,15 +60,17 @@ Two mechanisms, both confirmed as the product's reason to exist:
   multi-select. A delete is recoverable: the item moves to a trash beside the content folder
   and is restored to the path it came from, or removed for good on a second, separate ask.
 - Visual previews of every document, used in collection views.
-- A statistics surface describing the collection. Must be driven by real data; the numbers shown
-  today are hardcoded fiction (12,489 views, 573 documents against a real 76).
+- A statistics surface describing the collection. Every figure is computed by walking the
+  content folder. It once reported 12,489 views and 573 documents against a real 76; that is
+  the failure mode this capability exists to avoid.
 - An in-app document editor. Edits the file's raw text, frontmatter included, with a live
   preview beside it. A save is refused with 409 when the file changed on disk since it was
   opened, and the author is told rather than silently overwriting the other edit.
 
-**Also present:** document viewer with table of contents, full-text search over every document's
-contents (⌘K), filename filtering in the plate index, folder tree navigation,
-light/dark theme, GFM tables, KaTeX math, syntax-highlighted code.
+**Also present:** document viewer with table of contents, full-text search over every
+document's contents (⌘K), filename filtering in the plate index, folder tree navigation
+operable by keyboard, light/dark theme, printing through a real print stylesheet, GFM tables,
+KaTeX math, syntax highlighting, `mermaid` diagrams, and GitHub-style callouts.
 
 **Technical constraints:** React 19, TypeScript strict, Vite 6, Tailwind CSS v4 (CSS-first tokens —
 `tailwind.config.js` is not read), shadcn/ui (new-york), TanStack Query for server state,
@@ -77,8 +80,9 @@ react-router-dom, Express 5 + multer on the API. Node 22 in CI.
 
 - Authentication and permissions. Concurrent writes are detected (the editor refuses a stale
   save) but not merged: the loser chooses between reloading and overwriting.
-- Deployment target for the Express API.
 - Real read/usage measurement behind the statistics surface.
+- **Rename.** Move relocates an item and keeps its name — the endpoint takes a destination
+  folder, not a destination path — so renaming a document is not reachable from any surface.
 - MDX compilation with an untrusted content folder. A compiled document may not import, and
   gets a fixed component vocabulary plus whatever it defines itself, but its expressions do
   run. Nothing here sandboxes them.
@@ -86,17 +90,23 @@ react-router-dom, Express 5 + multer on the API. Node 22 in CI.
 ## Brand Commitments
 
 - Name: **MDXViewer**.
-- Interface language: **English only**, including labels, copy and errors. The repository rules
-  state this and the current UI violates it (the table-of-contents panel reads
-  "Índice de Contenido"). Code, comments and commits are English as well.
-- No logo, wordmark, brand palette or typographic commitment has been established. The current
-  slate/blue shadcn defaults are an unconfigured starting point, not a brand decision.
+- Interface language: **English only**, including labels, copy and errors. Code, comments and
+  commits are English as well. The panel that read "Índice de Contenido" for months is the
+  failure mode; it is fixed, and the rule is in `AGENTS.md` because no tool checks it.
+- A visual world is committed and documented in `DESIGN.md`: the observer's plate, two
+  renditions of one tradition, one accent hue, and a typographic commitment — Bodoni Moda for
+  display, Archivo for interface, JetBrains Mono for code. The slate/blue shadcn defaults that
+  preceded it were an unconfigured starting point; they are gone.
+- No logo or wordmark has been established.
 
 ## Evidence on Hand
 
 - 76 real documents in `public/content`, with real frontmatter, and 76 generated previews in
   `public/previews`.
-- A working file API: health, statistics, file tree, file content, create, upload, delete, move.
+- A working file API: health, statistics, file tree, file content, save, search, create, upload,
+  delete (to the trash), restore, purge, move, previews.
+- 67 server tests, run in process against a temporary content folder, covering the containment
+  guards on every path that reads, writes, moves or deletes.
 - No users, customers, testimonials, benchmarks, pricing, licensing or deployment record exists.
   None may be invented in any surface.
 
