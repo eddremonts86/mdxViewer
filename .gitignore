@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Deleted documents waiting to be restored. Someone's real files, and whatever
+# they threw away is not this repository's business.
+public/trash/

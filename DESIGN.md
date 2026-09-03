@@ -378,7 +378,12 @@ element.
   region's edge, and a 3px node dot terminating it.
 - **Destructive confirmation:** a real plate dialog naming the exact objects, with the
   count set in figures and the amber fill on the confirming action. Never a browser
-  dialog.
+  dialog. It says where the objects go, because a delete moves them to the trash; the
+  one action that does not come back asks a second time, in place, on its own row.
+- **Trash row:** the deleted object as it was — magnitude dot, italic name — then the
+  plate it fell out of, its size, the date it went, and the two actions. Restore is the
+  hairline secondary; deleting for good only becomes an amber fill after the row has been
+  asked once, and offers "Keep it" beside it.
 - **Nav item:** icon plus label; active carries an amber 1px underline, not a filled pill.
 - **Borrowed primitives:** dialog, dropdown, select, tooltip, badge, alert, checkbox and
   toast all came from shadcn and were all re-cut to 2/3px radii with no shadow, panel

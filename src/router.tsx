@@ -15,6 +15,7 @@ const DocumentsListPage = lazy(() =>
 const StatisticsPage = lazy(() =>
     import("@/pages/StatisticsPage").then(module => ({ default: module.StatisticsPage }))
 );
+const TrashPage = lazy(() => import("@/pages/TrashPage").then(module => ({ default: module.TrashPage })));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage").then(module => ({ default: module.NotFoundPage })));
 
 const surface = (element: React.ReactNode) => <Suspense fallback={<DocumentLoader />}>{element}</Suspense>;
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
             { index: true, element: surface(<HomePage />) },
             { path: "/docs", element: surface(<DocumentsListPage />) },
             { path: "/statistics", element: surface(<StatisticsPage />) },
+            { path: "/trash", element: surface(<TrashPage />) },
             { path: "/document/*", element: surface(<DocumentPage />) },
             { path: "*", element: surface(<NotFoundPage />) },
         ],

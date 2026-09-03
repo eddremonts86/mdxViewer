@@ -53,7 +53,9 @@ Two mechanisms, both confirmed as the product's reason to exist:
 
 **Confirmed capabilities — durable, the design must serve all four:**
 
-- File management: create file, create folder, upload, move by drag and drop, delete, multi-select.
+- File management: create file, create folder, upload, move by drag and drop, delete,
+  multi-select. A delete is recoverable: the item moves to a trash beside the content folder
+  and is restored to the path it came from, or removed for good on a second, separate ask.
 - Visual previews of every document, used in collection views.
 - A statistics surface describing the collection. Must be driven by real data; the numbers shown
   today are hardcoded fiction (12,489 views, 573 documents against a real 76).

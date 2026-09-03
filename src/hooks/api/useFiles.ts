@@ -19,6 +19,7 @@ export const fileKeys = {
     lists: () => [...fileKeys.all, "list"] as const,
     list: () => [...fileKeys.lists()] as const,
     content: (path: string) => [...fileKeys.all, "content", path] as const,
+    trash: () => ["trash"] as const,
 } as const;
 
 /**
@@ -54,6 +55,45 @@ export function useFileContent(filePath: string, enabled = true) {
                 return false;
             }
             return failureCount < 2;
+        },
+    });
+}
+
+/**
+ * What is waiting in the trash.
+ */
+export function useTrash() {
+    return useQuery({
+        queryKey: fileKeys.trash(),
+        queryFn: FileAPI.getTrash,
+    });
+}
+
+/**
+ * Restoring puts a document back in the tree, so both listings change.
+ */
+export function useRestoreFromTrash() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: string) => FileAPI.restoreFromTrash(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: fileKeys.trash() });
+            queryClient.invalidateQueries({ queryKey: fileKeys.list() });
+        },
+    });
+}
+
+/**
+ * Purging touches nothing in the content folder, so only the trash is refetched.
+ */
+export function usePurgeTrash() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (ids: string[]) => FileAPI.purgeTrash(ids),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: fileKeys.trash() });
         },
     });
 }
@@ -123,8 +163,8 @@ export function useDeleteFiles() {
     return useMutation({
         mutationFn: (paths: string[]) => FileAPI.deleteItems(paths),
         onSuccess: () => {
-            // Invalidate and refetch file list
             queryClient.invalidateQueries({ queryKey: fileKeys.list() });
+            queryClient.invalidateQueries({ queryKey: fileKeys.trash() });
         },
         onError: (_error: APIError) => {
             // Error handling for file deletion failure

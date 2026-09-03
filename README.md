@@ -19,6 +19,7 @@ what the product is and is not.
 | `/document/*` | The document plate: a title block from frontmatter, prose, contents. |
 |               | **Edit** opens the source beside a live preview and writes the file. |
 | `/statistics` | The survey. Measurements taken from the content folder.              |
+| `/trash`      | Deleted documents, with where they came from. Restore or purge.      |
 
 ## Getting started
 
@@ -94,6 +95,7 @@ server/
 
 public/content/         # The documentation the app charts
 public/previews/        # Generated previews
+public/trash/           # Deleted documents, waiting to be restored (not tracked)
 ```
 
 ## Known gaps
@@ -105,8 +107,9 @@ These are recorded rather than hidden:
   inside that folder. Put it behind your own auth before exposing it.
 - **MDX is not compiled.** `.mdx` files render through the same Markdown pipeline as
   `.md`; JSX inside them does not execute. The UI does not claim otherwise.
-- **No trash.** A delete is `fs.rm`; the confirmation states how many documents go, but
-  nothing comes back.
+- **The trash never empties itself.** A delete moves the item to `public/trash`, beside the
+  content folder, and it waits there until someone restores it or deletes it for good. There
+  is no retention policy and no size cap.
 - **No merge on a concurrent edit.** The editor sends the mtime it loaded and the service
   refuses a stale save with 409, so nobody's work disappears silently — but resolving it is
   a choice between reloading and overwriting, not a merge.

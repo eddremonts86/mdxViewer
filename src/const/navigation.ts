@@ -1,4 +1,4 @@
-import { BarChart3, FileText, Telescope } from "lucide-react";
+import { BarChart3, FileText, Telescope, Trash2 } from "lucide-react";
 
 /**
  * Only surfaces that exist. A route that renders "coming soon" does not earn a
@@ -19,5 +19,10 @@ export const navigationItems = [
         name: "Statistics",
         path: "/statistics",
         icon: BarChart3,
+    },
+    {
+        name: "Trash",
+        path: "/trash",
+        icon: Trash2,
     },
 ];

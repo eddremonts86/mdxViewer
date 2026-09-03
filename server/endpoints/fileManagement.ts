@@ -9,6 +9,7 @@ import path from "path";
 import { ERRORS, FILE_CONFIG, HTTP_STATUS } from "../constants/index.js";
 import type { ApiResponse } from "../types/index.js";
 import { logOperation, logServerError } from "../utils/logger.js";
+import { moveToTrash } from "../utils/trash.js";
 import {
     realPathInsideContent,
     resolveInsideContent,
@@ -396,6 +397,7 @@ export const deleteFiles = async (req: Request, res: Response<ApiResponse>) => {
         const results: Array<{
             path: string;
             type: string;
+            trashId: string;
         }> = [];
 
         const errors: Array<{
@@ -412,19 +414,17 @@ export const deleteFiles = async (req: Request, res: Response<ApiResponse>) => {
                     logServerError("Refused a delete outside the content folder", new Error(itemPath));
                     continue;
                 }
-                const stats = await fs.stat(fullPath);
-
-                if (stats.isDirectory()) {
-                    await fs.rm(fullPath, { recursive: true, force: true });
-                    logOperation(`✅ Folder deleted: ${itemPath}`);
-                } else {
-                    await fs.unlink(fullPath);
-                    logOperation(`✅ File deleted: ${itemPath}`);
-                }
+                // Recoverable, per PRODUCT.md's fourth principle: this moves the
+                // item out of the content folder rather than unlinking it. Deleting
+                // for good is DELETE /api/trash, which the trash surface asks for
+                // separately.
+                const entry = await moveToTrash(fullPath, itemPath);
+                logOperation(`Moved to trash: ${itemPath}`);
 
                 results.push({
                     path: itemPath,
-                    type: stats.isDirectory() ? "folder" : "file",
+                    type: entry.type,
+                    trashId: entry.id,
                 });
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : "Unknown error";
@@ -448,7 +448,7 @@ export const deleteFiles = async (req: Request, res: Response<ApiResponse>) => {
                 successCount: results.length,
                 errorCount: errors.length,
             },
-            message: `Deleted ${results.length}/${paths.length} items successfully`,
+            message: `Moved ${results.length}/${paths.length} items to the trash`,
         });
     } catch (error) {
         logServerError("❌ Failed to delete items:", error instanceof Error ? error : new Error(String(error)));

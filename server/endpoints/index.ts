@@ -7,3 +7,4 @@ export * from "./fileManagement.js";
 export * from "./files.js";
 export * from "./preview.js";
 export * from "./statistics.js";
+export * from "./trash.js";

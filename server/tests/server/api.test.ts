@@ -15,7 +15,7 @@ import { promises as fs } from "fs";
 import os from "os";
 import path from "path";
 import request from "supertest";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 let app: Express;
 let contentDir: string;
@@ -53,6 +53,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
     await fs.rm(contentDir, { recursive: true, force: true });
+    await fs.rm(path.join(path.dirname(contentDir), "trash"), { recursive: true, force: true });
     await fs.rm(outsideMarker, { force: true });
     delete process.env.CONTENT_DIR;
 });
@@ -253,5 +254,137 @@ describe("saving a document", () => {
     it("leaves no temporary file behind", async () => {
         const entries = await fs.readdir(path.join(contentDir, "docs"));
         expect(entries.filter(name => name.endsWith(".tmp"))).toEqual([]);
+    });
+});
+
+describe("the trash", () => {
+    const trashDir = () => path.join(path.dirname(contentDir), "trash");
+    const list = () =>
+        request(app)
+            .get("/api/trash")
+            .expect(200)
+            .then(response => response.body.data);
+
+    beforeEach(async () => {
+        await fs.rm(trashDir(), { recursive: true, force: true });
+    });
+
+    it("a delete moves the document out rather than destroying it", async () => {
+        await fs.writeFile(path.join(contentDir, "docs", "doomed.md"), "# Doomed\n");
+
+        const response = await request(app)
+            .delete("/api/files")
+            .send({ paths: ["docs/doomed.md"] })
+            .expect(200);
+        expect(response.body.data.deleted[0].trashId).toBeTruthy();
+
+        // Gone from the content folder…
+        await expect(fs.access(path.join(contentDir, "docs", "doomed.md"))).rejects.toThrow();
+
+        // …and waiting in the trash, with where it came from recorded.
+        const entries = await list();
+        expect(entries).toHaveLength(1);
+        expect(entries[0]).toMatchObject({ originalPath: "docs/doomed.md", name: "doomed.md", type: "file" });
+    });
+
+    it("restores a document to the path it came from", async () => {
+        await fs.writeFile(path.join(contentDir, "docs", "returning.md"), "# Returning\n");
+        await request(app)
+            .delete("/api/files")
+            .send({ paths: ["docs/returning.md"] })
+            .expect(200);
+
+        const [entry] = await list();
+        await request(app).post("/api/trash/restore").send({ id: entry.id }).expect(200);
+
+        expect(await fs.readFile(path.join(contentDir, "docs", "returning.md"), "utf8")).toBe("# Returning\n");
+        expect(await list()).toHaveLength(0);
+    });
+
+    it("restores a whole folder with its documents inside", async () => {
+        await fs.mkdir(path.join(contentDir, "notes"), { recursive: true });
+        await fs.writeFile(path.join(contentDir, "notes", "one.md"), "# One\n");
+        await fs.writeFile(path.join(contentDir, "notes", "two.md"), "# Two\n");
+
+        await request(app)
+            .delete("/api/files")
+            .send({ paths: ["notes"] })
+            .expect(200);
+        const [entry] = await list();
+        expect(entry.type).toBe("folder");
+
+        await request(app).post("/api/trash/restore").send({ id: entry.id }).expect(200);
+        expect((await fs.readdir(path.join(contentDir, "notes"))).sort()).toEqual(["one.md", "two.md"]);
+    });
+
+    it("will not overwrite something that took the name in the meantime", async () => {
+        await fs.writeFile(path.join(contentDir, "docs", "contested.md"), "# Original\n");
+        await request(app)
+            .delete("/api/files")
+            .send({ paths: ["docs/contested.md"] })
+            .expect(200);
+
+        await fs.writeFile(path.join(contentDir, "docs", "contested.md"), "# Someone else's\n");
+
+        const [entry] = await list();
+        await request(app).post("/api/trash/restore").send({ id: entry.id }).expect(409);
+
+        expect(await fs.readFile(path.join(contentDir, "docs", "contested.md"), "utf8")).toBe("# Someone else's\n");
+        expect(await list()).toHaveLength(1);
+    });
+
+    it("purges for good, and only what was asked for", async () => {
+        await fs.writeFile(path.join(contentDir, "docs", "gone-a.md"), "a");
+        await fs.writeFile(path.join(contentDir, "docs", "gone-b.md"), "b");
+        await request(app)
+            .delete("/api/files")
+            .send({ paths: ["docs/gone-a.md", "docs/gone-b.md"] })
+            .expect(200);
+
+        const entries = await list();
+        expect(entries).toHaveLength(2);
+
+        await request(app)
+            .delete("/api/trash")
+            .send({ ids: [entries[0].id] })
+            .expect(200);
+        const left = await list();
+        expect(left).toHaveLength(1);
+        expect(left[0].id).toBe(entries[1].id);
+    });
+
+    it.each(["..", "../..", "/", "docs/../.."])("refuses an id that climbs out of the trash: %s", async id => {
+        // A purge is permanent, so an id that resolves outside the trash must not
+        // be followed — this is the one endpoint where being wrong is unrecoverable.
+        await request(app)
+            .delete("/api/trash")
+            .send({ ids: [id] })
+            .expect(200);
+        expect(await fs.readFile(outsideMarker, "utf8")).toBe("secret");
+        await fs.access(path.join(contentDir, "docs", "intro.md"));
+    });
+
+    it("reports an unknown id rather than pretending", async () => {
+        await request(app).post("/api/trash/restore").send({ id: "nope" }).expect(404);
+        await request(app).post("/api/trash/restore").send({}).expect(404);
+        await request(app).delete("/api/trash").send({ ids: [] }).expect(400);
+    });
+
+    it("keeps the trash out of the content tree and the survey", async () => {
+        await fs.writeFile(path.join(contentDir, "docs", "counted.md"), "# Counted\n");
+        const before = await request(app).get("/api/statistics").expect(200);
+
+        await request(app)
+            .delete("/api/files")
+            .send({ paths: ["docs/counted.md"] })
+            .expect(200);
+        const after = await request(app).get("/api/statistics").expect(200);
+
+        expect(after.body.data.totalDocuments).toBe(before.body.data.totalDocuments - 1);
+
+        const names = (await request(app).get("/api/files").expect(200)).body.data.map(
+            (item: { originalName?: string }) => item.originalName
+        );
+        expect(names).not.toContain("trash");
     });
 });

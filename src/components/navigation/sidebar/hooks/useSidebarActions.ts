@@ -71,7 +71,9 @@ export function useSidebarActions(refetch: () => void) {
                 onSuccess: () => {
                     toast({
                         variant: "success",
-                        title: paths.length === 1 ? "Object deleted" : `${paths.length} objects deleted`,
+                        // Say where it went, not just that it went: it is in the
+                        // trash and can be put back, which "deleted" denies.
+                        title: paths.length === 1 ? "Moved to the trash" : `${paths.length} objects moved to the trash`,
                         description: paths.length === 1 ? paths[0] : undefined,
                     });
                     setPendingDeletion([]);

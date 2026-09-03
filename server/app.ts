@@ -25,7 +25,10 @@ import {
     getHealth,
     getPreview,
     getStatistics,
+    getTrash,
     moveFiles,
+    purgeTrashEntries,
+    restoreTrashEntry,
     saveFileContent,
     uploadFiles,
 } from "./endpoints/index.js";
@@ -140,6 +143,19 @@ app.post("/api/files/move", (req, res) => {
 
 app.put("/api/files/content", (req, res) => {
     saveFileContent(req, res);
+});
+
+// Trash Routes
+app.get("/api/trash", (req, res) => {
+    getTrash(req, res);
+});
+
+app.post("/api/trash/restore", (req, res) => {
+    restoreTrashEntry(req, res);
+});
+
+app.delete("/api/trash", (req, res) => {
+    purgeTrashEntries(req, res);
 });
 
 // 🎯 UNIVERSAL PREVIEW SOLUTION - Handles ALL nesting levels and URL encoding

@@ -11,6 +11,10 @@ import { ERRORS, FILE_CONFIG, SERVER_CONFIG } from "../constants/index.js";
 /** Absolute, normalised roots. Everything this server touches lives under one. */
 const CONTENT_ROOT = path.resolve(SERVER_CONFIG.CONTENT_PATH);
 const PREVIEWS_ROOT = path.resolve(path.dirname(SERVER_CONFIG.CONTENT_PATH), "previews");
+// Deleted documents wait here. A sibling of the content root, not a folder inside
+// it, so the tree, the chart and the survey never count something already thrown
+// away — and so a document cannot be "deleted" into a place it still shows up.
+const TRASH_ROOT = path.resolve(path.dirname(SERVER_CONFIG.CONTENT_PATH), "trash");
 
 /**
  * The root as the filesystem finally reports it. The two differ whenever the
@@ -94,6 +98,12 @@ export const resolveInsideContent = (...segments: (string | undefined | null)[])
 /** The same guard for the generated previews, which are also addressed by URL. */
 export const resolveInsidePreviews = (...segments: (string | undefined | null)[]): string | null =>
     resolveInside(PREVIEWS_ROOT, segments);
+
+/** The same guard for the trash, whose entry ids arrive from the client. */
+export const resolveInsideTrash = (...segments: (string | undefined | null)[]): string | null =>
+    resolveInside(TRASH_ROOT, segments);
+
+export const trashRoot = (): string => TRASH_ROOT;
 
 /**
  * The same check, after following symlinks. Use it for anything that reads,

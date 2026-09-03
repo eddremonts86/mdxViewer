@@ -26,9 +26,12 @@ The file service. Every response is `{ success, data?, error?, message? }`.
 | `POST`   | `/api/files/create`           | `{ name, type: "md" \| "mdx", path, content? }` |
 | `POST`   | `/api/folders/create`         | `{ name, path }`                          |
 | `POST`   | `/api/files/upload`           | Multipart; `.md`, `.mdx`, `.txt` only     |
-| `DELETE` | `/api/files`                  | `{ paths: string[] }` — recursive, no trash |
+| `DELETE` | `/api/files`                  | `{ paths: string[] }` — moves to the trash |
 | `POST`   | `/api/files/move`             | `{ sourcePath, targetPath }`              |
 | `PUT`    | `/api/files/content`          | `{ path, content, lastModified? }` — overwrite |
+| `GET`    | `/api/trash`                  | What is waiting to be restored             |
+| `POST`   | `/api/trash/restore`          | `{ id }` — back to where it came from      |
+| `DELETE` | `/api/trash`                  | `{ ids: string[] }` — permanent            |
 | `GET`    | `/api/previews/**`            | A document's preview image, any depth      |
 
 ### Paths are confined to the content folder
@@ -82,6 +85,24 @@ Omitting `lastModified` skips the comparison and overwrites — that is what the
 "Overwrite anyway" does. The write itself goes to a temporary file and is renamed into
 place, so an interrupted save cannot leave a truncated document.
 
+### The trash
+
+A delete no longer unlinks anything. It moves the item to `public/trash`, a sibling of the
+content folder, as one directory per entry:
+
+```text
+trash/<id>/meta.json   where it came from, its size, and when it went
+trash/<id>/<name>      the document or folder itself
+```
+
+A directory per entry rather than a shared index, because two people deleting at once
+would race on one file. Being outside the content root is what keeps a deleted document
+out of the tree, the chart and the survey.
+
+`POST /api/trash/restore` puts an entry back at its recorded path and **refuses with 409**
+if something has since taken that name — restoring never overwrites. `DELETE /api/trash` is
+the only unrecoverable call in this service.
+
 ## The client
 
 `src/api/fileAPI.ts` is the only client. Its base URL is relative, so the built
@@ -99,11 +120,14 @@ await FileAPI.uploadFiles(files, "docs"); // UploadResult
 await FileAPI.deleteItems(["docs/notes.md"]);
 await FileAPI.moveItem({ sourcePath: "docs/notes.md", targetPath: "" });
 await FileAPI.saveFileContent({ path: "docs/notes.md", content: raw, lastModified });
+await FileAPI.getTrash(); // TrashEntry[]
+await FileAPI.restoreFromTrash(entryId);
+await FileAPI.purgeTrash([entryId]); // permanent
 ```
 
 Types it exports: `FileItem`, `ApiResponse<T>`, `CreateFileRequest`,
 `CreateFolderRequest`, `SaveFileRequest`, `DocumentFrontmatter`, `DocumentContent`,
-`UploadResult`.
+`TrashEntry`, `UploadResult`.
 
 `DocumentContent.raw` is the file as it sits on disk; `content` is the same file with its
 frontmatter split off. The editor works on `raw` so a save cannot reformat YAML the author
@@ -122,6 +146,9 @@ import {
     useCreateFolder,
     useDeleteFiles,
     useSaveFile,
+    useTrash,
+    useRestoreFromTrash,
+    usePurgeTrash,
     useUploadFiles,
     useMoveItem,
 } from "@/hooks/api/useFiles";

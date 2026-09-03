@@ -32,8 +32,8 @@ const NAMES_SHOWN = 8;
 
 /**
  * Confirming a removal from the catalogue. These are real files on someone's
- * disk, so the surface names exactly what is about to go and says plainly that
- * it cannot be undone.
+ * disk, so the surface names exactly what is about to go — and now says where it
+ * goes, because a delete moves the item to the trash rather than unlinking it.
  */
 export function DeleteDialog({ open, onOpenChange, onConfirm, targets, isLoading = false }: DeleteDialogProps) {
     const shown = targets.slice(0, NAMES_SHOWN);
@@ -56,7 +56,7 @@ export function DeleteDialog({ open, onOpenChange, onConfirm, targets, isLoading
                                 all of them go.{" "}
                             </>
                         ) : null}
-                        Removed from the content folder on disk. There is no trash — this cannot be undone.
+                        Moved out of the content folder to the trash, where you can put them back.
                     </DialogDescription>
                 </DialogHeader>
 

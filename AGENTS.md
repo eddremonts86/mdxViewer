@@ -33,7 +33,7 @@ same order. CI runs on Linux on purpose: that is where a case-mismatched import
 fails and macOS does not.
 
 What passing means today: **0 lint errors**, 60 warnings (all `no-console`, in
-`server/` and `scripts/`, where console output is the interface), and 45 tests.
+`server/` and `scripts/`, where console output is the interface), and 56 tests.
 Do not raise the error count. Warnings are a budget, not a target — if you add
 one, say why.
 
@@ -57,9 +57,12 @@ six are not, so they are the whole list:
    mtime the editor loaded and returns 409 on a mismatch; overwriting is a separate,
    explicit choice the author makes. Several people share one instance and there is no
    locking, so this is the only thing standing between them.
-5. **Destructive actions get real surfaces that state their reach.** Not
-   `window.confirm`. Deleting three folders means deleting the 27 documents
-   inside them, and the dialog says so.
+5. **Destructive actions get real surfaces that state their reach, and stay
+   recoverable.** Not `window.confirm`. Deleting three folders means moving the 27
+   documents inside them, and the dialog says so. A delete moves to
+   `public/trash`; the only unrecoverable path in the product is
+   `DELETE /api/trash`, which the trash surface asks for a second time before
+   sending. Do not add a second one.
 6. **A stock shadcn component inside this world is a lapse.** The primitives in
    `src/components/ui/` have been re-cut — 2/3px radii, no shadows, tracked
    capital labels, one accent hue. `DESIGN.md` → Do's and Don'ts is the list.
@@ -72,6 +75,7 @@ src/components/atlas/     The chart layer
 src/components/ui/        shadcn primitives, re-cut for this world
 src/pages/                One file per surface
 src/api/fileAPI.ts        The only client for the file service
+server/utils/trash.ts     Deleted items: move out, list, restore, purge
 server/app.ts             Routes, middleware, uploads
 server/start.ts           Binds the port
 public/content/           The documentation this instance charts

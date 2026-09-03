@@ -57,6 +57,16 @@ export interface DocumentContent {
     lastModified?: string;
 }
 
+/** One deleted document or folder, waiting to be restored or purged. */
+export interface TrashEntry {
+    id: string;
+    originalPath: string;
+    name: string;
+    type: "file" | "folder";
+    size: number;
+    deletedAt: string;
+}
+
 export interface SaveFileRequest {
     path: string;
     content: string;
@@ -140,6 +150,56 @@ class FileAPI {
 
         if (!response.ok || !result.success) {
             throw new Error(result.error ?? `Failed to save document: ${response.statusText}`);
+        }
+
+        return result.data!;
+    }
+
+    /**
+     * What is waiting in the trash
+     */
+    static async getTrash(): Promise<TrashEntry[]> {
+        const response = await fetch(`${API_BASE_URL}/api/trash`);
+        const result: ApiResponse<TrashEntry[]> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Failed to read the trash: ${response.statusText}`);
+        }
+
+        return result.data ?? [];
+    }
+
+    /**
+     * Put a deleted document back where it came from
+     */
+    static async restoreFromTrash(id: string): Promise<TrashEntry> {
+        const response = await fetch(`${API_BASE_URL}/api/trash/restore`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
+        });
+        const result: ApiResponse<TrashEntry> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Failed to restore: ${response.statusText}`);
+        }
+
+        return result.data!;
+    }
+
+    /**
+     * Delete for good. Nothing comes back from here.
+     */
+    static async purgeTrash(ids: string[]): Promise<{ purged: string[] }> {
+        const response = await fetch(`${API_BASE_URL}/api/trash`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ids }),
+        });
+        const result: ApiResponse<{ purged: string[] }> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Failed to purge: ${response.statusText}`);
         }
 
         return result.data!;
