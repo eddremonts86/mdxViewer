@@ -14,7 +14,6 @@ import {
     DragIndicator,
     MoveItemDialog,
     SidebarContent,
-    SidebarFolderControls,
     SidebarHeader,
     SidebarNav,
     SidebarSearch,
@@ -194,6 +193,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         onCreateFolder={() => actions.openFolderDialog("")}
                         onUpload={actions.pickAndUpload}
                         onImportFolder={() => setImporting(true)}
+                        onExpandAll={() => expandAll(folderPaths(filteredFiles))}
+                        onCollapseAll={collapseAll}
                         onToggleSelectionMode={toggleSelectionMode}
                         onClose={() => onOpenChange(false)}
                         isSelectionModeActive={isSelectionModeActive}
@@ -218,15 +219,6 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         onClearSearch={() => setSearchTerm("")}
                         resultsCount={filteredFiles.length}
                     />
-
-                    {!searchTerm && filteredFiles.length > 0 && (
-                        <SidebarFolderControls
-                            searchTerm={searchTerm}
-                            hasFiles={filteredFiles.length > 0}
-                            onExpandAll={() => expandAll(folderPaths(filteredFiles))}
-                            onCollapseAll={collapseAll}
-                        />
-                    )}
 
                     <SidebarContent
                         isLoading={isLoading}

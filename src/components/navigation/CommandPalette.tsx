@@ -165,7 +165,7 @@ export function CommandPalette() {
                 type="button"
                 onClick={() => setOpen(true)}
                 aria-label="Search every document"
-                className="border-rule text-ink-dim hover:text-ink focus-visible:outline-mark flex h-8 items-center gap-2 rounded-[2px] border px-2.5 focus-visible:outline focus-visible:outline-offset-2"
+                className="border-rule text-ink-dim hover:text-ink focus-visible:outline-mark flex h-7 items-center gap-2 rounded-[2px] border px-2 focus-visible:outline focus-visible:outline-offset-2"
             >
                 <Search className="h-3.5 w-3.5" aria-hidden="true" />
                 <span className="figures hidden text-[0.6875rem] tracking-[0.08em] sm:inline">{shortcutLabel()}</span>

@@ -411,7 +411,20 @@ element.
   Night Sky text. Secondary is a hairline with Glow Amber text. Both carry a small
   compass-star glyph on the primary action only.
 - **Input:** a Night Sky well inside a hairline, magnifier glyph on the leading edge,
-  clear control on the trailing edge, no rounding beyond 2px.
+  clear control on the trailing edge, no rounding beyond 2px. The index's filter was
+  the last stock shadcn survivor — `bg-card/90`, `text-primary`, a 2px focus ring —
+  and now matches the spec it always claimed.
+- **Band:** every ruled region across the plate index is one band: 2.5rem tall, `px-3`,
+  a hairline beneath, and a label on the single label step. The index carried four of
+  them with four different paddings and two different type steps for the same kind of
+  label; they are two bands now, and the primitive is why they cannot drift again.
+- **Band control:** 1.75rem square for a glyph, the same height with a tracked capital
+  label when it needs words. One size for every control in the header band and the
+  index — there were four. A control that carries state is pressed, not filled.
+- **Grouped actions:** four unlabelled glyphs for the four ways of adding to the
+  collection cost most of a 15rem column and had to be hovered to be read. They are one
+  `+` menu with names. A glyph earns its place in a band only when it is the whole
+  vocabulary of one action.
 - **Section eyebrow:** tracked capital label in Glow Amber, a hairline running to the
   region's edge, and a 3px node dot terminating it.
 - **Destructive confirmation:** a real plate dialog naming the exact objects, with the

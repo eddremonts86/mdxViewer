@@ -34,7 +34,7 @@ export function Layout() {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="lg:hidden"
+                    className="h-7 w-7 lg:hidden"
                     onClick={() => setSidebarOpen(!sidebarOpen)}
                     aria-expanded={sidebarOpen}
                     aria-controls="plate-index"

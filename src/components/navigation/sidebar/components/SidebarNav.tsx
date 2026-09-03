@@ -15,7 +15,7 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
     const location = useLocation();
 
     return (
-        <nav className="border-rule border-b px-2 py-2 md:hidden" aria-label="Surfaces">
+        <nav className="border-rule border-b px-3 py-2 md:hidden" aria-label="Surfaces">
             <ul>
                 {navigationItems.map(item => {
                     const Icon = item.icon;

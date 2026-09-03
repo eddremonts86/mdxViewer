@@ -1,74 +1,113 @@
-import { FilePlus2, FolderInput, FolderPlus, Loader2, Upload, X } from "lucide-react";
+import {
+    ChevronsDownUp,
+    ChevronsUpDown,
+    FilePlus2,
+    FolderInput,
+    FolderPlus,
+    Loader2,
+    Plus,
+    Upload,
+    X,
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { BandButton, SidebarBand } from "./SidebarBand";
 
 interface SidebarHeaderProps {
     onCreateFile: () => void;
     onCreateFolder: () => void;
     onUpload: () => void;
     onImportFolder: () => void;
+    onExpandAll: () => void;
+    onCollapseAll: () => void;
     onToggleSelectionMode: () => void;
     onClose: () => void;
     isSelectionModeActive: boolean;
     isUploadPending: boolean;
 }
 
-/** The index's masthead: what this column is, and the four ways to add to it. */
+/**
+ * The index's masthead: what this column is, and what can be done to it.
+ *
+ * The four ways of adding to the collection were four unlabelled glyphs whose
+ * meanings you had to hover to learn, and they took most of a 15rem column. They
+ * are one menu now, with names — the same four actions, one control, and room in
+ * the band for the two that were stranded in a fourth band of their own.
+ */
 export function SidebarHeader({
     onCreateFile,
     onCreateFolder,
     onUpload,
     onImportFolder,
+    onExpandAll,
+    onCollapseAll,
     onToggleSelectionMode,
     onClose,
     isSelectionModeActive,
     isUploadPending,
 }: SidebarHeaderProps) {
     return (
-        <div className="border-rule flex items-center gap-1 border-b px-3 py-2.5">
-            <h2 className="text-mark-read mr-auto text-[0.6875rem] font-semibold tracking-[0.15em] uppercase">Index</h2>
+        <SidebarBand label="Index">
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <button
+                        type="button"
+                        title="Add to the collection"
+                        className="text-ink-dim hover:text-ink focus-visible:outline-mark flex h-7 w-7 shrink-0 items-center justify-center rounded-[2px] focus-visible:outline focus-visible:outline-offset-1"
+                    >
+                        {isUploadPending ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                            <Plus className="h-3.5 w-3.5" />
+                        )}
+                        <span className="sr-only">Add to the collection</span>
+                    </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="bg-panel border-rule">
+                    <DropdownMenuItem onClick={onCreateFile}>
+                        <FilePlus2 size={13} className="mr-2" />
+                        New document
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={onCreateFolder}>
+                        <FolderPlus size={13} className="mr-2" />
+                        New folder
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={onUpload}>
+                        <Upload size={13} className="mr-2" />
+                        Upload files
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={onImportFolder}>
+                        <FolderInput size={13} className="mr-2" />
+                        Import a folder
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
 
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onCreateFile} title="New document">
-                <FilePlus2 className="h-3.5 w-3.5" />
-                <span className="sr-only">New document</span>
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onCreateFolder} title="New folder">
-                <FolderPlus className="h-3.5 w-3.5" />
-                <span className="sr-only">New folder</span>
-            </Button>
-            <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7"
-                onClick={onUpload}
-                disabled={isUploadPending}
-                title="Upload files"
-            >
-                {isUploadPending ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                    <Upload className="h-3.5 w-3.5" />
-                )}
-                <span className="sr-only">Upload files</span>
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onImportFolder} title="Import a folder">
-                <FolderInput className="h-3.5 w-3.5" />
-                <span className="sr-only">Import a folder</span>
-            </Button>
-            <Button
-                variant="ghost"
-                size="sm"
-                onClick={onToggleSelectionMode}
-                aria-pressed={isSelectionModeActive}
-                className={cn("h-7 px-2", isSelectionModeActive && "bg-mark-soft text-mark-read")}
-            >
+            <BandButton label="Open all plates" onClick={onExpandAll}>
+                <ChevronsUpDown className="h-3.5 w-3.5" />
+            </BandButton>
+
+            <BandButton label="Close all plates" onClick={onCollapseAll}>
+                <ChevronsDownUp className="h-3.5 w-3.5" />
+            </BandButton>
+
+            <BandButton label="Draw a set" onClick={onToggleSelectionMode} pressed={isSelectionModeActive} wide>
                 {isSelectionModeActive ? "Done" : "Draw"}
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 lg:hidden" onClick={onClose}>
-                <X className="h-3.5 w-3.5" />
-                <span className="sr-only">Close index</span>
-            </Button>
-        </div>
+            </BandButton>
+
+            <span className="lg:hidden">
+                <BandButton label="Close index" onClick={onClose}>
+                    <X className="h-3.5 w-3.5" />
+                </BandButton>
+            </span>
+        </SidebarBand>
     );
 }
