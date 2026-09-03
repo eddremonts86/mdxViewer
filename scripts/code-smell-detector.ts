@@ -11,7 +11,7 @@ import { parseESLintOutput, runESLint } from "./code-smell/eslint-runner";
 import { buildReport, logResults, writeReports } from "./code-smell/report-builder";
 
 function main(): void {
-    console.warn("🔍 Starting code smell analysis...");
+    console.warn("Starting code smell analysis...");
 
     const eslintOutput = runESLint();
     const smells = parseESLintOutput(eslintOutput);

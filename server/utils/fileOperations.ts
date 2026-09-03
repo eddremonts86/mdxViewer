@@ -47,7 +47,7 @@ const generatePreview = async (filePath: string, _content: string): Promise<stri
         // Create a simple preview URL based on the file path
         const previewFileName = filePath.replace(/\.(md|mdx)$/, ".png");
         const previewUrl = `/api/previews/${encodeURIComponent(previewFileName)}`;
-        console.log(`📸 Preview URL generated for: ${filePath} -> ${previewUrl}`);
+        console.log(`Preview URL generated for: ${filePath} -> ${previewUrl}`);
         return previewUrl;
     } catch (error) {
         console.error("Failed to generate preview URL:", error);

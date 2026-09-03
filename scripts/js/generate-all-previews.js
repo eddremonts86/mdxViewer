@@ -139,7 +139,7 @@ function createSVGPreview(title, type, folder, content) {
         <rect x="${BADGE_X}" y="${BADGE_Y}" width="${BADGE_WIDTH}" height="${BADGE_HEIGHT}" fill="${badgeColor}" rx="${BADGE_RADIUS}"/>
         <text x="${badgeX}" y="${BADGE_TEXT_Y}" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">${badgeText}</text>
         <text x="${TITLE_X}" y="${TITLE_Y}" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1a1a1a">${title}</text>
-        <text x="${FOLDER_X}" y="${FOLDER_Y}" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">📁 ${folder}</text>
+        <text x="${FOLDER_X}" y="${FOLDER_Y}" font-family="Arial, sans-serif" font-size="13" fill="#6b7280"> ${folder}</text>
         <text x="${TYPE_X}" y="${TYPE_Y}" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Type: ${type === "mdx" ? "MDX Interactive" : "Markdown Document"}</text>
         ${lines
             .map(
@@ -154,7 +154,7 @@ function createSVGPreview(title, type, folder, content) {
 // Generate preview for a single file
 async function generatePreview(file) {
     try {
-        console.log(`📝 Processing: ${file.relativePath}`);
+        console.log(`Processing: ${file.relativePath}`);
 
         // Read file content
         const content = await fs.readFile(file.path, "utf8");
@@ -178,26 +178,26 @@ async function generatePreview(file) {
         const svgPath = path.join(previewDir, svgFilename);
 
         await fs.writeFile(svgPath, svgContent);
-        console.log(`✅ Generated: ${svgPath}`);
+        console.log(`Generated: ${svgPath}`);
 
         return true;
     } catch (error) {
-        console.error(`❌ Failed to generate preview for ${file.relativePath}:`, error.message);
+        console.error(`Failed to generate preview for ${file.relativePath}:`, error.message);
         return false;
     }
 }
 
 // Main function
 async function main() {
-    console.log("🚀 Starting comprehensive preview generation...");
+    console.log("Starting comprehensive preview generation...");
 
     try {
         // Get all markdown files
         const files = await getAllMarkdownFiles(CONTENT_DIR);
-        console.log(`📄 Found ${files.length} markdown files`);
+        console.log(`Found ${files.length} markdown files`);
 
         if (files.length === 0) {
-            console.log("⚠️  No markdown files found");
+            console.log("No markdown files found");
             return;
         }
 
@@ -210,14 +210,14 @@ async function main() {
             filesByFolder[file.folder].push(file);
         });
 
-        console.log(`📁 Found ${Object.keys(filesByFolder).length} folders`);
+        console.log(`Found ${Object.keys(filesByFolder).length} folders`);
 
         let successCount = 0;
         let errorCount = 0;
 
         // Generate previews for each folder
         for (const [folder, folderFiles] of Object.entries(filesByFolder)) {
-            console.log(`\n📂 Processing folder: ${folder} (${folderFiles.length} files)`);
+            console.log(`\n Processing folder: ${folder} (${folderFiles.length} files)`);
 
             for (const file of folderFiles) {
                 const success = await generatePreview(file);
@@ -229,11 +229,11 @@ async function main() {
             }
         }
 
-        console.log("\n🎉 Preview generation complete!");
-        console.log(`✅ Successfully generated: ${successCount} previews`);
-        console.log(`❌ Failed: ${errorCount} previews`);
+        console.log("\n Preview generation complete!");
+        console.log(`Successfully generated: ${successCount} previews`);
+        console.log(`Failed: ${errorCount} previews`);
     } catch (error) {
-        console.error("💥 Preview generation failed:", error.message);
+        console.error("Preview generation failed:", error.message);
         process.exit(1);
     }
 }

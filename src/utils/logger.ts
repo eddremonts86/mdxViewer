@@ -123,17 +123,17 @@ export const logger = Logger.getInstance();
 
 // Helper functions for common logging patterns
 export const logOperation = (operation: string, context?: Record<string, unknown>) => {
-    logger.info(`🔄 ${operation}`, context);
+    logger.info(operation, context);
 };
 
 export const logSuccess = (operation: string, context?: Record<string, unknown>) => {
-    logger.info(`✅ ${operation}`, context);
+    logger.info(operation, context);
 };
 
 export const logError = (operation: string, error: Error, context?: Record<string, unknown>) => {
-    logger.error(`❌ ${operation}`, error, context);
+    logger.error(operation, error, context);
 };
 
 export const logWarning = (message: string, context?: Record<string, unknown>) => {
-    logger.warn(`⚠️ ${message}`, context);
+    logger.warn(message, context);
 };

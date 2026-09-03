@@ -3,9 +3,14 @@ import { cva, type VariantProps } from "class-variance-authority";
 /**
  * Controls in an engraved plate: square, tracked capitals, hairline borders.
  * Amber fill is reserved for the one action that changes something.
+ *
+ * Pressing one moves it a pixel. Every control in the product was static under
+ * the finger — the press was reported by a colour change alone, which reads as a
+ * hover that happened to stick. A pixel of travel is the cheapest thing that
+ * makes a control feel like it was struck, and it costs one transform.
  */
 export const buttonVariants = cva(
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-plate font-semibold uppercase tracking-[0.11em] transition-colors duration-150 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-mark disabled:pointer-events-none disabled:opacity-40",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-plate font-semibold uppercase tracking-[0.11em] transition-[color,background-color,border-color,transform] duration-150 active:translate-y-px focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-mark disabled:pointer-events-none disabled:opacity-40 disabled:active:translate-y-0",
     {
         variants: {
             variant: {

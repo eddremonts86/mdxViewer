@@ -25,7 +25,7 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
     try {
         const { name, type, path: relativePath, content } = req.body;
 
-        logOperation("📝 Creating file:", { name, type, relativePath });
+        logOperation("Creating file:", { name, type, relativePath });
 
         if (!name || !type || typeof relativePath !== "string") {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -83,7 +83,7 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
         // Write file
         await fs.writeFile(fullPath, fileContent, "utf8");
 
-        logOperation(`✅ File created: ${fileRelativePath}`);
+        logOperation(`File created: ${fileRelativePath}`);
 
         res.json({
             success: true,
@@ -94,7 +94,7 @@ export const createFile = async (req: Request, res: Response<ApiResponse>) => {
             message: `File ${fileName} created successfully`,
         });
     } catch (error) {
-        logServerError("❌ Failed to create file:", error instanceof Error ? error : new Error(String(error)));
+        logServerError("Failed to create file:", error instanceof Error ? error : new Error(String(error)));
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error: error instanceof Error ? error.message : "Failed to create file",
@@ -216,7 +216,7 @@ export const createFolder = async (req: Request, res: Response<ApiResponse>) => 
     try {
         const { name, path: relativePath } = req.body;
 
-        logOperation("📁 Creating folder:", { name, relativePath });
+        logOperation("Creating folder:", { name, relativePath });
 
         if (!name || typeof relativePath !== "string") {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -268,7 +268,7 @@ export const createFolder = async (req: Request, res: Response<ApiResponse>) => 
         // Create the folder
         await fs.mkdir(fullPath, { recursive: true });
 
-        logOperation(`✅ Folder created: ${folderRelativePath}`);
+        logOperation(`Folder created: ${folderRelativePath}`);
 
         res.json({
             success: true,
@@ -279,7 +279,7 @@ export const createFolder = async (req: Request, res: Response<ApiResponse>) => 
             message: `Folder ${name} created successfully`,
         });
     } catch (error) {
-        logServerError("❌ Failed to create folder:", error instanceof Error ? error : new Error(String(error)));
+        logServerError("Failed to create folder:", error instanceof Error ? error : new Error(String(error)));
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error: error instanceof Error ? error.message : "Failed to create folder",
@@ -297,7 +297,7 @@ export const uploadFiles = async (req: Request, res: Response<ApiResponse>) => {
         const targetPath = req.body.path ?? "";
         const createFolders = req.body.createFolders === "true";
 
-        logOperation("📤 Uploading files:", {
+        logOperation("Uploading files:", {
             count: files?.length || 0,
             targetPath,
             createFolders,
@@ -343,7 +343,7 @@ export const uploadFiles = async (req: Request, res: Response<ApiResponse>) => {
                     size: file.size,
                 });
 
-                logOperation(`✅ File uploaded: ${filePath}`);
+                logOperation(`File uploaded: ${filePath}`);
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : "Unknown error";
                 errors.push({
@@ -351,7 +351,7 @@ export const uploadFiles = async (req: Request, res: Response<ApiResponse>) => {
                     error: errorMessage,
                 });
                 logServerError(
-                    `❌ Failed to process file ${file.originalname}:`,
+                    `Failed to process file ${file.originalname}:`,
                     error instanceof Error ? error : new Error(String(error))
                 );
             }
@@ -369,7 +369,7 @@ export const uploadFiles = async (req: Request, res: Response<ApiResponse>) => {
             message: `Uploaded ${results.length}/${files.length} files successfully`,
         });
     } catch (error) {
-        logServerError("❌ Failed to upload files:", error instanceof Error ? error : new Error(String(error)));
+        logServerError("Failed to upload files:", error instanceof Error ? error : new Error(String(error)));
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error: error instanceof Error ? error.message : "Failed to upload files",
@@ -385,7 +385,7 @@ export const deleteFiles = async (req: Request, res: Response<ApiResponse>) => {
     try {
         const { paths } = req.body;
 
-        logOperation("🗑️ Deleting items:", { paths });
+        logOperation("Deleting items:", { paths });
 
         if (!Array.isArray(paths) || paths.length === 0) {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -433,7 +433,7 @@ export const deleteFiles = async (req: Request, res: Response<ApiResponse>) => {
                     error: errorMessage,
                 });
                 logServerError(
-                    `❌ Failed to delete ${itemPath}:`,
+                    `Failed to delete ${itemPath}:`,
                     error instanceof Error ? error : new Error(String(error))
                 );
             }
@@ -451,7 +451,7 @@ export const deleteFiles = async (req: Request, res: Response<ApiResponse>) => {
             message: `Moved ${results.length}/${paths.length} items to the trash`,
         });
     } catch (error) {
-        logServerError("❌ Failed to delete items:", error instanceof Error ? error : new Error(String(error)));
+        logServerError("Failed to delete items:", error instanceof Error ? error : new Error(String(error)));
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error: error instanceof Error ? error.message : "Failed to delete items",
@@ -529,7 +529,7 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
     try {
         const { sourcePath, targetPath } = req.body;
 
-        logOperation("🔄 Moving item:", { sourcePath, targetPath });
+        logOperation("Moving item:", { sourcePath, targetPath });
 
         if (!sourcePath || typeof targetPath !== "string") {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -548,7 +548,7 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
         // Move the item
         await fs.rename(sourceFullPath, targetFullPath);
 
-        logOperation(`✅ Item moved: ${sourcePath} → ${targetRelativePath}`);
+        logOperation(`Item moved: ${sourcePath} → ${targetRelativePath}`);
 
         res.json({
             success: true,
@@ -560,7 +560,7 @@ export const moveFiles = async (req: Request, res: Response<ApiResponse>) => {
             message: `${sourceFileName} moved successfully`,
         });
     } catch (error) {
-        logServerError("❌ Failed to move item:", error instanceof Error ? error : new Error(String(error)));
+        logServerError("Failed to move item:", error instanceof Error ? error : new Error(String(error)));
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error: error instanceof Error ? error.message : "Failed to move item",

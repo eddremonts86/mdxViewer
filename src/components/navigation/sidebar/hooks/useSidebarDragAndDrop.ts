@@ -43,7 +43,7 @@ export const useSidebarDragAndDrop = (
             }, 0);
 
             toast({
-                title: "🎯 Drag to move",
+                title: "Drag to move",
                 description: `Drop "${itemName}" on a folder to move it there`,
                 duration: 3000,
             });

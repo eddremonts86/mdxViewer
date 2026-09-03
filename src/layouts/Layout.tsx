@@ -19,7 +19,7 @@ export function Layout() {
         location.pathname === path || (path !== "/" && location.pathname.startsWith(path));
 
     return (
-        <div className="bg-sky text-ink flex h-screen flex-col">
+        <div className="bg-sky text-ink flex h-[100dvh] flex-col">
             <a
                 href="#plate"
                 className="focus:bg-mark focus:text-sky sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-3 focus:py-2 focus:text-[0.6875rem] focus:font-semibold focus:tracking-[0.11em] focus:uppercase"

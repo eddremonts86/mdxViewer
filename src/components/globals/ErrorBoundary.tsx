@@ -37,7 +37,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         if (this.props.fallback) return this.props.fallback;
 
         return (
-            <div className="bg-sky text-ink min-h-screen">
+            <div className="bg-sky text-ink min-h-[100dvh]">
                 <EmptyPlate
                     designation="Plate spoiled"
                     title="The interface stopped drawing"

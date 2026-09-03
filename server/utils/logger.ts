@@ -67,15 +67,15 @@ export const serverLogger = ServerLogger.getInstance();
 
 // Helper functions for common server logging patterns
 export const logOperation = (operation: string, context?: LogContext): void => {
-    serverLogger.info(`🔄 ${operation}`, context);
+    serverLogger.info(operation, context);
 };
 
 export const logSuccess = (operation: string, context?: LogContext): void => {
-    serverLogger.info(`✅ ${operation}`, context);
+    serverLogger.info(operation, context);
 };
 
 export const logServerError = (operation: string, error: Error, context?: LogContext): void => {
-    serverLogger.error(`❌ ${operation}`, error, context);
+    serverLogger.error(operation, error, context);
 };
 
 export const logRequest = (method: string, path: string): void => {

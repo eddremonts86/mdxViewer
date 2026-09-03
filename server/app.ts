@@ -168,7 +168,7 @@ app.delete("/api/trash", (req, res) => {
     purgeTrashEntries(req, res);
 });
 
-// 🎯 UNIVERSAL PREVIEW SOLUTION - Handles ALL nesting levels and URL encoding
+//  UNIVERSAL PREVIEW SOLUTION - Handles ALL nesting levels and URL encoding
 app.use("/api/previews", (req, res, _next) => {
     // Extract the full path after /api/previews/
     const requestPath = req.url.startsWith("/") ? req.url.slice(1) : req.url;
@@ -179,7 +179,7 @@ app.use("/api/previews", (req, res, _next) => {
     // Remove query parameters if any
     const [cleanPath] = decodedPath.split("?");
 
-    console.warn(`🔍 Preview: ${req.url} -> ${cleanPath}`);
+    console.warn(`Preview: ${req.url} -> ${cleanPath}`);
 
     // Set the filename parameter for the getPreview handler
     req.params = { filename: cleanPath };

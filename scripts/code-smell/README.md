@@ -48,25 +48,25 @@ This directory contains the refactored code smell detection tool, now split into
 
 ## Benefits of This Structure
 
-### 🔧 **Maintainability**
+### **Maintainability**
 
 - Each module has a single responsibility
 - Changes to one area don't affect others
 - Easier to test individual components
 
-### 📈 **Scalability**
+### **Scalability**
 
 - Easy to add new report formats
 - Simple to extend with new analysis rules
 - Straightforward to add new recommendation logic
 
-### 🔍 **Readability**
+### **Readability**
 
 - Clear separation of concerns
 - Self-documenting module names
 - Smaller, focused functions
 
-### 🧪 **Testability**
+### **Testability**
 
 - Each module can be unit tested independently
 - Dependencies are explicit through imports

@@ -30,7 +30,7 @@ export const getStatistics = async (_req: Request, res: Response<ApiResponse>) =
             message: "Statistics generated successfully",
         });
     } catch (error) {
-        logServerError("❌ Failed to generate statistics:", error instanceof Error ? error : new Error(String(error)));
+        logServerError("Failed to generate statistics:", error instanceof Error ? error : new Error(String(error)));
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error: error instanceof Error ? error.message : "Failed to generate statistics",

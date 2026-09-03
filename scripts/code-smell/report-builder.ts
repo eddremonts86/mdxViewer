@@ -45,16 +45,16 @@ export function writeReports(report: SmellReport): void {
 }
 
 export function logResults(report: SmellReport): void {
-    console.warn("✅ Analysis complete!");
-    console.warn(`📊 Found ${report.totalSmells} issues in ${report.totalFiles} files`);
-    console.warn(`🔴 Errors: ${report.errors}`);
-    console.warn(`🟡 Warnings: ${report.warnings}`);
-    console.warn("📁 Reports generated:");
+    console.warn("Analysis complete!");
+    console.warn(`Found ${report.totalSmells} issues in ${report.totalFiles} files`);
+    console.warn(`Errors: ${report.errors}`);
+    console.warn(`Warnings: ${report.warnings}`);
+    console.warn("Reports generated:");
     console.warn("   - code-smell-report.html (interactive)");
     console.warn("   - code-smell-report.json (machine-readable)");
 
     if (report.totalSmells > 0) {
-        console.warn("\n🎯 Top recommendations:");
-        report.recommendations.slice(0, 3).forEach(rec => console.warn(`   ${rec}`));
+        console.warn("\n Top recommendations:");
+        report.recommendations.slice(0, 3).forEach(rec => console.warn(`${rec}`));
     }
 }

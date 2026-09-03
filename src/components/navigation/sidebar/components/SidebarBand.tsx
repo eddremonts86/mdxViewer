@@ -61,7 +61,7 @@ export function BandButton({
             title={label}
             aria-pressed={pressed}
             className={cn(
-                "text-ink-dim hover:text-ink focus-visible:outline-mark flex h-7 shrink-0 items-center justify-center gap-1.5 rounded-[2px] focus-visible:outline focus-visible:outline-offset-1 disabled:opacity-40",
+                "text-ink-dim hover:text-ink focus-visible:outline-mark flex h-7 shrink-0 items-center justify-center gap-1.5 rounded-[2px] transition-[color,background-color,transform] duration-150 focus-visible:outline focus-visible:outline-offset-1 active:translate-y-px disabled:opacity-40 disabled:active:translate-y-0",
                 wide ? "px-2 text-[0.625rem] font-semibold tracking-[0.14em] uppercase" : "w-7",
                 pressed && "bg-mark-soft text-mark-read"
             )}

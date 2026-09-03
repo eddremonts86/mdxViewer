@@ -19,29 +19,29 @@ export function generateRecommendations(smells: CodeSmell[]): string[] {
 
     if (categories["Complexity Issues"] > 10) {
         recommendations.push(
-            "🔴 HIGH PRIORITY: Consider breaking down complex functions into smaller, more focused functions."
+            "HIGH PRIORITY: Consider breaking down complex functions into smaller, more focused functions."
         );
-        recommendations.push("💡 Use the Single Responsibility Principle to reduce complexity.");
+        recommendations.push("Use the Single Responsibility Principle to reduce complexity.");
     }
 
     if (categories["Length Issues"] > 5) {
-        recommendations.push("🟡 MEDIUM PRIORITY: Split large files and functions to improve readability.");
-        recommendations.push("💡 Consider extracting utility functions or creating separate modules.");
+        recommendations.push("MEDIUM PRIORITY: Split large files and functions to improve readability.");
+        recommendations.push("Consider extracting utility functions or creating separate modules.");
     }
 
     if (categories["TypeScript Issues"] > 0) {
-        recommendations.push("🟡 MEDIUM PRIORITY: Improve TypeScript usage for better type safety.");
-        recommendations.push("💡 Use proper typing instead of 'any', prefer nullish coalescing and optional chaining.");
+        recommendations.push("MEDIUM PRIORITY: Improve TypeScript usage for better type safety.");
+        recommendations.push("Use proper typing instead of 'any', prefer nullish coalescing and optional chaining.");
     }
 
     if (categories["React Issues"] > 0) {
-        recommendations.push("🟠 IMPORTANT: Fix React hook dependencies to prevent bugs.");
-        recommendations.push("💡 Ensure all hook dependencies are properly declared.");
+        recommendations.push("IMPORTANT: Fix React hook dependencies to prevent bugs.");
+        recommendations.push("Ensure all hook dependencies are properly declared.");
     }
 
     if (categories["Maintainability Issues"] > MAINTAINABILITY_CRITICAL) {
-        recommendations.push("🔴 CRITICAL: Focus on code maintainability improvements.");
-        recommendations.push("💡 Remove unused variables, replace magic numbers with constants.");
+        recommendations.push("CRITICAL: Focus on code maintainability improvements.");
+        recommendations.push("Remove unused variables, replace magic numbers with constants.");
     }
 
     return recommendations;

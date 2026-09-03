@@ -63,7 +63,7 @@ export const MoveItemDialog: React.FC<MoveItemDialogProps> = ({
                         onClick={() => onMoveToFolder("")}
                     >
                         <Folder className="mr-2 h-4 w-4" />
-                        📁 Root Folder
+                        Root folder
                     </Button>
                     {/* Folder list */}
                     {renderFolderList(filteredFiles)}
