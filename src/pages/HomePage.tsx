@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+
+import { X } from "lucide-react";
 
 import { CompassStar, DataGrid, EmptyPlate, MagnitudeDot, PlateLabel, SkyChart } from "@/components/atlas";
 import { DocumentLoader } from "@/components/document";
@@ -14,6 +16,7 @@ import {
     MAGNITUDE_RADIUS,
     platesOf,
 } from "@/lib/atlas";
+import { cn } from "@/lib/utils";
 
 /** The magnitude key: the ramp itself, printed, so a reader can decode a dot. */
 function MagnitudeKey({ objects }: { objects: AtlasObject[] }) {
@@ -42,13 +45,42 @@ function MagnitudeKey({ objects }: { objects: AtlasObject[] }) {
     );
 }
 
+/**
+ * Everything on or under a folder. A plate holds its own documents; charting it
+ * means charting what is inside it, however deep — the folder is a place in the
+ * collection, not one level of it.
+ */
+const inFolder = (object: AtlasObject, folder: string): boolean =>
+    object.folder === folder || object.folder.startsWith(`${folder}/`);
+
+/** The region of the plate a set of objects occupies, for the chart to frame. */
+function regionOf(objects: AtlasObject[]) {
+    if (objects.length === 0) return null;
+    const xs = objects.map(object => object.x);
+    const ys = objects.map(object => object.y);
+    return {
+        minX: Math.min(...xs),
+        maxX: Math.max(...xs),
+        minY: Math.min(...ys),
+        maxY: Math.max(...ys),
+    };
+}
+
 export function HomePage() {
     const { data: files, isLoading, error } = useFiles();
     const navigate = useNavigate();
+    const [params, setParams] = useSearchParams();
     const [eyed, setEyed] = useState<AtlasObject | null>(null);
 
-    const objects = useMemo(() => chartCollection(files ?? []), [files]);
-    const plates = useMemo(() => platesOf(objects), [objects]);
+    const folder = params.get("folder");
+
+    // Charted whole, then narrowed. Charting only the folder would renumber every
+    // plate and move its constellation, so a document's designation would change
+    // depending on what else was on screen. A constellation keeps its place.
+    const all = useMemo(() => chartCollection(files ?? []), [files]);
+    const objects = useMemo(() => (folder ? all.filter(object => inFolder(object, folder)) : all), [all, folder]);
+    const region = useMemo(() => (folder ? regionOf(objects) : null), [folder, objects]);
+    const plates = useMemo(() => platesOf(all), [all]);
     const plateNames = useMemo(() => new Map(plates.map(plate => [plate.plate, plate.folder])), [plates]);
     const recent = useMemo(
         () =>
@@ -102,8 +134,19 @@ export function HomePage() {
                             The Collection
                         </h1>
                         <p className="text-ink-dim figures text-[0.75rem] font-medium tracking-[0.06em]">
-                            {objects.length} objects · {plates.length} plates
+                            {folder ? `${objects.length} of ${all.length} objects` : `${objects.length} objects`} ·{" "}
+                            {folder ?? `${plates.length} plates`}
                         </p>
+                        {folder ? (
+                            <button
+                                type="button"
+                                onClick={() => setParams({}, { replace: true })}
+                                className="border-mark text-mark-read hover:bg-mark-soft focus-visible:outline-mark flex items-center gap-1.5 border px-2 py-1 text-[0.625rem] font-semibold tracking-[0.13em] uppercase focus-visible:outline focus-visible:outline-offset-2"
+                            >
+                                <X className="h-3 w-3" />
+                                Whole collection
+                            </button>
+                        ) : null}
                     </header>
 
                     <a
@@ -120,6 +163,7 @@ export function HomePage() {
                             activePath={eyed?.path ?? null}
                             onHover={setEyed}
                             onSelect={object => navigate(`/document/${object.path}`)}
+                            focus={region}
                             className="relative flex-1"
                         />
                     </div>
@@ -170,18 +214,37 @@ export function HomePage() {
                     <div className="mt-8 space-y-3">
                         <PlateLabel reading={`${plates.length}`}>Plates</PlateLabel>
                         <ul className="space-y-1.5">
-                            {plates.map(plate => (
-                                <li key={plate.plate} className="flex items-baseline gap-3">
-                                    <span className="text-ink-dim figures w-6 shrink-0 text-[0.6875rem] font-medium">
-                                        {String(plate.plate).padStart(2, "0")}
-                                    </span>
-                                    <span className="text-ink truncate text-[0.8125rem]">{plate.folder}</span>
-                                    <span className="bg-rule h-px flex-1" />
-                                    <span className="text-ink-dim figures text-[0.6875rem] font-medium">
-                                        {plate.count}
-                                    </span>
-                                </li>
-                            ))}
+                            {plates.map(plate => {
+                                const charted = plate.folder === folder;
+                                return (
+                                    <li key={plate.plate}>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setParams(charted ? {} : { folder: plate.folder }, { replace: true })
+                                            }
+                                            aria-pressed={charted}
+                                            className="focus-visible:outline-mark flex w-full items-baseline gap-3 text-left focus-visible:outline focus-visible:outline-offset-2"
+                                        >
+                                            <span className="text-ink-dim figures w-6 shrink-0 text-[0.6875rem] font-medium">
+                                                {String(plate.plate).padStart(2, "0")}
+                                            </span>
+                                            <span
+                                                className={cn(
+                                                    "truncate text-[0.8125rem]",
+                                                    charted ? "text-mark-read" : "text-ink"
+                                                )}
+                                            >
+                                                {plate.folder}
+                                            </span>
+                                            <span className="bg-rule h-px flex-1" />
+                                            <span className="text-ink-dim figures text-[0.6875rem] font-medium">
+                                                {plate.count}
+                                            </span>
+                                        </button>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </div>
                 </aside>

@@ -1,4 +1,6 @@
-import { ChevronDown, ChevronRight, MoreHorizontal, Move, Plus, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
+
+import { ChevronDown, ChevronRight, MoreHorizontal, Move, Plus, Telescope, Trash2 } from "lucide-react";
 
 import type { FileItem } from "@/api/fileAPI";
 import { MagnitudeDot } from "@/components/atlas";
@@ -63,6 +65,13 @@ function RowActions({ item, isFolder }: { item: FileItem; isFolder: boolean }) {
             <DropdownMenuContent align="end" className="bg-panel border-rule">
                 {isFolder ? (
                     <>
+                        <DropdownMenuItem asChild>
+                            <Link to={`/?folder=${encodeURIComponent(item.path)}`}>
+                                <Telescope size={13} className="mr-2" />
+                                Chart this folder
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => tree.onCreateFile(item.path)}>
                             <Plus size={13} className="mr-2" />
                             New document
