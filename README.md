@@ -21,18 +21,40 @@ what the product is and is not.
 
 ## Getting started
 
-Requirements: Node 22+ and pnpm.
+Requirements: Node 22+ and pnpm (`packageManager` in package.json pins the version;
+corepack will pick it up).
 
 ```bash
 pnpm install
 pnpm run dev
 ```
 
-`dev` runs two processes: the Vite client on :5173 and the Express file service on :3001.
-The client talks to `/api` relatively; set `VITE_API_URL` when the API lives on another
-origin.
+`dev` runs two processes: the Vite client on :5173 and the file service on :3001. They
+read different port variables on purpose — the client takes `PORT`, the service takes
+`API_PORT` — because a single inherited `PORT` would make them fight over it.
 
-Content lives in `public/content`. Anything you drop there appears on the chart.
+Content lives in `public/content` by default. Point `CONTENT_DIR` at any folder to chart
+documentation you already own; nothing outside that folder is reachable.
+
+## Deploying
+
+One service, one origin. The file service serves the built client, so `/api` resolves
+relatively, CORS never enters it, and a deep link like `/document/docs/intro.md` falls
+back to the app instead of 404ing.
+
+```bash
+docker build -t mdxviewer .
+docker run -p 3001:3001 -v /path/to/your/docs:/app/public/content mdxviewer
+```
+
+Without Docker: `pnpm run build && pnpm start`.
+
+| Variable          | Default              | What it does                                  |
+| ----------------- | -------------------- | --------------------------------------------- |
+| `API_PORT`        | `3001`               | Port the service binds (`PORT` also honoured) |
+| `CONTENT_DIR`     | `public/content`     | The folder this instance charts               |
+| `ALLOWED_ORIGINS` | `http://localhost:5173` | Comma-separated; the dev client only       |
+| `MAX_FOLDER_DEPTH`| `10`                 | How deep the content tree may nest            |
 
 ## Scripts
 
@@ -42,7 +64,8 @@ Content lives in `public/content`. Anything you drop there appears on the chart.
 | `pnpm run build`      | `tsc -b` then `vite build`                                |
 | `pnpm run lint`       | ESLint (formatting is Prettier's job, not ESLint's)       |
 | `pnpm run format`     | Prettier over `src`, `server` and `scripts`               |
-| `pnpm run test:run`   | Vitest, once                                              |
+| `pnpm run test:unit`  | Vitest, once — in process, against a temp folder          |
+| `pnpm start`          | Production: the service serving the built client           |
 | `pnpm run generate:previews-safe` | Regenerate the SVG document previews          |
 
 CI runs formatting, lint and the build on Linux — on purpose, because that is where a
@@ -61,7 +84,8 @@ src/
 └── assets/styles/      # Token layer and the document typeset
 
 server/
-├── clean-server.ts     # Express app and routes
+├── app.ts              # Routes, middleware, uploads; serves dist in production
+├── start.ts            # Binds the port
 ├── endpoints/          # files, file management, previews, statistics
 └── utils/              # scanning, formatting, validation
 
@@ -73,14 +97,13 @@ public/previews/        # Generated previews
 
 These are recorded rather than hidden:
 
-- **The file service is not access-controlled.** `validatePath()` exists in
-  `server/utils/validation.ts` and is not yet called by the endpoints, so a crafted
-  `path` can read and write outside `public/content`. Do not expose this to a network
-  you do not control until that is fixed.
+- **There is no authentication.** Every path is now confined to the content folder and
+  covered by tests, but anyone who can reach the service can read, write and delete
+  inside that folder. Put it behind your own auth before exposing it.
 - **MDX is not compiled.** `.mdx` files render through the same Markdown pipeline as
   `.md`; JSX inside them does not execute. The UI does not claim otherwise.
-- **The server tests need a listening server** and are being rewritten to run in
-  process; they are not in CI yet.
+- **No trash.** A delete is `fs.rm`; the confirmation states how many documents go, but
+  nothing comes back.
 - **Reads and readers are not counted**, so the survey reports file facts only.
 
 ## Contributing

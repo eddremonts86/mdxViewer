@@ -26,7 +26,7 @@ export function SearchInput({
             <div className="group relative">
                 <Search
                     className={cn(
-                        "absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors duration-200",
+                        "absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors",
                         searchTerm ? "text-primary" : "text-muted-foreground group-focus-within:text-primary"
                     )}
                 />
@@ -36,7 +36,7 @@ export function SearchInput({
                     value={searchTerm}
                     onChange={onSearchChange}
                     className={cn(
-                        "h-9 pr-9 pl-9 text-sm transition-all duration-200",
+                        "h-9 pr-9 pl-9 text-sm transition-all",
                         "focus:ring-primary/20 focus:border-primary focus:ring-2",
                         searchTerm && "border-primary/50"
                     )}
@@ -45,7 +45,7 @@ export function SearchInput({
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="hover:bg-destructive/10 hover:text-destructive absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 p-0 transition-colors duration-200"
+                        className="hover:bg-destructive/10 hover:text-destructive absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2 p-0 transition-colors"
                         onClick={onClearSearch}
                     >
                         <X className="h-3 w-3" />
@@ -54,7 +54,7 @@ export function SearchInput({
                 )}
             </div>
             {searchTerm && (
-                <div className="animate-in slide-in-from-top-1 mt-3 duration-300">
+                <div className="mt-3 duration-300">
                     <div className="flex items-center justify-between text-xs">
                         {isTyping ? (
                             <span className="text-muted-foreground animate-pulse font-medium">Searching...</span>

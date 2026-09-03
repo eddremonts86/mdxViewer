@@ -157,4 +157,26 @@ app.use("/api/previews", (req, res, _next) => {
     getPreview(req, res);
 });
 
+/**
+ * In production the built client is served from here, so the whole product is
+ * one origin: `/api` resolves relatively with no CORS involved, and a deep link
+ * like /document/docs/intro.md falls back to index.html instead of 404ing.
+ *
+ * This is what makes the product deployable at all — before it, the API lived
+ * only on a developer's machine and the deployed client had nothing to talk to.
+ */
+const CLIENT_DIR = path.join(__dirname, "..", "dist");
+
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(CLIENT_DIR, { index: false, maxAge: "1y", immutable: true }));
+
+    app.get(/^(?!\/api\/).*/, (req, res, next) => {
+        // Anything that is not a document request is a genuine miss.
+        if (req.method !== "GET") return next();
+        res.sendFile(path.join(CLIENT_DIR, "index.html"), error => {
+            if (error) next(error);
+        });
+    });
+}
+
 export default app;

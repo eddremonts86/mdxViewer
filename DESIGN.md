@@ -323,6 +323,13 @@ Emitted light is the one sanctioned exception to No-Shadow and it is spent twice
 radial bloom on magnitude 0–2 objects, and a 10px `shadowBlur` on the reticle. Both are
 drawn on the canvas, not in CSS.
 
+Motion is one authored moment, not five: an overlay is the only thing here that appears
+rather than simply being there, so the scrim washes in over 120ms and the plate settles
+0.5% of a scale over 140ms — once, and nowhere else. The five borrowed primitives arrived
+carrying scattered `animate-in` / `zoom-in-95` / `slide-in-from-*` classes that generated
+no CSS at all, because the plugin behind them was only ever registered in the Tailwind v3
+config this project no longer has. They were removed rather than revived.
+
 ### Named Rules
 
 **The No-Shadow Rule.** A raised surface changes tone, never casts. If a component needs
