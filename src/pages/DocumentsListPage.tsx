@@ -8,9 +8,10 @@ import { DocumentLoader } from "@/components/document";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFiles } from "@/hooks/api/useFiles";
+import { useGraph } from "@/hooks/useGraph";
 import { useEffectiveTheme } from "@/hooks/useMarkdownTheme";
 import { type AtlasObject, chartCollection, formatEpoch, formatMagnitude, formatSize, platesOf } from "@/lib/atlas";
-import { buildGraph, type Graph } from "@/lib/graph";
+import type { Graph } from "@/lib/graph";
 import { plateColour } from "@/lib/plateColour";
 import { cn } from "@/lib/utils";
 
@@ -97,7 +98,7 @@ export function DocumentsListPage() {
 
     // The same settled collection the chart draws, so a card is a cut of it and
     // not a second, differently-shaped picture of the same folder.
-    const graph = useMemo(() => buildGraph(objects), [objects]);
+    const { graph } = useGraph(objects);
 
     const shown = useMemo(() => {
         const needle = term.trim().toLowerCase();

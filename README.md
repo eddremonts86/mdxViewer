@@ -7,9 +7,11 @@ reorganize the folder itself — create, upload, move and delete, with deletes t
 back.
 
 The interface is built as an engraved star atlas: every document is a catalogued object
-with a designation and a magnitude, folders are constellations, and the one amber colour
-on screen belongs to the observer — where you are, what you selected, what you are about
-to change. See [`DESIGN.md`](DESIGN.md) for the system and [`PRODUCT.md`](PRODUCT.md) for
+with a designation and a magnitude, and the collection is plotted in three dimensions as
+the graph it already is — a folder is a hub, the documents inside it hang from it, and
+every edge means one thing: is inside. Each folder carries its own hue, on every surface;
+amber belongs to the observer alone — where you are, what you selected, what you are
+about to change. See [`DESIGN.md`](DESIGN.md) for the system and [`PRODUCT.md`](PRODUCT.md) for
 what the product is and is not.
 
 ## Surfaces

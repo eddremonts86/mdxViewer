@@ -7,6 +7,7 @@ import { CompassStar, DataGrid, EmptyPlate, MagnitudeDot, PlateLabel, SkyChart }
 import { DocumentLoader } from "@/components/document";
 import { Button } from "@/components/ui/button";
 import { useFiles } from "@/hooks/api/useFiles";
+import { useEffectiveTheme } from "@/hooks/useMarkdownTheme";
 import {
     type AtlasObject,
     chartCollection,
@@ -16,6 +17,7 @@ import {
     MAGNITUDE_RADIUS,
     platesOf,
 } from "@/lib/atlas";
+import { plateColour } from "@/lib/plateColour";
 import { cn } from "@/lib/utils";
 
 /** The magnitude key: the ramp itself, printed, so a reader can decode a dot. */
@@ -58,6 +60,7 @@ export function HomePage() {
     const navigate = useNavigate();
     const [params, setParams] = useSearchParams();
     const [eyed, setEyed] = useState<AtlasObject | null>(null);
+    const rendition = useEffectiveTheme() === "dark" ? "dark" : "light";
 
     const folder = params.get("folder");
 
@@ -214,6 +217,14 @@ export function HomePage() {
                                             <span className="text-ink-dim figures w-6 shrink-0 text-[0.6875rem] font-medium">
                                                 {String(plate.plate).padStart(2, "0")}
                                             </span>
+                                            {/* The rail sits beside the chart that
+                                                colours these folders; it named them
+                                                all in one ink. */}
+                                            <span
+                                                aria-hidden="true"
+                                                className="inline-block h-1.5 w-1.5 shrink-0 rounded-full"
+                                                style={{ background: plateColour(plate.folderPath, rendition) }}
+                                            />
                                             <span
                                                 className={cn(
                                                     "truncate text-[0.8125rem]",

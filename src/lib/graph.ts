@@ -26,6 +26,22 @@ import type { AtlasObject } from "@/lib/atlas";
  * clusters that appear are the collection's real shape rather than a decoration.
  */
 
+/** What the layout needs to know about one document: nothing but where it lives. */
+export interface LayoutSeed {
+    documents: { id: string; folderPath: string }[];
+}
+
+/** A settled node before its document is attached back to it. */
+export interface PlacedNode {
+    id: string;
+    kind: "folder" | "document";
+    folderPath: string;
+    label: string;
+    weight: number;
+    x: number;
+    y: number;
+}
+
 export interface GraphNode {
     id: string;
     /** A folder is a hub; a document is a leaf. */
@@ -79,7 +95,8 @@ const humanise = (segment: string): string =>
  * will be drawn on instead of a circle centred in a wide empty field — which is
  * what a large screen used to show.
  */
-export function buildGraph(objects: AtlasObject[], aspect = 1): Graph {
+export function layoutGraph(seed: LayoutSeed, aspect = 1): Graph {
+    const objects = seed.documents;
     if (objects.length === 0) return { nodes: [], edges: [] };
 
     // Every folder on every path, including the ones holding only folders.
@@ -134,17 +151,17 @@ export function buildGraph(objects: AtlasObject[], aspect = 1): Graph {
 
     for (const object of objects) {
         nodes.push({
-            id: object.path,
+            id: object.id,
             kind: "document",
-            object,
+            object: null,
             folderPath: object.folderPath,
-            label: object.name,
+            label: "",
             weight: 1,
             x: 0.5,
             y: 0.5,
         });
 
-        edges.push({ source: object.path, target: object.folderPath ? `folder:${object.folderPath}` : ROOT });
+        edges.push({ source: object.id, target: object.folderPath ? `folder:${object.folderPath}` : ROOT });
     }
 
     const simulated: Simulated[] = nodes.map(node => ({ id: node.id, weight: node.weight }));

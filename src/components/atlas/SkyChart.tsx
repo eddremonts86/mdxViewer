@@ -16,8 +16,8 @@ import {
     plateNames,
     reticle,
 } from "@/components/atlas/skyLayers";
+import { useGraph } from "@/hooks/useGraph";
 import type { AtlasObject } from "@/lib/atlas";
-import { buildGraph } from "@/lib/graph";
 
 import { LinearInterpolator, OrbitView, type OrbitViewState } from "@deck.gl/core";
 import DeckGL from "@deck.gl/react";
@@ -145,10 +145,7 @@ export function SkyChart({ objects, activePath, onHover, onSelect, className }: 
      * The collection, settled. Laid out once per set of objects: a force layout is
      * a property of the collection, not something to watch happen.
      */
-    const graph = useMemo(
-        () => buildGraph(objects, size.height > 0 ? size.width / size.height : 1),
-        [objects, size.width, size.height]
-    );
+    const { graph, settling } = useGraph(objects, size.height > 0 ? size.width / size.height : 1);
     const documents = useMemo(() => graph.nodes.filter(node => node.kind === "document"), [graph]);
     const eyed = useMemo(() => documents.find(node => node.id === activePath) ?? null, [documents, activePath]);
     const deepest = useMemo(
@@ -293,6 +290,12 @@ export function SkyChart({ objects, activePath, onHover, onSelect, className }: 
                     <Scan className="h-3 w-3" />
                 </PlateScaleButton>
             </div>
+
+            {settling ? (
+                <p className="text-ink-dim border-rule bg-panel/80 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border px-3 py-2 text-[0.6875rem] font-semibold tracking-[0.13em] uppercase">
+                    Settling the collection…
+                </p>
+            ) : null}
 
             <p
                 ref={readoutRef}

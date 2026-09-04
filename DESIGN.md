@@ -176,8 +176,8 @@ thing — is inside.** The clusters are the collection's real shape._
 A documentation set is a sky: a fixed field of objects that someone has to find their
 way around in the dark. MDXViewer charts it. The collection is drawn as a chart with a
 ruled graticule, every document is a catalogued object with a designation and a
-magnitude, folders are constellations named in place on the plate, and the
-one thing the observer adds — where they are, what they picked, what they are about to
+magnitude, folders are hubs the documents inside them hang from and are named in place
+on the plate, and the one thing the observer adds — where they are, what they picked, what they are about to
 change — is written in the amber of a red flashlight. The chart and the folder agree
 exactly; that agreement is the product.
 
@@ -360,8 +360,8 @@ nothing else does.
 The engraved figure layer supplies atmosphere without depth, all of it drawn on canvas
 beneath the data and never under body text: a fixed-seed field of uncatalogued stars at
 5–21% opacity, five contour bands at 70% of the figure opacity, and the folder
-constellation lines capped at 22%. None of it is interactive and none of it carries
-meaning; the catalogued objects sit on top of it and do.
+containment edges drawn in the hue of what they hold. The uncatalogued field carries no
+meaning and is never interactive; the edges and the catalogued objects on top of it do.
 
 Emitted light is the one sanctioned exception to No-Shadow and it is spent twice: a
 radial bloom on magnitude 0–2 objects, and a 10px `shadowBlur` on the reticle. Both are
@@ -400,8 +400,9 @@ element.
 
 ## Components
 
-- **Plate card** (document in a collection view): a square chart plate on the left
-  showing the document's folder constellation with its own point ringed, and a data
+- **Plate card** (document in a collection view): a square cut of the same settled graph
+  on the left — the document's folder as a hub with its documents on spokes, in the
+  folder's hue, the document itself ringed — and a data
   block on the right — italic Bodoni title, an amber designation line (`API · 02 · MDX`),
   then a two-column tabular grid of real values (MAG from file size, MOD from mtime,
   SIZE, TYPE). No screenshot thumbnails, no gradients.
@@ -503,7 +504,8 @@ drawn set. The user always knows how wide the next action reaches before it fire
 **Do** encode every ranking as size on the magnitude ramp first.
 **Do** compute every figure from a real file; an honest empty state beats a plausible number.
 **Do** rebuild every atom in this vocabulary — nav, buttons, inputs, dialogs, empty states.
-**Do** draw the constellation lines and contour texture on canvas, as the real technique.
+**Do** let the collection's own structure place things: the layout is a force-directed
+graph of the folder tree, not an arrangement chosen to look good.
 **Do** give both renditions the same care and their own accent ink.
 **Do** separate content by tone, weight and italic before reaching for colour — code and
 callouts are both differentiated that way, and both are legible for it.
