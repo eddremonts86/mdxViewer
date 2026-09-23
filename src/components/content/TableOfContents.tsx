@@ -1,151 +1,78 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { Book, ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
+import { PlateLabel } from "@/components/atlas";
 import { cn } from "@/lib/utils";
-import { generateHeadingId } from "@/utils/headingUtils";
-
-interface TableOfContentsItem {
-    level: number;
-    title: string;
-    id: string;
-}
+import { parseHeadings } from "@/utils/headingUtils";
 
 interface TableOfContentsProps {
-    content?: string;
-    items?: TableOfContentsItem[];
+    /** Markdown source; headings are parsed with the same id generator the
+        rendered headings use, so every anchor resolves. */
+    content: string;
     className?: string;
 }
 
-export function TableOfContents({ content, items, className }: TableOfContentsProps) {
-    const [toc, setToc] = useState<TableOfContentsItem[]>([]);
+const SCROLL_OFFSET = 84;
+const INDENT_REM_PER_LEVEL = 0.65;
+
+export function TableOfContents({ content, className }: TableOfContentsProps) {
+    const headings = useMemo(() => parseHeadings(content), [content]);
     const [activeId, setActiveId] = useState<string>("");
-    const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
     useEffect(() => {
-        // Si se pasan items directamente, usarlos
-        if (items) {
-            setToc(items);
-            return;
-        }
+        if (headings.length === 0) return undefined;
 
-        // Si no, extraer encabezados del contenido
-        if (!content) {
-            setToc([]);
-            return;
-        }
-
-        const headingRegex = /^(#{1,6})\s+(.+)$/gm;
-        const headings: TableOfContentsItem[] = [];
-
-        let match;
-        while ((match = headingRegex.exec(content)) !== null) {
-            const level = match[1].length;
-            const title = match[2].trim();
-            const id = generateHeadingId(title);
-
-            headings.push({ level, title, id });
-        }
-
-        setToc(headings);
-    }, [content, items]);
-
-    useEffect(() => {
-        // Observar elementos en el viewport para resaltar el activo
         const observer = new IntersectionObserver(
             entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        setActiveId(entry.target.id);
-                    }
-                });
+                for (const entry of entries) {
+                    if (entry.isIntersecting) setActiveId(entry.target.id);
+                }
             },
-            {
-                rootMargin: "-20% 0% -35% 0%",
-                threshold: 0.1,
-            },
+            { rootMargin: "-15% 0% -60% 0%", threshold: 0.05 }
         );
 
-        // Observar todos los encabezados
-        toc.forEach(({ id }) => {
+        for (const { id } of headings) {
             const element = document.getElementById(id);
-            if (element) {
-                observer.observe(element);
-            }
-        });
+            if (element) observer.observe(element);
+        }
 
         return () => observer.disconnect();
-    }, [toc]);
+    }, [headings]);
 
-    const handleClick = (id: string) => {
+    if (headings.length === 0) return null;
+
+    const goTo = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
         const element = document.getElementById(id);
-        if (element) {
-            // Use a better scroll implementation with offset for header
-            const headerOffset = 80; // Adjust based on your header height
-            const elementPosition = element.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: "smooth",
-            });
-
-            // Update URL hash
-            window.history.pushState(null, "", `#${id}`);
-        }
+        if (!element) return;
+        event.preventDefault();
+        const container = element.closest("main") ?? document.documentElement;
+        const top = element.getBoundingClientRect().top + container.scrollTop - SCROLL_OFFSET;
+        container.scrollTo({ top, behavior: "smooth" });
+        window.history.replaceState(null, "", `#${id}`);
     };
-
-    const toggleExpanded = () => {
-        setIsExpanded(!isExpanded);
-    };
-
-    if (toc.length === 0) {
-        return null;
-    }
 
     return (
-        <div className={cn("space-y-2", className)}>
-            <Button
-                variant="ghost"
-                onClick={toggleExpanded}
-                className="hover:bg-accent/50 flex w-full items-center justify-between border-b px-4 py-2 transition-colors duration-200 h-auto"
-            >
-                <div className="flex items-center gap-2">
-                    <Book className="text-muted-foreground h-4 w-4" />
-                    <h3 className="text-foreground text-sm font-semibold">Índice de Contenido</h3>
-                </div>
-                {isExpanded ? (
-                    <ChevronUp className="text-muted-foreground h-4 w-4" />
-                ) : (
-                    <ChevronDown className="text-muted-foreground h-4 w-4" />
-                )}
-            </Button>
-
-            {isExpanded && (
-                <nav className="space-y-1">
-                    {toc.map(({ level, title, id }) => (
-                        <Button
-                            key={id}
-                            variant="ghost"
-                            onClick={() => handleClick(id)}
+        <nav className={cn("space-y-3", className)} aria-label="On this plate">
+            <PlateLabel reading={`${headings.length}`}>On this plate</PlateLabel>
+            <ul className="space-y-px">
+                {headings.map(({ id, title, level }) => (
+                    <li key={id}>
+                        <a
+                            href={`#${id}`}
+                            onClick={event => goTo(event, id)}
+                            aria-current={activeId === id ? "location" : undefined}
                             className={cn(
-                                "group hover:bg-accent hover:text-accent-foreground flex w-full items-center justify-start gap-2 rounded-lg px-4 py-1.5 text-left text-sm transition-all duration-200 h-auto",
-                                activeId === id && "bg-accent text-accent-foreground font-medium",
-                                level === 1 && "font-medium",
-                                level === 2 && "pl-6",
-                                level === 3 && "pl-8 text-xs",
-                                level === 4 && "pl-10 text-xs",
-                                level === 5 && "pl-12 text-xs opacity-75",
-                                level === 6 && "pl-14 text-xs opacity-50",
+                                "focus-visible:outline-mark block truncate border-l py-1 pr-1 text-[0.8125rem] transition-colors focus-visible:outline focus-visible:outline-offset-[-2px]",
+                                activeId === id
+                                    ? "border-mark text-mark-read"
+                                    : "border-rule text-ink-dim hover:text-ink"
                             )}
+                            style={{ paddingLeft: `calc(${level * INDENT_REM_PER_LEVEL}rem)` }}
                         >
-                            {level > 1 && <ChevronRight className="text-muted-foreground h-3 w-3 flex-shrink-0" />}
-                            <span className="truncate">{title}</span>
-                        </Button>
-                    ))}
-                </nav>
-            )}
-        </div>
+                            {title}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </nav>
     );
 }

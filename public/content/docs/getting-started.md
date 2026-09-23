@@ -49,7 +49,7 @@ description: "Document description"
 
 ### MDX Files (.mdx)
 
-`.mdx` files allow you to use React components:
+`.mdx` files are read, but **MDX is not compiled**: their JSX is not executed. A file like the one below renders as Markdown, and the viewer prints a note saying the components were not run. It is written this way so the files are ready if compilation is added later:
 
 ```jsx
 import { Alert } from '../components/Alert'

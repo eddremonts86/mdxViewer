@@ -3,14 +3,16 @@ import { createRoot } from "react-dom/client";
 
 import App from "./App";
 
-// Import fonts
-import "@fontsource/inter/400.css";
-import "@fontsource/inter/500.css";
-import "@fontsource/inter/600.css";
-import "@fontsource/inter/700.css";
+// Bodoni Moda names every catalogued object; its italic is the designation.
+import "@fontsource/bodoni-moda/500.css";
+import "@fontsource/bodoni-moda/500-italic.css";
+import "@fontsource/bodoni-moda/600.css";
+// Archivo carries labels, figures and controls.
+import "@fontsource/archivo/400.css";
+import "@fontsource/archivo/500.css";
+import "@fontsource/archivo/600.css";
+// JetBrains Mono is for code only.
 import "@fontsource/jetbrains-mono/400.css";
-import "@fontsource/jetbrains-mono/500.css";
-import "@fontsource/jetbrains-mono/600.css";
 import "./assets/styles/index.css";
 // Import View Transitions CSS
 import "./assets/styles/view-transitions.css";
@@ -34,5 +36,5 @@ createRoot(document.getElementById("root")!).render(
             <App />
             <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
-    </StrictMode>,
+    </StrictMode>
 );

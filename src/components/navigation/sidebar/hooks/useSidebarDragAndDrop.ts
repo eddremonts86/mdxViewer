@@ -1,6 +1,11 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import { useToast } from "@/hooks/use-toast";
+
+/** How long a folder must be hovered before it opens itself under the pointer. */
+const AUTO_EXPAND_DELAY_MS = 800;
+/** Long enough for the drop animation to finish before styles are cleared. */
+const DROP_SETTLE_MS = 200;
 
 /**
  * Custom hook for managing drag and drop operations in the sidebar
@@ -38,12 +43,12 @@ export const useSidebarDragAndDrop = (
             }, 0);
 
             toast({
-                title: "🎯 Drag to move",
+                title: "Drag to move",
                 description: `Drop "${itemName}" on a folder to move it there`,
                 duration: 3000,
             });
         },
-        [toast],
+        [toast]
     );
 
     const handleDragOver = useCallback(
@@ -68,12 +73,12 @@ export const useSidebarDragAndDrop = (
                 const timer = setTimeout(() => {
                     setAnimatingFolders(folders => new Set([...folders, targetPath]));
                     handleFolderAutoExpansion(targetPath);
-                }, 800); // Wait 800ms before auto-expanding
+                }, AUTO_EXPAND_DELAY_MS);
 
                 setDragAutoExpandTimer(timer);
             }
         },
-        [isDragging, draggedItem, dragAutoExpandTimer, handleFolderAutoExpansion],
+        [isDragging, draggedItem, dragAutoExpandTimer, handleFolderAutoExpansion]
     );
 
     const handleDragLeave = useCallback(
@@ -94,28 +99,28 @@ export const useSidebarDragAndDrop = (
                 setDragOverFolder(null);
             }
         },
-        [dragAutoExpandTimer],
+        [dragAutoExpandTimer]
     );
 
     const handleDrop = useCallback(
         (e: React.DragEvent, targetPath: string, isFolder: boolean) => {
             e.preventDefault();
-            
+
             if (!draggedItem || !isFolder) return;
-            
+
             // Prevent dropping a folder into itself or its children
             if (targetPath.startsWith(draggedItem)) return;
 
             // Perform the move operation
             moveItemMutation({
                 sourcePath: draggedItem,
-                targetPath: targetPath,
+                targetPath,
             });
 
             // Clear drag state
             setDragOverFolder(null);
         },
-        [draggedItem, moveItemMutation],
+        [draggedItem, moveItemMutation]
     );
 
     const handleDragEnd = useCallback(() => {
@@ -145,7 +150,7 @@ export const useSidebarDragAndDrop = (
             dragElements.forEach(el => {
                 (el as HTMLElement).style.transition = "";
             });
-        }, 200);
+        }, DROP_SETTLE_MS);
     }, [dragAutoExpandTimer]);
 
     return {

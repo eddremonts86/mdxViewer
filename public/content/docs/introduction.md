@@ -8,33 +8,31 @@ tags: ["introduction", "guide", "getting started"]
 
 # Introduction to MDX Viewer
 
-Welcome to the **Advanced Markdown and MDX Viewer**. This application allows you to navigate, view, and export documents in a professional manner.
+Welcome to **MDXViewer**. It charts a folder of Markdown and MDX documentation so you can see the whole collection at once, read any document in it, and reorganize the folder itself.
 
 ## Key Features
 
 Our MDX Viewer comes with a comprehensive set of features designed to enhance your documentation experience:
 
-### 📁 Tree Navigation
+### Tree Navigation
 
 Explore documents organized in folders with an intuitive sidebar navigation. The tree structure makes it easy to find and access your content quickly.
 
-### 📄 Dual Rendering
+### Dual Rendering
 
-Complete support for both `.md` (Markdown) and `.mdx` (MDX) files with interactive React components embedded seamlessly.
+Both `.md` and `.mdx` files are read and rendered. Note that `.mdx` is rendered **as Markdown**: MDX is not compiled, so React components written inside an `.mdx` file are not executed. The viewer says so on any document that defines them, and leaves their source out rather than printing it as prose.
 
-### 🎨 Interactive Components
+### The Chart
 
-Custom MDX elements that bring your documentation to life with interactive examples and demonstrations.
+The whole collection is plotted as a graph: every document is a point sized by its file size, every folder is a hub the documents inside it hang from, and the object under the pointer is named in place. It is the answer to "what is in here", before you open anything.
 
-### 📥 Export Capabilities
+### Printing
 
-Download your documents in multiple formats:
+Any document prints with its own stylesheet: the interface chrome is dropped, the height caps are lifted, and the page comes out as ink on paper rather than as a screenshot of a dark screen. External links print their URL beside them.
 
--   **PDF**: Perfect for sharing and printing
--   **HTML**: For web distribution
--   Direct printing with optimized formatting
+There is no PDF or HTML export. Use your browser's "Print to PDF" if you need a file.
 
-### 🌙 Theme Support
+### Theme Support
 
 Beautiful dark and light modes with smooth transitions, ensuring comfortable reading in any environment.
 
@@ -46,9 +44,8 @@ Use the **left sidebar** to navigate between documents. Click on folders to expa
 
 At the top of each document, you'll find convenient action buttons:
 
--   **📥 Download PDF**: Converts the current document to PDF format
--   **🖨️ Print**: Print with optimized document formatting
--   **🔗 Share**: Copy the direct link to share the document
+-   **Chart**: Go back to the collection
+-   **🖨️ Print**: Print with the document's own print stylesheet
 
 ## Typography Examples
 

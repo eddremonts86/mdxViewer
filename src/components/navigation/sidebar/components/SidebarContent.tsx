@@ -1,161 +1,86 @@
-import React from "react";
-
-import { Loader2 } from "lucide-react";
-
 import type { FileItem } from "@/api/fileAPI";
 import { NoResults } from "@/components/search/NoResults";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
+import { TreeProvider, type TreeState } from "../TreeContext";
 import { FileItemRenderer } from "./FileItemRenderer";
 
-interface SidebarContentProps {
-    // Data props
+/** Relative widths of the placeholder rules shown while the index loads. */
+const RULE_WIDTHS = [0.9, 0.6, 0.75, 0.5, 0.8, 0.45];
+const RULE_OPACITY = 0.7;
+
+interface SidebarContentProps extends TreeState {
     isLoading: boolean;
     error: Error | null;
     filteredFiles: FileItem[];
     searchTerm: string;
     onClearSearch: () => void;
     onRefetch: () => void;
-    // Selection props
-    isSelectionModeActive: boolean;
-    selectedFiles: string[];
-    onSelectFile: (path: string, event?: React.MouseEvent) => void;
-    onCheckboxChange: (itemPath: string, checked: boolean | string) => void;
-    // Folder expansion props
-    expandedFolders: Set<string>;
-    onToggleFolder: (path: string) => void;
-    // Item interaction props
-    onItemClick: (item: FileItem, event?: React.MouseEvent) => void;
-    // Action props
-    onCreateFile: (parentPath: string) => void;
-    onCreateFolder: (parentPath: string) => void;
-    onMoveItem: (itemPath: string, itemName: string) => void;
-    onDeleteItem: (itemPath: string) => void;
-    // Drag and drop props
-    isDragging: boolean;
-    draggedItem: string | null;
-    draggedItemName: string;
-    dragOverFolder: string | null;
-    animatingFolders: Set<string>;
-    onDragStart: (e: React.DragEvent, itemPath: string, itemName: string) => void;
-    onDragEnd: () => void;
-    onDragOver: (e: React.DragEvent, targetPath: string, isFolder: boolean) => void;
-    onDragLeave: (e: React.DragEvent) => void;
-    onDrop: (e: React.DragEvent, targetPath: string, isFolder: boolean) => void;
 }
 
 /**
- * Main content area component for the sidebar
- * Handles loading states, errors, and file list rendering
+ * The index field. Everything a row needs travels by context, so the recursion
+ * carries two props instead of twenty-two.
  */
-export const SidebarContent: React.FC<SidebarContentProps> = ({
+export function SidebarContent({
     isLoading,
     error,
     filteredFiles,
     searchTerm,
     onClearSearch,
     onRefetch,
-    isSelectionModeActive,
-    selectedFiles,
-    onSelectFile,
-    onCheckboxChange,
-    expandedFolders,
-    onToggleFolder,
-    onItemClick,
-    onCreateFile,
-    onCreateFolder,
-    onMoveItem,
-    onDeleteItem,
-    isDragging,
-    draggedItem,
-    draggedItemName,
-    dragOverFolder,
-    animatingFolders,
-    onDragStart,
-    onDragEnd,
-    onDragOver,
-    onDragLeave,
-    onDrop,
-}) => {
+    ...tree
+}: SidebarContentProps) {
     return (
         <section
-            className={cn("relative flex-1 overflow-auto", isDragging && "bg-blue-50/30 dark:bg-blue-900/10")}
-            onDragOver={e => onDragOver(e, "", true)}
-            onDragLeave={onDragLeave}
-            onDrop={e => onDrop(e, "", true)}
-            aria-label="File explorer content"
+            className={cn("relative flex-1 overflow-y-auto py-1", tree.isDragging && "bg-panel/40")}
+            onDragOver={event => tree.onDragOver(event, "", true)}
+            onDragLeave={tree.onDragLeave}
+            onDrop={event => tree.onDrop(event, "", true)}
+            aria-label="Plate index"
         >
-            {/* Global drag overlay */}
-            {isDragging && (
-                <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-blue-500/5">
-                    <div className="rounded-lg border border-blue-300 bg-white px-4 py-2 shadow-lg dark:bg-gray-800">
-                        <div className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                            📁 Drop to move "{draggedItemName}" to root folder
-                        </div>
-                        <div className="mt-1 text-xs text-blue-600 dark:text-blue-400">
-                            Or drop on a specific folder below
-                        </div>
-                    </div>
-                </div>
-            )}
+            {tree.isDragging ? (
+                <p className="border-rule text-ink-dim sticky top-0 z-10 border-b px-3 py-1.5 text-[0.6875rem] tracking-[0.08em] uppercase">
+                    Drop here to move to the root plate
+                </p>
+            ) : null}
 
-            {isLoading && (
-                <div className="flex items-center justify-center p-8">
-                    <Loader2 className="h-6 w-6 animate-spin" />
-                    <span className="ml-2">Loading files...</span>
-                </div>
-            )}
+            {isLoading ? (
+                <ul className="space-y-2 p-3" aria-busy="true">
+                    {RULE_WIDTHS.map((width, row) => (
+                        <li
+                            key={row}
+                            className="bg-rule h-2"
+                            style={{ width: `${width * 100}%`, opacity: RULE_OPACITY }}
+                        />
+                    ))}
+                </ul>
+            ) : null}
 
-            {error && (
-                <div className="p-4">
-                    <Card className="border-destructive bg-destructive/10 p-4">
-                        <p className="text-destructive text-sm">Failed to load files: {error.message}</p>
-                        <Button variant="outline" size="sm" onClick={onRefetch} className="mt-2">
-                            Retry
-                        </Button>
-                    </Card>
+            {error ? (
+                <div className="p-3">
+                    <p className="text-ink text-[0.8125rem] leading-relaxed">The index could not be read.</p>
+                    <p className="text-ink-dim mt-1 text-[0.75rem] leading-relaxed">{error.message}</p>
+                    <Button variant="outline" size="sm" onClick={onRefetch} className="mt-3">
+                        Try again
+                    </Button>
                 </div>
-            )}
+            ) : null}
 
-            {!isLoading && !error && (
-                <>
-                    {filteredFiles.length === 0 ? (
-                        <NoResults searchTerm={searchTerm} onClearSearch={onClearSearch} />
-                    ) : (
-                        <div className="space-y-1 p-2">
+            {!isLoading && !error ? (
+                filteredFiles.length === 0 ? (
+                    <NoResults searchTerm={searchTerm} onClearSearch={onClearSearch} />
+                ) : (
+                    <TreeProvider value={tree}>
+                        <ul role="tree" aria-label="Documents and folders">
                             {filteredFiles.map(item => (
-                                <FileItemRenderer
-                                    key={item.path}
-                                    item={item}
-                                    isSelectionModeActive={isSelectionModeActive}
-                                    selectedFiles={selectedFiles}
-                                    onSelectFile={onSelectFile}
-                                    onCheckboxChange={onCheckboxChange}
-                                    expandedFolders={expandedFolders}
-                                    onToggleFolder={onToggleFolder}
-                                    onItemClick={onItemClick}
-                                    onCreateFile={onCreateFile}
-                                    onCreateFolder={onCreateFolder}
-                                    onMoveItem={onMoveItem}
-                                    onDeleteItem={onDeleteItem}
-                                    isDragging={isDragging}
-                                    draggedItem={draggedItem}
-                                    draggedItemName={draggedItemName}
-                                    dragOverFolder={dragOverFolder}
-                                    animatingFolders={animatingFolders}
-                                    onDragStart={onDragStart}
-                                    onDragEnd={onDragEnd}
-                                    onDragOver={onDragOver}
-                                    onDragLeave={onDragLeave}
-                                    onDrop={onDrop}
-                                />
+                                <FileItemRenderer key={item.path} item={item} />
                             ))}
-                        </div>
-                    )}
-                </>
-            )}
+                        </ul>
+                    </TreeProvider>
+                )
+            ) : null}
         </section>
     );
-};
+}

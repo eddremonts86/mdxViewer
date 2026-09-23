@@ -1,3 +1,3 @@
-export { NavigationBreadcrumb } from "./NavigationBreadcrumb";
-export { Sidebar } from "./sidebar";
+export { CommandPalette } from "./CommandPalette";
+export { Sidebar } from "./Sidebar";
 export { TransitionLink } from "./TransitionLink";

@@ -64,18 +64,12 @@ export const formatDate = (dateString: string): string => {
 /**
  * Format API messages with placeholders
  */
-export const formatMessage = (
-    template: string,
-    replacements: Record<string, string | number>,
-): string => {
+export const formatMessage = (template: string, replacements: Record<string, string | number>): string => {
     let formatted = template;
 
     Object.entries(replacements).forEach(([key, value]) => {
         const placeholder = `{${key}}`;
-        formatted = formatted.replace(
-            new RegExp(placeholder, "g"),
-            value.toString(),
-        );
+        formatted = formatted.replace(new RegExp(placeholder, "g"), value.toString());
     });
 
     return formatted;

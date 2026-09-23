@@ -5,5 +5,8 @@
 
 export * from "./fileManagement.js";
 export * from "./files.js";
+export * from "./importTree.js";
 export * from "./preview.js";
+export * from "./search.js";
 export * from "./statistics.js";
+export * from "./trash.js";

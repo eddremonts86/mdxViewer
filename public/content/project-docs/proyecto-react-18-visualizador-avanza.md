@@ -1,5 +1,13 @@
 # Proyecto React 18: Visualizador Avanzado de Markdown y MDX
 
+> **Nota de 2026-09-03.** Este documento es un registro histórico y se conserva
+> tal como se escribió. Parte de lo que describe ya no es cierto del producto:
+> MDX no se compila (los componentes React de un `.mdx` no se ejecutan), no hay
+> exportación a PDF ni a HTML —solo impresión con su propia hoja de estilos— y
+> varios módulos que menciona (`fileSystemAPI`, `useFileSystemDynamic`,
+> `export.utils`, `DocumentViewer`) se eliminaron. Lo que el producto hace hoy
+> está en `PRODUCT.md` y en `docs/introduction.md`.
+
 Crea un proyecto completamente funcional y listo para producción en React 18 + TypeScript + Vite para construir un visualizador profesional de archivos Markdown (.md) y MDX (.mdx). **IMPORTANTE: El proyecto debe ser 100% autónomo, funcional desde el primer momento sin requerir intervención manual adicional.**
 
 ## 🚀 Instrucciones de Creación Automática

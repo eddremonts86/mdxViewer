@@ -84,18 +84,18 @@ export class Logger {
         const prefix = `[${timestamp}] ${levelStr}:`;
 
         switch (entry.level) {
-        case LogLevel.ERROR:
-            console.error(prefix, entry.message, entry.context ?? "", entry.error ?? "");
-            break;
-        case LogLevel.WARN:
-            console.warn(prefix, entry.message, entry.context ?? "");
-            break;
-        case LogLevel.INFO:
-            console.warn(prefix, entry.message, entry.context ?? ""); // Use warn as info is not allowed
-            break;
-        case LogLevel.DEBUG:
-            console.warn(prefix, entry.message, entry.context ?? ""); // Use warn as debug is not allowed
-            break;
+            case LogLevel.ERROR:
+                console.error(prefix, entry.message, entry.context ?? "", entry.error ?? "");
+                break;
+            case LogLevel.WARN:
+                console.warn(prefix, entry.message, entry.context ?? "");
+                break;
+            case LogLevel.INFO:
+                console.warn(prefix, entry.message, entry.context ?? ""); // Use warn as info is not allowed
+                break;
+            case LogLevel.DEBUG:
+                console.warn(prefix, entry.message, entry.context ?? ""); // Use warn as debug is not allowed
+                break;
         }
     }
 
@@ -123,17 +123,17 @@ export const logger = Logger.getInstance();
 
 // Helper functions for common logging patterns
 export const logOperation = (operation: string, context?: Record<string, unknown>) => {
-    logger.info(`🔄 ${operation}`, context);
+    logger.info(operation, context);
 };
 
 export const logSuccess = (operation: string, context?: Record<string, unknown>) => {
-    logger.info(`✅ ${operation}`, context);
+    logger.info(operation, context);
 };
 
 export const logError = (operation: string, error: Error, context?: Record<string, unknown>) => {
-    logger.error(`❌ ${operation}`, error, context);
+    logger.error(operation, error, context);
 };
 
 export const logWarning = (message: string, context?: Record<string, unknown>) => {
-    logger.warn(`⚠️ ${message}`, context);
+    logger.warn(message, context);
 };

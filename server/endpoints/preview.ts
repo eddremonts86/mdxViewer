@@ -9,6 +9,7 @@ import path from "path";
 import { HTTP_STATUS, SERVER_CONFIG } from "../constants/index.js";
 import type { ApiResponse } from "../types/index.js";
 import { logServerError } from "../utils/logger.js";
+import { resolveInsideContent, resolveInsidePreviews } from "../utils/validation.js";
 
 /**
  * Sanitize filename to be URL-safe and match kebab-case convention
@@ -40,6 +41,92 @@ function sanitizeFolderPath(folderPath: string): string {
 }
 
 /**
+ * Escape text before interpolating it into SVG markup
+ */
+function escapeXml(text: string): string {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+}
+
+/**
+ * Split "docs/guides/intro.png" into its folder part and its file part
+ */
+function splitPreviewPath(filename: string): { actualFilename: string; sourceBasePath: string } {
+    if (!filename.includes("/")) {
+        return { actualFilename: filename, sourceBasePath: "" };
+    }
+
+    const pathParts = filename.split("/");
+    const actualFilename = pathParts.pop() ?? filename;
+
+    return { actualFilename, sourceBasePath: pathParts.join("/") };
+}
+
+/**
+ * Where the pre-generated SVG preview for this request would live
+ */
+function resolveSvgPreviewPath(actualFilename: string, sourceBasePath: string): string | null {
+    // Strip the .png that the client appends, keeping the source extension
+    let svgFilename = actualFilename;
+    if (svgFilename.endsWith(".md.png")) {
+        svgFilename = svgFilename.replace(/\.md\.png$/, ".md");
+    } else if (svgFilename.endsWith(".mdx.png")) {
+        svgFilename = svgFilename.replace(/\.mdx\.png$/, ".mdx");
+    } else {
+        svgFilename = svgFilename.replace(/\.png$/, "");
+    }
+
+    const finalSvgName = sanitizeFilename(svgFilename).replace(/\.(md|mdx)$/, ".svg");
+    const sanitizedBasePath = sourceBasePath ? sanitizeFolderPath(sourceBasePath) : "";
+
+    return resolveInsidePreviews(sanitizedBasePath, finalSvgName);
+}
+
+/**
+ * Name of the source document behind a preview request, or null when there is none
+ */
+async function findSourceDocument(basePath: string, actualFilename: string): Promise<string | null> {
+    const candidates = [actualFilename.replace(/\.png$/, ".md"), actualFilename.replace(/\.png$/, ".mdx")];
+
+    for (const candidate of candidates) {
+        try {
+            await fs.access(path.join(basePath, candidate));
+            return candidate;
+        } catch {
+            // Try the next extension
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Placeholder shown while a real preview has not been generated yet
+ */
+function renderPlaceholderSvg(sourceFilename: string, sourceBasePath: string): string {
+    const displayTitle = escapeXml(sourceFilename.replace(/\.(md|mdx)$/, "").replace(/-/g, " "));
+    const fileType = sourceFilename.endsWith(".mdx") ? "MDX" : "MD";
+    const folderName = escapeXml(sourceBasePath || "root");
+
+    return `
+        <svg width="400" height="240" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="240" fill="#f8f9fa"/>
+            <rect x="20" y="20" width="60" height="25" fill="#3b82f6" rx="4"/>
+            <text x="35" y="38" font-family="Arial, sans-serif" font-size="12" fill="white">${fileType}</text>
+            <text x="20" y="70" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1a1a1a">${displayTitle}</text>
+            <text x="20" y="100" font-family="Arial, sans-serif" font-size="14" fill="#666666">Folder: ${folderName}</text>
+            <text x="20" y="120" font-family="Arial, sans-serif" font-size="14" fill="#666666">Type: ${fileType === "MDX" ? "MDX Interactive" : "Markdown"}</text>
+            <text x="20" y="140" font-family="Arial, sans-serif" font-size="14" fill="#666666">Preview generating...</text>
+            <text x="20" y="160" font-family="Arial, sans-serif" font-size="12" fill="#999999">Run: npm run generate:previews</text>
+        </svg>
+    `;
+}
+
+/**
  * Serve preview images - generate if not exists
  * GET /api/previews/:filename
  */
@@ -54,19 +141,8 @@ export const getPreview = async (req: Request, res: Response) => {
             });
         }
 
-        // Handle nested paths (e.g., "docs/introduction.png")
-        const isNestedPath = filename.includes("/");
-        let actualFilename = filename;
-        let sourceBasePath = "";
+        const { actualFilename, sourceBasePath } = splitPreviewPath(filename);
 
-        if (isNestedPath) {
-            // Split path and filename
-            const pathParts = filename.split("/");
-            actualFilename = pathParts.pop() ?? filename;
-            sourceBasePath = pathParts.join("/");
-        }
-
-        // Check if it's a PNG request
         if (!actualFilename.endsWith(".png")) {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
@@ -74,138 +150,56 @@ export const getPreview = async (req: Request, res: Response) => {
             });
         }
 
-        const previewsDir = path.join(
-            path.dirname(SERVER_CONFIG.CONTENT_PATH),
-            "previews",
-        );
-        const previewPath = path.join(previewsDir, filename);
-
-        // Check if PNG preview exists
+        // 1. A generated PNG preview, if one exists
+        const previewPath = resolveInsidePreviews(filename);
+        if (!previewPath) {
+            return res.status(HTTP_STATUS.FORBIDDEN).json({
+                success: false,
+                error: "Preview path is outside the previews folder",
+            });
+        }
         try {
-            await fs.access(previewPath);
-
-            // Serve existing PNG preview
-            const stat = await fs.stat(previewPath);
-            const stream = await fs.readFile(previewPath);
+            const [stat, png] = await Promise.all([fs.stat(previewPath), fs.readFile(previewPath)]);
 
             res.setHeader("Content-Type", "image/png");
             res.setHeader("Content-Length", stat.size);
             res.setHeader("Cache-Control", "public, max-age=86400"); // 24 hours
 
-            return res.send(stream);
+            return res.send(png);
         } catch {
-            // PNG doesn't exist, try SVG preview
-            // For SVG, we need to remove both .md/.mdx and .png extensions
-            // and sanitize the filename to match our safe naming convention
-            let svgFilename = actualFilename;
-
-            // Remove the .png extension first
-            if (svgFilename.endsWith(".md.png")) {
-                svgFilename = svgFilename.replace(/\.md\.png$/, ".md");
-            } else if (svgFilename.endsWith(".mdx.png")) {
-                svgFilename = svgFilename.replace(/\.mdx\.png$/, ".mdx");
-            } else {
-                svgFilename = svgFilename.replace(/\.png$/, "");
-            }
-
-            // Sanitize the filename to match our safe naming convention
-            const sanitizedFilename = sanitizeFilename(svgFilename);
-            const finalSvgName = sanitizedFilename.replace(
-                /\.(md|mdx)$/,
-                ".svg",
-            );
-
-            // Also sanitize the source base path
-            const sanitizedBasePath = sourceBasePath
-                ? sanitizeFolderPath(sourceBasePath)
-                : "";
-
-            const svgPreviewPath = path.join(
-                path.dirname(SERVER_CONFIG.CONTENT_PATH),
-                "previews",
-                sanitizedBasePath,
-                finalSvgName,
-            );
-
-            try {
-                await fs.access(svgPreviewPath);
-
-                // Serve existing SVG preview
-                const svgContent = await fs.readFile(svgPreviewPath, "utf8");
-
-                res.setHeader("Content-Type", "image/svg+xml");
-                res.setHeader("Cache-Control", "public, max-age=86400"); // 24 hours
-
-                return res.send(svgContent);
-            } catch {
-                // Neither PNG nor SVG exists, check if source document exists and generate fallback
-                const sourceFilename = actualFilename.replace(/\.png$/, ".md");
-                const altSourceFilename = actualFilename.replace(
-                    /\.png$/,
-                    ".mdx",
-                );
-
-                let actualSourceFilename;
-
-                // Construct full source paths
-                const basePath = sourceBasePath
-                    ? path.join(SERVER_CONFIG.CONTENT_PATH, sourceBasePath)
-                    : SERVER_CONFIG.CONTENT_PATH;
-
-                // Try .md first, then .mdx
-                try {
-                    const sourceFile = path.join(basePath, sourceFilename);
-                    await fs.access(sourceFile);
-                    actualSourceFilename = sourceFilename;
-                } catch {
-                    try {
-                        const sourceFile = path.join(
-                            basePath,
-                            altSourceFilename,
-                        );
-                        await fs.access(sourceFile);
-                        actualSourceFilename = altSourceFilename;
-                    } catch {
-                        // Return 404 if source document doesn't exist
-                        return res.status(HTTP_STATUS.NOT_FOUND).json({
-                            success: false,
-                            error: "Source document not found",
-                        });
-                    }
-                }
-
-                // Generate a simple SVG placeholder since PNG doesn't exist yet
-                const displayTitle = actualSourceFilename
-                    .replace(/\.(md|mdx)$/, "")
-                    .replace(/-/g, " ");
-                const fileType = actualSourceFilename.endsWith(".mdx")
-                    ? "MDX"
-                    : "MD";
-                const folderName = sourceBasePath || "root";
-
-                const svgContent = `
-                    <svg width="400" height="240" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="400" height="240" fill="#f8f9fa"/>
-                        <rect x="20" y="20" width="60" height="25" fill="#3b82f6" rx="4"/>
-                        <text x="35" y="38" font-family="Arial, sans-serif" font-size="12" fill="white">${fileType}</text>
-                        <text x="20" y="70" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1a1a1a">${displayTitle}</text>
-                        <text x="20" y="100" font-family="Arial, sans-serif" font-size="14" fill="#666666">Folder: ${folderName}</text>
-                        <text x="20" y="120" font-family="Arial, sans-serif" font-size="14" fill="#666666">Type: ${fileType === "MDX" ? "MDX Interactive" : "Markdown"}</text>
-                        <text x="20" y="140" font-family="Arial, sans-serif" font-size="14" fill="#666666">Preview generating...</text>
-                        <text x="20" y="160" font-family="Arial, sans-serif" font-size="12" fill="#999999">Run: npm run generate:previews</text>
-                    </svg>
-                `;
-
-                res.setHeader("Content-Type", "image/svg+xml");
-                res.setHeader("Cache-Control", "public, max-age=300"); // 5 minutes for SVG fallback
-                return res.send(svgContent);
-            }
+            // No PNG - fall through to the SVG preview
         }
+
+        // 2. A generated SVG preview, if one exists
+        const svgPath = resolveSvgPreviewPath(actualFilename, sourceBasePath);
+        try {
+            if (!svgPath) throw new Error("outside previews");
+            const svgContent = await fs.readFile(svgPath, "utf8");
+
+            res.setHeader("Content-Type", "image/svg+xml");
+            res.setHeader("Cache-Control", "public, max-age=86400"); // 24 hours
+
+            return res.send(svgContent);
+        } catch {
+            // No SVG - fall through to the placeholder
+        }
+
+        // 3. Nothing generated yet: show a placeholder if the document exists at all
+        const basePath = resolveInsideContent(sourceBasePath);
+        const sourceFilename = basePath ? await findSourceDocument(basePath, actualFilename) : null;
+
+        if (!sourceFilename) {
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                success: false,
+                error: "Source document not found",
+            });
+        }
+
+        res.setHeader("Content-Type", "image/svg+xml");
+        res.setHeader("Cache-Control", "public, max-age=300"); // 5 minutes for the placeholder
+        return res.send(renderPlaceholderSvg(sourceFilename, sourceBasePath));
     } catch (error) {
-        logServerError(
-            "Error serving preview:",
-            error instanceof Error ? error : new Error(String(error)),
-        );
+        logServerError("Error serving preview:", error instanceof Error ? error : new Error(String(error)));
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             error: "Failed to serve preview",
@@ -224,6 +218,7 @@ export const getHealth = (_req: Request, res: Response<ApiResponse>) => {
             status: "ok",
             timestamp: new Date().toISOString(),
             contentPath: SERVER_CONFIG.CONTENT_PATH,
+            mdxExecute: SERVER_CONFIG.MDX_EXECUTE,
         },
         message: "Server is healthy",
     });

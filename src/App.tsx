@@ -8,7 +8,7 @@ import "./assets/styles/App.css";
 
 function App() {
     return (
-        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+        <ThemeProvider defaultTheme="system" storageKey="mdxviewer-theme">
             <ErrorBoundary>
                 <RouterProvider router={router} />
             </ErrorBoundary>

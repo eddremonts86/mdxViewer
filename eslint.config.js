@@ -1,4 +1,5 @@
 import js from "@eslint/js";
+import eslintConfigPrettier from "eslint-config-prettier";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
@@ -85,26 +86,29 @@ export default tseslint.config(
             "no-var": "error",
             "prefer-const": "error",
             "no-unreachable": "error",
-            "no-unused-vars": [
-                "error",
-                {
-                    varsIgnorePattern: "^(tw|tailwind|_)",
-                    argsIgnorePattern: "^_",
-                    ignoreRestSiblings: true,
-                },
-            ],
+            // The base rule cannot read TypeScript, so it flags parameter names
+            // inside type signatures. @typescript-eslint/no-unused-vars below
+            // is the type-aware replacement.
+            "no-unused-vars": "off",
 
             // Duplicate code indicators
             "no-duplicate-imports": "error",
 
-            // Magic numbers - Allow commonly used values
+            // Magic numbers. The previous ignore list had grown to forty
+            // arbitrary integers (107, 809, 846...) added one at a time to
+            // silence specific reports, which is the rule not working. Every
+            // entry below has a reason, and a number outside them earns a named
+            // constant rather than a new entry here.
             "no-magic-numbers": [
                 "error",
                 {
                     ignore: [
-                        -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 18, 24, 36, 50, 55, 60, 80, 95, 100, 107,
-                        116, 127, 133, 137, 140, 143, 144, 145, 162, 179, 200, 253, 255, 300, 400, 403, 404, 500, 800,
-                        809, 846, 1000, 30000, 60000,
+                        // Small integers: indices, counts, heading levels, steps.
+                        -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                        // Percentages and time arithmetic.
+                        60, 100, 1000,
+                        // HTTP status codes the app actually branches on.
+                        400, 403, 404, 409, 500,
                     ],
                     ignoreArrayIndexes: true,
                     ignoreDefaultValues: true,
@@ -122,22 +126,7 @@ export default tseslint.config(
                 },
             ],
 
-            // Code formatting rules
-            indent: ["error", 4],
-            quotes: ["error", "double"],
-            semi: ["error", "always"],
-            "comma-dangle": ["error", "always-multiline"],
-            "no-trailing-spaces": "error",
-            "eol-last": "error",
-            "max-len": [
-                "error",
-                {
-                    code: 120,
-                    ignoreUrls: true,
-                    ignoreStrings: true,
-                    ignoreTemplateLiterals: true,
-                },
-            ],
+            // Formatting is owned by Prettier - see .prettierrc
 
             // TypeScript specific code smells
             "@typescript-eslint/no-explicit-any": "error",
@@ -181,6 +170,16 @@ export default tseslint.config(
                     enforceForRenamedProperties: false,
                 },
             ],
+        },
+    },
+    // The client is layout ratios, chart geometry, durations and status codes.
+    // The rule also refuses the fix it asks for: hoisting values into a named
+    // `const RULE_WIDTHS = [0.85, 1, 0.65]` still reports every element. It stays
+    // on for the server and the scripts, where a bare number usually is a bug.
+    {
+        files: ["src/**/*.{ts,tsx}"],
+        rules: {
+            "no-magic-numbers": "off",
         },
     },
     // Configuration for JavaScript files (scripts folder)
@@ -228,22 +227,7 @@ export default tseslint.config(
                 },
             ],
 
-            // Code formatting rules
-            indent: ["error", 4],
-            quotes: ["error", "double"],
-            semi: ["error", "always"],
-            "comma-dangle": ["error", "always-multiline"],
-            "no-trailing-spaces": "error",
-            "eol-last": "error",
-            "max-len": [
-                "error",
-                {
-                    code: 120,
-                    ignoreUrls: true,
-                    ignoreStrings: true,
-                    ignoreTemplateLiterals: true,
-                },
-            ],
+            // Formatting is owned by Prettier - see .prettierrc
 
             // Additional code smell rules
             "no-console": ["warn", { allow: ["warn", "error"] }],
@@ -283,7 +267,7 @@ export default tseslint.config(
     // Configuration for config files
     {
         extends: [js.configs.recommended],
-        files: ["*.config.js", "tailwind.config.js"],
+        files: ["*.config.js"],
         languageOptions: {
             ecmaVersion: 2020,
             globals: { ...globals.browser, ...globals.node },
@@ -312,5 +296,7 @@ export default tseslint.config(
             "@typescript-eslint/no-explicit-any": "off",
             "no-magic-numbers": "off",
         },
-    }
+    },
+    // Must stay last: turns off every rule that conflicts with Prettier
+    eslintConfigPrettier
 );

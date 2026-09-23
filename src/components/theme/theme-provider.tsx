@@ -10,7 +10,7 @@ interface ThemeProviderProps {
 
 interface ThemeProviderState {
     theme: Theme;
-    setTheme: (_theme: Theme) => void;
+    setTheme: (theme: Theme) => void;
 }
 
 const initialState: ThemeProviderState = {
@@ -20,45 +20,57 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
+const isTheme = (value: string | null): value is Theme => value === "dark" || value === "light" || value === "system";
+
+const readStoredTheme = (storageKey: string, fallback: Theme): Theme => {
+    try {
+        const stored = localStorage.getItem(storageKey);
+        return isTheme(stored) ? stored : fallback;
+    } catch {
+        // Private mode or blocked site data: the default is a fine answer.
+        return fallback;
+    }
+};
+
 export function ThemeProvider({
     children,
     defaultTheme = "system",
-    storageKey = "vite-ui-theme",
+    storageKey = "mdxviewer-theme",
     ...props
 }: ThemeProviderProps) {
-    const [theme, setTheme] = useState<Theme>(() => {
-        const storedTheme = localStorage.getItem(storageKey) as Theme;
-        console.log("ThemeProvider: Stored theme:", storedTheme, "Default theme:", defaultTheme);
-        return storedTheme || defaultTheme;
-    });
+    const [theme, setTheme] = useState<Theme>(() => readStoredTheme(storageKey, defaultTheme));
 
     useEffect(() => {
         const root = window.document.documentElement;
+        const query = window.matchMedia("(prefers-color-scheme: dark)");
 
-        root.classList.remove("light", "dark");
+        const apply = () => {
+            const resolved = theme === "system" ? (query.matches ? "dark" : "light") : theme;
+            root.classList.remove("light", "dark");
+            root.classList.add(resolved);
+        };
 
-        if (theme === "system") {
-            const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        apply();
 
-            console.log("Setting system theme:", systemTheme);
-            root.classList.add(systemTheme);
-            return;
-        }
-
-        console.log("Setting theme:", theme);
-        root.classList.add(theme);
+        // Following the system means following it as it changes, not once at mount.
+        if (theme !== "system") return undefined;
+        query.addEventListener("change", apply);
+        return () => query.removeEventListener("change", apply);
     }, [theme]);
 
     const value = useMemo(
         () => ({
             theme,
             setTheme: (newTheme: Theme) => {
-                console.log("Changing theme from", theme, "to", newTheme);
-                localStorage.setItem(storageKey, newTheme);
+                try {
+                    localStorage.setItem(storageKey, newTheme);
+                } catch {
+                    // The choice still applies for this session.
+                }
                 setTheme(newTheme);
             },
         }),
-        [theme, storageKey],
+        [theme, storageKey]
     );
 
     return (

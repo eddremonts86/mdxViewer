@@ -1,20 +1,19 @@
-import { BarChart3, BookOpen, Home, PlayCircle, Settings, Users } from "lucide-react";
+import { BarChart3, FileText, Telescope, Trash2 } from "lucide-react";
 
+/**
+ * Only surfaces that exist. A route that renders "coming soon" does not earn a
+ * place in the band.
+ */
 export const navigationItems = [
     {
-        name: "Dashboard",
+        name: "Chart",
         path: "/",
-        icon: Home,
+        icon: Telescope,
     },
     {
         name: "Documents",
         path: "/docs",
-        icon: BookOpen,
-    },
-    {
-        name: "Examples",
-        path: "/examples",
-        icon: PlayCircle,
+        icon: FileText,
     },
     {
         name: "Statistics",
@@ -22,13 +21,8 @@ export const navigationItems = [
         icon: BarChart3,
     },
     {
-        name: "Users",
-        path: "/users",
-        icon: Users,
-    },
-    {
-        name: "Settings",
-        path: "/settings",
-        icon: Settings,
+        name: "Trash",
+        path: "/trash",
+        icon: Trash2,
     },
 ];

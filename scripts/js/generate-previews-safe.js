@@ -33,20 +33,12 @@ async function getAllMarkdownFiles(dir, basePath = "") {
 
         for (const entry of entries) {
             const fullPath = path.join(dir, entry.name);
-            const relativePath = basePath
-                ? `${basePath}/${entry.name}`
-                : entry.name;
+            const relativePath = basePath ? `${basePath}/${entry.name}` : entry.name;
 
             if (entry.isDirectory()) {
-                const subFiles = await getAllMarkdownFiles(
-                    fullPath,
-                    relativePath,
-                );
+                const subFiles = await getAllMarkdownFiles(fullPath, relativePath);
                 files.push(...subFiles);
-            } else if (
-                entry.isFile() &&
-                (entry.name.endsWith(".md") || entry.name.endsWith(".mdx"))
-            ) {
+            } else if (entry.isFile() && (entry.name.endsWith(".md") || entry.name.endsWith(".mdx"))) {
                 files.push({
                     name: entry.name,
                     path: fullPath,
@@ -110,7 +102,7 @@ function createSVGPreview(title, type, folder, content) {
             line
                 .trim()
                 .substring(0, PREVIEW_LINE_MAX_LENGTH)
-                .replace(/[<>&"']/g, ""),
+                .replace(/[<>&"']/g, "")
         );
 
     const badgeColor = type === "mdx" ? "#10b981" : "#3b82f6";
@@ -128,14 +120,14 @@ function createSVGPreview(title, type, folder, content) {
         <rect x="${BADGE_X}" y="${BADGE_Y}" width="${BADGE_WIDTH}" height="${BADGE_HEIGHT}" fill="${badgeColor}" rx="${BADGE_RADIUS}"/>
         <text x="${badgeX}" y="${BADGE_TEXT_Y}" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">${badgeText}</text>
         <text x="${TITLE_X}" y="${TITLE_Y}" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1a1a1a">${title}</text>
-        <text x="${FOLDER_X}" y="${FOLDER_Y}" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">📁 ${folder}</text>
+        <text x="${FOLDER_X}" y="${FOLDER_Y}" font-family="Arial, sans-serif" font-size="13" fill="#6b7280"> ${folder}</text>
         <text x="${TYPE_X}" y="${TYPE_Y}" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Type: ${type === "mdx" ? "MDX Interactive" : "Markdown Document"}</text>
         ${lines
-        .map(
-            (line, i) =>
-                `<text x="${TEXT_X}" y="${PREVIEW_BASE_Y_POSITION + i * PREVIEW_LINE_HEIGHT}" font-family="Arial, sans-serif" font-size="11" fill="#374151">${line}</text>`,
-        )
-        .join("")}
+            .map(
+                (line, i) =>
+                    `<text x="${TEXT_X}" y="${PREVIEW_BASE_Y_POSITION + i * PREVIEW_LINE_HEIGHT}" font-family="Arial, sans-serif" font-size="11" fill="#374151">${line}</text>`
+            )
+            .join("")}
         <rect x="0" y="0" width="${SVG_WIDTH}" height="${SVG_HEIGHT}" fill="none" stroke="#e5e7eb" stroke-width="1"/>
     </svg>`;
 }
@@ -143,16 +135,14 @@ function createSVGPreview(title, type, folder, content) {
 // Generate preview for a single file
 async function generatePreview(file) {
     try {
-        console.log(`📝 Processing: ${file.relativePath}`);
+        console.log(`Processing: ${file.relativePath}`);
 
         // Read file content
         const content = await fs.readFile(file.path, "utf8");
 
         // Use sanitized filename for the preview
         const sanitizedName = sanitizeFilename(file.name);
-        const title = sanitizedName
-            .replace(/\.(md|mdx)$/, "")
-            .replace(/[-_]/g, " ");
+        const title = sanitizedName.replace(/\.(md|mdx)$/, "").replace(/[-_]/g, " ");
         const type = file.name.endsWith(".mdx") ? "mdx" : "md";
 
         // Sanitize folder name too
@@ -163,19 +153,11 @@ async function generatePreview(file) {
         await fs.mkdir(previewDir, { recursive: true });
 
         // Generate SVG with sanitized filename
-        const svgContent = createSVGPreview(
-            title,
-            type,
-            sanitizedFolder,
-            content,
-        );
-        const svgPath = path.join(
-            previewDir,
-            sanitizedName.replace(/\.(md|mdx)$/, ".svg"),
-        );
+        const svgContent = createSVGPreview(title, type, sanitizedFolder, content);
+        const svgPath = path.join(previewDir, sanitizedName.replace(/\.(md|mdx)$/, ".svg"));
 
         await fs.writeFile(svgPath, svgContent);
-        console.log(`✅ Generated: ${svgPath}`);
+        console.log(`Generated: ${svgPath}`);
 
         return {
             success: true,
@@ -184,10 +166,7 @@ async function generatePreview(file) {
             previewPath: svgPath,
         };
     } catch (error) {
-        console.error(
-            `❌ Failed to generate preview for ${file.relativePath}:`,
-            error.message,
-        );
+        console.error(`Failed to generate preview for ${file.relativePath}:`, error.message);
         return {
             success: false,
             originalName: file.name,
@@ -196,18 +175,44 @@ async function generatePreview(file) {
     }
 }
 
+// Generate every preview for one folder, collecting renames along the way
+async function generateFolderPreviews(folder, folderFiles, renamedFiles) {
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const file of folderFiles) {
+        const result = await generatePreview(file);
+
+        if (!result.success) {
+            errorCount++;
+            continue;
+        }
+
+        successCount++;
+        if (result.originalName !== result.sanitizedName) {
+            renamedFiles.push({
+                folder,
+                original: result.originalName,
+                sanitized: result.sanitizedName,
+            });
+        }
+    }
+
+    return { successCount, errorCount };
+}
+
 // Main function
 async function main() {
-    console.log("🚀 Starting safe preview generation...");
-    console.log("📝 Generating previews with URL-safe filenames (no spaces)");
+    console.log("Starting safe preview generation...");
+    console.log("Generating previews with URL-safe filenames (no spaces)");
 
     try {
         // Get all markdown files
         const files = await getAllMarkdownFiles(CONTENT_DIR);
-        console.log(`📄 Found ${files.length} markdown files`);
+        console.log(`Found ${files.length} markdown files`);
 
         if (files.length === 0) {
-            console.log("⚠️  No markdown files found");
+            console.log("No markdown files found");
             return;
         }
 
@@ -221,7 +226,7 @@ async function main() {
             filesByFolder[sanitizedFolder].push(file);
         });
 
-        console.log(`📁 Found ${Object.keys(filesByFolder).length} folders`);
+        console.log(`Found ${Object.keys(filesByFolder).length} folders`);
 
         let successCount = 0;
         let errorCount = 0;
@@ -229,47 +234,27 @@ async function main() {
 
         // Generate previews for each folder
         for (const [folder, folderFiles] of Object.entries(filesByFolder)) {
-            console.log(
-                `\n📂 Processing folder: ${folder} (${folderFiles.length} files)`,
-            );
+            console.log(`\n Processing folder: ${folder} (${folderFiles.length} files)`);
 
-            for (const file of folderFiles) {
-                const result = await generatePreview(file);
-                if (result.success) {
-                    successCount++;
-                    if (result.originalName !== result.sanitizedName) {
-                        renamedFiles.push({
-                            folder,
-                            original: result.originalName,
-                            sanitized: result.sanitizedName,
-                        });
-                    }
-                } else {
-                    errorCount++;
-                }
-            }
+            const folderResult = await generateFolderPreviews(folder, folderFiles, renamedFiles);
+            successCount += folderResult.successCount;
+            errorCount += folderResult.errorCount;
         }
 
-        console.log("\n🎉 Preview generation complete!");
-        console.log(`✅ Successfully generated: ${successCount} previews`);
-        console.log(`❌ Failed: ${errorCount} previews`);
+        console.log("\n Preview generation complete!");
+        console.log(`Successfully generated: ${successCount} previews`);
+        console.log(`Failed: ${errorCount} previews`);
 
         if (renamedFiles.length > 0) {
-            console.log("\n📋 Files with sanitized names:");
+            console.log("\n Files with sanitized names:");
             renamedFiles.forEach(file => {
-                console.log(
-                    `   ${file.folder}/${file.original} -> ${file.sanitized}`,
-                );
+                console.log(`${file.folder}/${file.original} -> ${file.sanitized}`);
             });
-            console.log(
-                "\n⚠️  Note: Preview names are sanitized but source files remain unchanged.",
-            );
-            console.log(
-                "   To rename source files too, run: npm run rename:files",
-            );
+            console.log("\n  Note: Preview names are sanitized but source files remain unchanged.");
+            console.log("To rename source files too, run: npm run rename:files");
         }
     } catch (error) {
-        console.error("💥 Preview generation failed:", error.message);
+        console.error("Preview generation failed:", error.message);
         process.exit(1);
     }
 }

@@ -1,20 +1,16 @@
-import React from "react";
-
-import { SCROLL_SETTINGS } from "@/const/markdown";
 import type { EffectiveTheme, ThemeType } from "@/types/markdown";
 import { extractTextFromReactNode as extractText, generateHeadingId as createHeadingId } from "@/utils/headingUtils";
 
-/**
- * Helper function to generate heading IDs using our utility
- */
-export const generateHeadingId = (children: React.ReactNode): string => {
-    const text = extractText(children);
-    return createHeadingId(text);
-};
+/** Height of the fixed header band, so an anchor never lands under it. */
+const HEADER_OFFSET = 84;
 
 /**
- * Determines the effective theme based on the current theme setting
+ * Heading ids come from one generator, shared with the table of contents, so
+ * every anchor in a document resolves to the heading it names.
  */
+export const generateHeadingId = (children: React.ReactNode): string => createHeadingId(extractText(children));
+
+/** Which rendition the syntax highlighter should use. */
 export const getEffectiveTheme = (theme: ThemeType): EffectiveTheme => {
     if (theme === "system") {
         return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
@@ -22,39 +18,22 @@ export const getEffectiveTheme = (theme: ThemeType): EffectiveTheme => {
     return theme;
 };
 
-/**
- * Handles smooth scrolling to anchor links with header offset
- */
-export const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, href?: string): void => {
-    // Handle internal anchor links
-    if (href?.startsWith("#")) {
-        e.preventDefault();
-        const targetId = href.slice(1);
-        const element = document.getElementById(targetId);
-        if (element) {
-            // Use better scroll with header offset
-            const elementPosition = element.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - SCROLL_SETTINGS.headerOffset;
+/** In-document anchors scroll the plate, not the window. */
+export const handleAnchorClick = (event: React.MouseEvent<HTMLAnchorElement>, href?: string): void => {
+    if (!href?.startsWith("#")) return;
 
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: SCROLL_SETTINGS.behavior,
-            });
+    const element = document.getElementById(href.slice(1));
+    if (!element) return;
 
-            // Update URL hash without triggering a page reload
-            window.history.pushState(null, "", href);
-        }
-    }
+    event.preventDefault();
+    const container = element.closest("main") ?? document.documentElement;
+    const top = element.getBoundingClientRect().top + container.scrollTop - HEADER_OFFSET;
+    container.scrollTo({ top, behavior: "smooth" });
+    window.history.replaceState(null, "", href);
 };
 
-/**
- * Determines if a link should open in a new tab
- */
 export const isExternalLink = (href?: string): boolean => href?.startsWith("http") ?? false;
 
-/**
- * Gets the appropriate target and rel attributes for links
- */
 export const getLinkAttributes = (href?: string) => {
     const isExternal = isExternalLink(href);
     return {
@@ -63,60 +42,9 @@ export const getLinkAttributes = (href?: string) => {
     };
 };
 
-/**
- * Extracts language from code block className
- */
 export const extractLanguageFromClassName = (className?: string): string | null => {
     const match = /language-(\w+)/.exec(className ?? "");
     return match ? match[1] : null;
 };
 
-/**
- * Determines if code should be rendered inline
- */
 export const isInlineCode = (className?: string): boolean => !className?.includes("language-");
-
-/**
- * Creates custom style objects for different markdown elements
- */
-export const createHeadingStyle = (fontWeight: string, letterSpacing: string, fontFamily: string) => ({
-    fontFamily,
-    letterSpacing,
-    fontWeight,
-});
-
-export const createTextStyle = (fontFamily: string, lineHeight?: string, letterSpacing?: string) => ({
-    fontFamily,
-    ...(lineHeight && { lineHeight }),
-    ...(letterSpacing && { letterSpacing }),
-});
-
-export const createCodeStyle = ({
-    fontFamily,
-    fontSize,
-    lineHeight,
-    fontWeight,
-    fontFeatures,
-    backgroundColor,
-    borderRadius,
-    padding,
-}: {
-    fontFamily: string;
-    fontSize: string;
-    lineHeight: string;
-    fontWeight: string;
-    fontFeatures: string;
-    backgroundColor?: string;
-    borderRadius?: string;
-    padding?: string;
-}) => ({
-    fontFamily,
-    fontWeight,
-    fontSize,
-    lineHeight,
-    fontFeatureSettings: fontFeatures,
-    ...(backgroundColor && { background: backgroundColor }),
-    ...(borderRadius && { borderRadius }),
-    ...(padding && { padding }),
-    margin: 0,
-});

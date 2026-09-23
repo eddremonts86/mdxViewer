@@ -133,10 +133,9 @@ function generateSmellsTable(report: SmellReport): string {
                             <td>${smell.category}</td>
                             <td>${smell.message}</td>
                             <td class="${smell.fixable ? "fixable" : "not-fixable"}">
-                                ${smell.fixable ? "✅ Auto-fixable" : "❌ Manual fix required"}
-                            </td>
+                                ${smell.fixable ? "Auto-fixable" : "Manual fix required"} </td>
                         </tr>
-                    `,
+                    `
         )
         .join("");
 
@@ -155,8 +154,7 @@ function generateSmellsTable(report: SmellReport): string {
                     </tr>
                 </thead>
                 <tbody>
-                    ${tableRows}
-                </tbody>
+                    ${tableRows} </tbody>
             </table>
         </div>
     `;
@@ -169,8 +167,8 @@ function generateChartScript(report: SmellReport): string {
             type: 'doughnut',
             data: {
                 labels: [${Object.keys(report.categories)
-        .map(c => `"${c}"`)
-        .join(",")}],
+                    .map(c => `"${c}"`)
+                    .join(",")}],
                 datasets: [{
                     data: [${Object.values(report.categories).join(",")}],
                     backgroundColor: [
@@ -201,35 +199,30 @@ export function generateHTMLReport(report: SmellReport): string {
     <title>Code Smell Report - MDXViewer</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        ${generateHTMLStyles()}
-    </style>
+        ${generateHTMLStyles()} </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔍 Code Smell Analysis Report</h1>
+            <h1> Code Smell Analysis Report</h1>
             <p class="timestamp">Generated: ${report.timestamp}</p>
             <p>Comprehensive code quality analysis for MDXViewer project</p>
         </div>
 
-        ${generateStatsSection(report)}
-
-        <div class="chart-container">
+        ${generateStatsSection(report)} <div class="chart-container">
             <h3>Issues by Category</h3>
             <canvas id="categoryChart" width="400" height="200"></canvas>
         </div>
 
         <div class="recommendations">
-            <h3>🎯 Recommendations</h3>
+            <h3> Recommendations</h3>
             ${report.recommendations.map(rec => `<div class="recommendation">${rec}</div>`).join("")}
         </div>
 
-        ${generateSmellsTable(report)}
-    </div>
+        ${generateSmellsTable(report)} </div>
 
     <script>
-        ${generateChartScript(report)}
-    </script>
+        ${generateChartScript(report)} </script>
 </body>
 </html>`;
 }

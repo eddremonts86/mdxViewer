@@ -7,13 +7,13 @@ const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
         <input
             type={type}
             className={cn(
-                "border-input bg-background ring-offset-background file:text-foreground placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-                className,
+                "border-rule bg-sky text-ink placeholder:text-ink-dim focus-visible:border-mark focus-visible:outline-mark rounded-plate flex h-9 w-full border px-3 py-2 text-[0.875rem] transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-1 disabled:cursor-not-allowed disabled:opacity-40",
+                className
             )}
             ref={ref}
             {...props}
         />
-    ),
+    )
 );
 Input.displayName = "Input";
 

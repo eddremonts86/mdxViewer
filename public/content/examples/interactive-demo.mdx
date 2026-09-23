@@ -40,18 +40,19 @@ class UserManager {
 ## Features List
 
 1. Real-time rendering
-2. Interactive components
-3. Syntax highlighting
-4. Tree navigation
-5. PDF export
+2. Syntax highlighting
+3. Tree navigation
+4. The chart: the whole collection plotted by file size
+5. Printing, with a stylesheet written for paper
 
 ## Example Table
 
 | Feature | Status | Description |
 |---------|--------|-------------|
 | MD Rendering | ✅ | Functional |
-| MDX Rendering | ✅ | Functional |
-| Themes | ✅ | Light/Dark |
-| Export PDF | 🚧 | In development |
+| MDX Rendering | ⚠️ | Renders as Markdown; JSX is not executed |
+| Themes | ✅ | The Sky (dark) and The Plate (light) |
+| Printing | ✅ | Real `@media print` stylesheet |
+| PDF / HTML export | ❌ | Does not exist. Use the browser's Print to PDF |
 
-**Note**: This file demonstrates how MDX allows combining Markdown with React components.
+**Note**: This file is written as MDX, but MDX is **not compiled** in this product: the components below are not executed. The viewer prints a notice saying so and leaves their source out. The file is kept in this shape so it is ready if compilation is added.

@@ -48,14 +48,14 @@ The MDX viewer is organized as follows:
     -   **`guides/`**: Tutorial guides
     -   **`api/`**: API documentation
 
--   **`src/utils/`**: Utilities, including PDF export
+-   **`src/utils/`**: Utilities — heading ids, frontmatter readers, MDX source handling
 
 ## 📚 Main Features
 
 -   **Tree Navigation**: Intuitive sidebar for exploring documents
--   **Dual Rendering**: Complete support for .md and .mdx
--   **Interactive Components**: Use of React components in MDX files
--   **Export**: Download in PDF, HTML, and optimized printing
+-   **Dual Rendering**: `.md` and `.mdx` are both read; `.mdx` renders as Markdown because MDX is not compiled, and its component source is left out rather than printed
+-   **The Chart**: The whole collection plotted as a graph — documents sized by file size, hanging from the folder that holds them
+-   **Printing**: A real print stylesheet. No PDF or HTML export
 -   **Themes**: Dark and light mode with smooth transitions
 
 ## 💡 Troubleshooting

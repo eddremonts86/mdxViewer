@@ -2,15 +2,9 @@ import React, { useState } from "react";
 
 import { FolderPlus, Loader2, Plus } from "lucide-react";
 
-import type { FileItem } from "@/api/fileAPI";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -28,7 +22,12 @@ interface CreateDocumentDialogProps {
     availableFolders?: Array<{ name: string; path: string }>;
 }
 
-export function CreateDocumentDialog({ open, onOpenChange, initialPath = "", availableFolders = [] }: CreateDocumentDialogProps) {
+export function CreateDocumentDialog({
+    open,
+    onOpenChange,
+    initialPath = "",
+    availableFolders = [],
+}: CreateDocumentDialogProps) {
     const [fileName, setFileName] = useState("");
     const [extension, setExtension] = useState<"md" | "mdx">("md");
     const [targetFolder, setTargetFolder] = useState(initialPath);
@@ -76,7 +75,7 @@ export function CreateDocumentDialog({ open, onOpenChange, initialPath = "", ava
             // Create new folder if requested
             if (createNewFolder && newFolderName.trim()) {
                 const newFolderPath = targetFolder ? `${targetFolder}/${newFolderName.trim()}` : newFolderName.trim();
-                
+
                 const folderDepthValidation = validateDepth(newFolderPath, true);
                 if (!folderDepthValidation.valid) {
                     setError(folderDepthValidation.error ?? "Invalid folder depth");
@@ -129,7 +128,7 @@ export function CreateDocumentDialog({ open, onOpenChange, initialPath = "", ava
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-[500px] w-full max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-h-[90vh] w-full max-w-[500px] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Plus className="h-5 w-5" />
@@ -140,7 +139,7 @@ export function CreateDocumentDialog({ open, onOpenChange, initialPath = "", ava
                 <form onSubmit={handleSubmit} className="space-y-3">
                     {/* Error Display */}
                     {error && (
-                        <div className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
+                        <div className="border-destructive bg-destructive/10 text-destructive rounded-md border p-3 text-sm">
                             <div className="flex items-center gap-2">
                                 <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path

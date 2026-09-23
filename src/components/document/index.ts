@@ -1,5 +1,8 @@
-export { DocumentContent } from "./DocumentContent";
 export { DocumentError } from "./DocumentError";
-export { DocumentHeader } from "./DocumentHeader";
 export { DocumentLoader } from "./DocumentLoader";
 export { DocumentWelcome } from "./DocumentWelcome";
+export { NotExecutedNotice } from "./NotExecutedNotice";
+export { PlateActions } from "./PlateActions";
+export { PlateBody } from "./PlateBody";
+export { PlateEditor } from "./PlateEditor";
+export { TitleBlock } from "./TitleBlock";

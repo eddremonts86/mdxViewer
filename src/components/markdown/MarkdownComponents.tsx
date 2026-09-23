@@ -1,143 +1,110 @@
-import React from "react";
+import { Children, cloneElement, isValidElement } from "react";
 
-import { MARKDOWN_CLASSES } from "@/const/markdown";
-import type {
-    BlockquoteProps,
-    ImageProps,
-    LinkProps,
-    ListProps,
-    MarkdownComponentProps,
-    TableProps,
-} from "@/types/markdown";
-import { generateHeadingId, getLinkAttributes, handleAnchorClick } from "@/utils/markdownUtils";
+import { Callout, type CalloutKind, isCalloutKind } from "@/components/markdown/Callout";
+import { CodeBlock } from "@/components/markdown/CodeBlock";
+import { MermaidDiagram } from "@/components/markdown/MermaidDiagram";
+import type { EffectiveTheme } from "@/types/markdown";
+import {
+    extractLanguageFromClassName,
+    generateHeadingId,
+    getLinkAttributes,
+    handleAnchorClick,
+    isInlineCode,
+} from "@/utils/markdownUtils";
 
-// Heading components
-export const H1 = ({ children, ...props }: React.ComponentProps<"h1">) => {
-    const id = generateHeadingId(children);
-    return (
-        <h1 {...props} id={id} className={MARKDOWN_CLASSES.h1}>
+/**
+ * The only markdown nodes that need a component. Everything else is plain HTML
+ * styled by `.plate-prose`, because a stylesheet is a better place for
+ * typography than three hundred inline style objects.
+ */
+
+const heading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
+    const Tag = `h${level}` as const;
+    const Heading = ({ children, ...props }: React.ComponentProps<"h1">) => (
+        <Tag {...props} id={generateHeadingId(children)}>
             {children}
-        </h1>
+        </Tag>
     );
+    Heading.displayName = `Heading${level}`;
+    return Heading;
 };
 
-export const H2 = ({ children, ...props }: React.ComponentProps<"h2">) => {
-    const id = generateHeadingId(children);
-    return (
-        <h2 {...props} id={id} className={MARKDOWN_CLASSES.h2}>
-            {children}
-        </h2>
-    );
+export const H1 = heading(1);
+export const H2 = heading(2);
+export const H3 = heading(3);
+export const H4 = heading(4);
+export const H5 = heading(5);
+export const H6 = heading(6);
+
+export const Link = ({ href, children, ...props }: React.ComponentProps<"a">) => (
+    <a {...props} {...getLinkAttributes(href)} href={href} onClick={event => handleAnchorClick(event, href)}>
+        {children}
+    </a>
+);
+
+export const Image = ({ src, alt, ...props }: React.ComponentProps<"img">) => (
+    <img {...props} src={src} alt={alt ?? ""} loading="lazy" />
+);
+
+/** Code blocks get the highlighter; inline code is styled by CSS. */
+export const createCodeComponent =
+    (effectiveTheme: EffectiveTheme) =>
+    ({ className, children, ...props }: React.ComponentProps<"code">) => {
+        const language = extractLanguageFromClassName(className);
+
+        if (isInlineCode(className) || !language) {
+            return (
+                <code {...props} className={className}>
+                    {children}
+                </code>
+            );
+        }
+
+        const code = String(children).replace(/\n$/, "");
+
+        // A mermaid fence is a diagram, not a listing.
+        if (language.toLowerCase() === "mermaid") {
+            return <MermaidDiagram code={code} theme={effectiveTheme} />;
+        }
+
+        return <CodeBlock code={code} language={language} theme={effectiveTheme} />;
+    };
+
+/**
+ * A blockquote that opens with `[!NOTE]` is a callout, not a quotation.
+ *
+ * The marker arrives as the first text node inside the first paragraph, so it is
+ * read and removed there rather than with another remark plugin — the pipeline
+ * already carries five.
+ */
+export const Blockquote = ({ children, ...props }: React.ComponentProps<"blockquote">) => {
+    const nodes = Children.toArray(children);
+    const first = nodes.find(node => isValidElement(node));
+
+    const marker = calloutMarker(first);
+    if (!marker) {
+        return <blockquote {...props}>{children}</blockquote>;
+    }
+
+    return <Callout kind={marker.kind}>{nodes.map(node => (node === first ? marker.rest : node))}</Callout>;
 };
 
-export const H3 = ({ children, ...props }: React.ComponentProps<"h3">) => {
-    const id = generateHeadingId(children);
-    return (
-        <h3 {...props} id={id} className={MARKDOWN_CLASSES.h3}>
-            {children}
-        </h3>
-    );
-};
+/** Reads `[!NOTE]` off the front of a paragraph, and gives back what is left of it. */
+function calloutMarker(node: unknown): { kind: CalloutKind; rest: React.ReactNode } | null {
+    if (!isValidElement<{ children?: React.ReactNode }>(node)) return null;
 
-export const H4 = ({ children, ...props }: React.ComponentProps<"h4">) => {
-    const id = generateHeadingId(children);
-    return (
-        <h4 {...props} id={id} className={MARKDOWN_CLASSES.h4}>
-            {children}
-        </h4>
-    );
-};
+    const parts = Children.toArray(node.props.children);
+    const [head] = parts;
+    if (typeof head !== "string") return null;
 
-export const H5 = ({ children, ...props }: React.ComponentProps<"h5">) => {
-    const id = generateHeadingId(children);
-    return (
-        <h5 {...props} id={id} className={MARKDOWN_CLASSES.h5}>
-            {children}
-        </h5>
-    );
-};
+    const match = /^\[!([A-Za-z]+)\]\s*\n?/.exec(head);
+    if (!match || !isCalloutKind(match[1])) return null;
 
-export const H6 = ({ children, ...props }: React.ComponentProps<"h6">) => {
-    const id = generateHeadingId(children);
-    return (
-        <h6 {...props} id={id} className={MARKDOWN_CLASSES.h6}>
-            {children}
-        </h6>
-    );
-};
+    const remainder = head.slice(match[0].length);
+    const rest = [remainder, ...parts.slice(1)].filter(part => part !== "");
 
-// Text components
-export const Paragraph = ({ children }: MarkdownComponentProps) => <p className={MARKDOWN_CLASSES.p}>{children}</p>;
-
-export const Blockquote = ({ children }: BlockquoteProps) => (
-    <blockquote className={MARKDOWN_CLASSES.blockquote}>
-        <div className="relative">
-            <span className="text-primary/30 absolute -top-2 -left-2 text-4xl">"</span>
-            {children}
-        </div>
-    </blockquote>
-);
-
-export const Strong = ({ children }: MarkdownComponentProps) => (
-    <strong className={MARKDOWN_CLASSES.strong}>{children}</strong>
-);
-
-export const Emphasis = ({ children }: MarkdownComponentProps) => <em className={MARKDOWN_CLASSES.em}>{children}</em>;
-
-// List components
-export const UnorderedList = ({ children }: ListProps) => <ul className={MARKDOWN_CLASSES.ul}>{children}</ul>;
-
-export const OrderedList = ({ children }: ListProps) => <ol className={MARKDOWN_CLASSES.ol}>{children}</ol>;
-
-export const ListItem = ({ children }: MarkdownComponentProps) => <li className={MARKDOWN_CLASSES.li}>{children}</li>;
-
-// Table components
-export const Table = ({ children }: TableProps) => (
-    <div className={MARKDOWN_CLASSES.table}>
-        <table className="w-full border-collapse">{children}</table>
-    </div>
-);
-
-export const TableHead = ({ children }: MarkdownComponentProps) => (
-    <thead className={MARKDOWN_CLASSES.thead}>{children}</thead>
-);
-
-export const TableBody = ({ children }: MarkdownComponentProps) => (
-    <tbody className={MARKDOWN_CLASSES.tbody}>{children}</tbody>
-);
-
-export const TableRow = ({ children }: MarkdownComponentProps) => <tr className={MARKDOWN_CLASSES.tr}>{children}</tr>;
-
-export const TableHeader = ({ children }: MarkdownComponentProps) => (
-    <th className={MARKDOWN_CLASSES.th}>{children}</th>
-);
-
-export const TableData = ({ children }: MarkdownComponentProps) => <td className={MARKDOWN_CLASSES.td}>{children}</td>;
-
-// Link component
-export const Link = ({ children, href, ...props }: LinkProps) => {
-    const linkAttributes = getLinkAttributes(href);
-
-    return (
-        <a
-            href={href}
-            onClick={e => handleAnchorClick(e, href)}
-            className={MARKDOWN_CLASSES.link}
-            {...linkAttributes}
-            {...props}
-        >
-            {children}
-        </a>
-    );
-};
-
-// Image component
-export const Image = ({ src, alt, ...props }: ImageProps) => (
-    <div className="my-8">
-        <img src={src} alt={alt} className={MARKDOWN_CLASSES.image} {...props} />
-        {alt && <p className={MARKDOWN_CLASSES.imageCaption}>{alt}</p>}
-    </div>
-);
-
-// Horizontal rule
-export const HorizontalRule = () => <hr className={MARKDOWN_CLASSES.hr} />;
+    return {
+        kind: match[1].toLowerCase() as CalloutKind,
+        rest: cloneElement(node, { children: rest }),
+    };
+}

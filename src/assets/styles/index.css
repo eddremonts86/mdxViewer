@@ -1,298 +1,579 @@
+/*
+ * DIRECTION CONTRACT — MDXViewer
+ *
+ * THESIS: A docs set is a sky you have to find your way around in the dark. This app
+ * charts it — objects with magnitudes, folders as constellations, one amber mark for
+ * the observer. Finding is refused the category default: you arrive at a field, not a
+ * tree and a welcome page. Reading keeps the conventional index/prose/contents layout,
+ * because that is the right shape for reading; the world lives in its treatment.
+ * OWN-WORLD: Engraved star atlas. Night Sky ground, Deep Indigo plates, hairline rules
+ * with terminal node dots, tracked capital column heads, Bodoni italic for every
+ * catalogued object, Archivo tabular figures, one amber that belongs to the observer.
+ * STORY: You see the whole collection as a field before any single document; you find an
+ * object by its magnitude and its plate; you mark it, and act on the marked set.
+ * FIRST VIEWPORT: A canvas chart of every document plotted by magnitude, folder
+ * constellations drawn and named in place, the observer's rail on the right carrying
+ * what is under the eye, and the register of recent objects along the bottom band.
+ * FORM: Celestial star atlas (notation-diagram-systems-star-atlas), the dealt challenger
+ * chosen over assigned candidate 3; staging 1, drawn registration. Seed key mdxv0001.
+ */
+
 @import "tailwindcss";
 
-@layer base {
-    :root {
-        --radius: 0.65rem;
-        --background: oklch(1 0 0);
-        --foreground: oklch(0.141 0.005 285.823);
-        --card: oklch(1 0 0);
-        --card-foreground: oklch(0.141 0.005 285.823);
-        --popover: oklch(1 0 0);
-        --popover-foreground: oklch(0.141 0.005 285.823);
-        --primary: oklch(0.623 0.214 259.815);
-        --primary-foreground: oklch(0.97 0.014 254.604);
-        --secondary: oklch(0.967 0.001 286.375);
-        --secondary-foreground: oklch(0.21 0.006 285.885);
-        --muted: oklch(0.967 0.001 286.375);
-        --muted-foreground: oklch(0.552 0.016 285.938);
-        --accent: oklch(0.967 0.001 286.375);
-        --accent-foreground: oklch(0.21 0.006 285.885);
-        --destructive: oklch(0.577 0.245 27.325);
-        --destructive-foreground: oklch(0.97 0.014 254.604);
-        --border: oklch(0.92 0.004 286.32);
-        --input: oklch(0.92 0.004 286.32);
-        --ring: oklch(0.623 0.214 259.815);
-        --chart-1: oklch(0.646 0.222 41.116);
-        --chart-2: oklch(0.6 0.118 184.704);
-        --chart-3: oklch(0.398 0.07 227.392);
-        --chart-4: oklch(0.828 0.189 84.429);
-        --chart-5: oklch(0.769 0.188 70.08);
-        --sidebar: oklch(0.985 0 0);
-        --sidebar-foreground: oklch(0.141 0.005 285.823);
-        --sidebar-primary: oklch(0.623 0.214 259.815);
-        --sidebar-primary-foreground: oklch(0.97 0.014 254.604);
-        --sidebar-accent: oklch(0.967 0.001 286.375);
-        --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-        --sidebar-border: oklch(0.92 0.004 286.32);
-        --sidebar-ring: oklch(0.623 0.214 259.815);
-    }
+/* The theme toggle sets .dark on <html>; without this, v4 follows the OS instead. */
+@custom-variant dark (&:is(.dark *));
 
-    .dark {
-        --background: oklch(0.141 0.005 285.823);
-        --foreground: oklch(0.985 0 0);
-        --card: oklch(0.21 0.006 285.885);
-        --card-foreground: oklch(0.985 0 0);
-        --popover: oklch(0.21 0.006 285.885);
-        --popover-foreground: oklch(0.985 0 0);
-        --primary: oklch(0.546 0.245 262.881);
-        --primary-foreground: oklch(0.379 0.146 265.522);
-        --secondary: oklch(0.274 0.006 286.033);
-        --secondary-foreground: oklch(0.985 0 0);
-        --muted: oklch(0.274 0.006 286.033);
-        --muted-foreground: oklch(0.705 0.015 286.067);
-        --accent: oklch(0.274 0.006 286.033);
-        --accent-foreground: oklch(0.985 0 0);
-        --destructive: oklch(0.704 0.191 22.216);
-        --destructive-foreground: oklch(0.985 0 0);
-        --border: oklch(1 0 0 / 10%);
-        --input: oklch(1 0 0 / 15%);
-        --ring: oklch(0.488 0.243 264.376);
-        --chart-1: oklch(0.488 0.243 264.376);
-        --chart-2: oklch(0.696 0.17 162.48);
-        --chart-3: oklch(0.769 0.188 70.08);
-        --chart-4: oklch(0.627 0.265 303.9);
-        --chart-5: oklch(0.645 0.246 16.439);
-        --sidebar: oklch(0.21 0.006 285.885);
-        --sidebar-foreground: oklch(0.985 0 0);
-        --sidebar-primary: oklch(0.546 0.245 262.881);
-        --sidebar-primary-foreground: oklch(0.379 0.146 265.522);
-        --sidebar-accent: oklch(0.274 0.006 286.033);
-        --sidebar-accent-foreground: oklch(0.985 0 0);
-        --sidebar-border: oklch(1 0 0 / 10%);
-        --sidebar-ring: oklch(0.488 0.243 264.376);
-    }
+/* ---------------------------------------------------------------------------
+   THE PLATE — light rendition. The chart engraved and printed: oxide-red ink
+   pressed into chart paper. Not an inversion of the sky; the other artifact.
+   --------------------------------------------------------------------------- */
+:root {
+    --sky: #f2f2e9;
+    --panel: #eaeadf;
+    --plate: #e0e0d3;
+    --ink: #0a1021;
+    --ink-dim: #5a6477;
+    --rule: #c7c7b8;
+    --rule-bright: #a8a898;
+    --mark: #b33418;
+    --mark-read: #b33418;
+    --mark-soft: #f0ded6;
+    --star: #16233d;
+    --figure: #24374f;
+    --figure-opacity: 0.07;
+
+    --radius-plate: 2px;
+    --radius-panel: 3px;
+
+    --font-display: "Bodoni Moda", Didot, Georgia, serif;
+    --font-ui: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --font-code: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ---------------------------------------------------------------------------
+   THE SKY — dark rendition. Light emitted on a night ground, amber annotation.
+   --------------------------------------------------------------------------- */
+.dark {
+    --sky: #0a1021;
+    --panel: #16233d;
+    --plate: #24374f;
+    --ink: #f2f2e9;
+    --ink-dim: #8592a8;
+    --rule: #2b3a52;
+    --rule-bright: #5a6477;
+    --mark: #ff4d2e;
+    --mark-read: #ffb36b;
+    --mark-soft: #2a1a1c;
+    --star: #f2f2e9;
+    --figure: #7b93b8;
+    --figure-opacity: 0.08;
+}
+
+/* ---------------------------------------------------------------------------
+   Token bridge. World names on the left; the shadcn semantic names the existing
+   primitives already reference are mapped onto the same values, so one palette
+   drives everything and no utility resolves to nothing.
+   --------------------------------------------------------------------------- */
+@theme inline {
+    --color-sky: var(--sky);
+    --color-panel: var(--panel);
+    --color-plate: var(--plate);
+    --color-ink: var(--ink);
+    --color-ink-dim: var(--ink-dim);
+    --color-rule: var(--rule);
+    --color-rule-bright: var(--rule-bright);
+    --color-mark: var(--mark);
+    --color-mark-read: var(--mark-read);
+    --color-mark-soft: var(--mark-soft);
+    --color-star: var(--star);
+    --color-figure: var(--figure);
+
+    --color-background: var(--sky);
+    --color-foreground: var(--ink);
+    --color-card: var(--panel);
+    --color-card-foreground: var(--ink);
+    --color-popover: var(--panel);
+    --color-popover-foreground: var(--ink);
+    --color-primary: var(--mark);
+    --color-primary-foreground: var(--sky);
+    --color-secondary: var(--plate);
+    --color-secondary-foreground: var(--ink);
+    --color-muted: var(--panel);
+    --color-muted-foreground: var(--ink-dim);
+    --color-accent: var(--plate);
+    --color-accent-foreground: var(--ink);
+    --color-destructive: var(--mark);
+    --color-destructive-foreground: var(--sky);
+    --color-border: var(--rule);
+    --color-input: var(--rule);
+    --color-ring: var(--mark);
+
+    --font-sans: var(--font-ui);
+    --font-serif: var(--font-display);
+    --font-mono: var(--font-code);
+
+    --radius-plate: 2px;
+    --radius-panel: 3px;
 }
 
 @layer base {
     * {
-        border-color: var(--border);
+        border-color: var(--rule);
+    }
+
+    html {
+        color-scheme: light;
+    }
+
+    html.dark {
+        color-scheme: dark;
     }
 
     body {
-        background-color: var(--background);
-        color: var(--foreground);
-        font-family:
-            "Inter",
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            "Roboto",
-            "Helvetica Neue",
-            Arial,
-            sans-serif;
-        font-feature-settings:
-            "rlig" 1,
-            "calt" 1,
-            "ss01" 1,
-            "ss02" 1;
+        background-color: var(--sky);
+        color: var(--ink);
+        font-family: var(--font-ui);
+        font-size: 0.9375rem;
+        line-height: 1.62;
         font-synthesis: none;
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        line-height: 1.75;
-        letter-spacing: -0.01em;
-        font-weight: 400;
     }
 
-    /* Ensure monospace elements use JetBrains Mono */
-    code,
-    pre,
-    .font-mono {
-        font-family:
-            "JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
-            "Source Code Pro", "Menlo", "Consolas", monospace !important;
-        font-feature-settings:
-            "liga" 1,
-            "calt" 1;
+    /* Every figure in this product exists to be compared down a column. */
+    .figures,
+    table,
+    time,
+    output {
+        font-variant-numeric: tabular-nums;
     }
 
-    /* Ensure text elements use Inter */
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p,
-    .font-sans {
-        font-family:
-            "Inter",
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            "Roboto",
-            "Helvetica Neue",
-            Arial,
-            sans-serif !important;
+    :focus-visible {
+        outline: 1px solid var(--mark);
+        outline-offset: 2px;
     }
 
-    /* Enhanced nested list styling for better documentation formatting */
-
-    /* Override prose styles for better list formatting */
-    .prose ul,
-    .prose ol {
-        margin-top: 1.25em;
-        margin-bottom: 1.25em;
-        padding-left: 1.625em;
+    ::selection {
+        background-color: var(--mark);
+        color: var(--sky);
     }
 
-    .prose li {
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
     }
 
-    .prose > ul > li,
-    .prose > ol > li {
-        padding-left: 0;
+    ::-webkit-scrollbar-track {
+        background: transparent;
     }
 
-    .prose ul ul,
-    .prose ul ol,
-    .prose ol ul,
-    .prose ol ol {
-        margin-top: 0.75em;
-        margin-bottom: 0.75em;
+    ::-webkit-scrollbar-thumb {
+        background: var(--rule);
+        border: 3px solid var(--sky);
     }
 
-    .prose ul ul {
-        list-style-type: circle;
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--rule-bright);
+    }
+}
+
+@layer components {
+    /* Registration ticks: corner marks on a major region. */
+    .plate-frame {
+        position: relative;
+        border: 1px solid var(--rule);
+        border-radius: var(--radius-panel);
     }
 
-    .prose ul ul ul {
-        list-style-type: square;
+    .plate-frame::before,
+    .plate-frame::after {
+        content: "";
+        position: absolute;
+        width: 7px;
+        height: 7px;
+        border-color: var(--mark);
+        opacity: 0.55;
+        pointer-events: none;
     }
 
-    .prose ol ol {
-        list-style-type: lower-alpha;
+    .plate-frame::before {
+        top: -1px;
+        left: -1px;
+        border-top: 1px solid;
+        border-left: 1px solid;
     }
 
-    .prose ol ol ol {
-        list-style-type: lower-roman;
+    .plate-frame::after {
+        right: -1px;
+        bottom: -1px;
+        border-right: 1px solid;
+        border-bottom: 1px solid;
     }
 
-    /* Specific handling for nested list items with multiple elements */
-    .prose li p {
-        margin-top: 0.75em;
-        margin-bottom: 0.75em;
+    /* --- The document plate: prose set for reading a charted object ---------- */
+
+    .plate-prose {
+        max-width: 70ch;
+        font-size: 1.0625rem;
+        line-height: 1.7;
+        color: var(--ink);
     }
 
-    .prose li > p:first-child {
+    .plate-prose > * + * {
+        margin-top: 1.15em;
+    }
+
+    .plate-prose h1,
+    .plate-prose h2,
+    .plate-prose h3,
+    .plate-prose h4,
+    .plate-prose h5,
+    .plate-prose h6 {
+        font-family: var(--font-display);
+        font-weight: 600;
+        line-height: 1.18;
+        letter-spacing: -0.012em;
+        text-wrap: balance;
+        scroll-margin-top: 5rem;
+    }
+
+    .plate-prose h1 {
+        font-size: 2.125rem;
+    }
+
+    .plate-prose h2 {
+        font-size: 1.625rem;
+        margin-top: 2.1em;
+        padding-bottom: 0.35em;
+        border-bottom: 1px solid var(--rule);
+    }
+
+    .plate-prose h3 {
+        font-size: 1.375rem;
+        margin-top: 1.9em;
+    }
+
+    .plate-prose h4,
+    .plate-prose h5,
+    .plate-prose h6 {
+        font-size: 1.0625rem;
+        margin-top: 1.7em;
+    }
+
+    .plate-prose h2 + *,
+    .plate-prose h3 + *,
+    .plate-prose h4 + * {
+        margin-top: 0.6em;
+    }
+
+    .plate-prose a {
+        color: var(--mark-read);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+        text-decoration-color: color-mix(in srgb, var(--mark-read) 40%, transparent);
+    }
+
+    .plate-prose a:hover {
+        text-decoration-color: var(--mark-read);
+    }
+
+    .plate-prose strong {
+        font-weight: 600;
+        color: var(--ink);
+    }
+
+    .plate-prose ul,
+    .plate-prose ol {
+        padding-left: 1.4em;
+    }
+
+    .plate-prose ul {
+        list-style: none;
+    }
+
+    /* List markers are plotted points, on the magnitude ramp. */
+    .plate-prose ul > li {
+        position: relative;
+    }
+
+    .plate-prose ul > li::before {
+        content: "";
+        position: absolute;
+        left: -1.05em;
+        top: 0.68em;
+        width: 5px;
+        height: 5px;
+        border-radius: 999px;
+        background: var(--star);
+        opacity: 0.75;
+    }
+
+    .plate-prose ul ul > li::before {
+        width: 3.5px;
+        height: 3.5px;
+        background: transparent;
+        border: 1px solid var(--star);
+    }
+
+    .plate-prose ol {
+        list-style: decimal;
+    }
+
+    .plate-prose ol::marker,
+    .plate-prose li::marker {
+        color: var(--ink-dim);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .plate-prose li + li {
+        margin-top: 0.4em;
+    }
+
+    .plate-prose li > ul,
+    .plate-prose li > ol {
+        margin-top: 0.4em;
+    }
+
+    .plate-prose blockquote {
+        padding-left: 1.1em;
+        border-left: 1px solid var(--mark);
+        color: var(--ink-dim);
+        font-style: italic;
+    }
+
+    .plate-prose code {
+        font-family: var(--font-code);
+        font-size: 0.85em;
+        padding: 0.12em 0.36em;
+        border-radius: var(--radius-plate);
+        background: var(--panel);
+        border: 1px solid var(--rule);
+    }
+
+    .plate-prose pre {
+        overflow-x: auto;
+        border-radius: var(--radius-panel);
+        border: 1px solid var(--rule);
+        background: var(--panel);
+    }
+
+    .plate-prose pre code {
+        border: 0;
+        background: transparent;
+        padding: 0;
+    }
+
+    /* A fenced block, whether Shiki has arrived yet or not. The wrapper owns the
+       frame so the two states cannot differ by a pixel; Shiki paints only the
+       spans inside. */
+    .plate-code {
+        position: relative;
+        border: 1px solid var(--rule);
+        border-radius: var(--radius-panel);
+        background: var(--panel);
+        overflow: hidden;
+    }
+
+    .plate-code pre {
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        overflow-x: auto;
+        padding: 1rem 1.1rem;
+        font-size: 0.8125rem;
+        line-height: 1.62;
+    }
+
+    .plate-code code {
+        font-family: var(--font-code);
+        display: block;
+        width: max-content;
+        min-width: 100%;
+    }
+
+    /* The fence's own label, set like every other label in the system. */
+    .plate-code[data-language]::before {
+        content: attr(data-language);
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 0.35em 0.7em;
+        font-family: var(--font-ui);
+        font-size: 0.5625rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+        border-left: 1px solid var(--rule);
+        border-bottom: 1px solid var(--rule);
+        border-bottom-left-radius: var(--radius-plate);
+        background: var(--plate);
+        pointer-events: none;
+    }
+
+    .plate-prose hr {
+        border: 0;
+        height: 1px;
+        background: var(--rule);
+        margin-block: 2.4em;
+    }
+
+    .plate-prose table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
+
+    .plate-prose th {
+        text-align: left;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        color: var(--mark-read);
+        padding: 0.5em 0.75em;
+        border-bottom: 1px solid var(--rule-bright);
+    }
+
+    .plate-prose td {
+        padding: 0.55em 0.75em;
+        border-bottom: 1px solid var(--rule);
+        vertical-align: top;
+    }
+
+    .plate-prose img {
+        max-width: 100%;
+        height: auto;
+        border-radius: var(--radius-plate);
+        border: 1px solid var(--rule);
+    }
+
+    .plate-prose > :first-child {
         margin-top: 0;
     }
 
-    .prose li > p:last-child {
-        margin-bottom: 0;
+    /* --- The one authored moment ---------------------------------------------
+       An overlay is the only thing in this product that appears rather than
+       simply being there, so it gets the only entrance: the scrim washes in and
+       the plate settles the last fraction of a percent, once, quickly. Five
+       primitives used to carry scattered zoom and slide classes that generated
+       no CSS at all, because the plugin behind them lived in the Tailwind v3
+       config this project no longer has.
+       --------------------------------------------------------------------- */
+    [data-slot="dialog-overlay"],
+    [data-radix-popper-content-wrapper] > * {
+        animation: plate-wash 120ms ease-out;
     }
 
-    .prose li > ul,
-    .prose li > ol {
-        margin-top: 0.75em;
+    [data-state="open"][role="dialog"] {
+        animation: plate-settle 140ms cubic-bezier(0.2, 0.8, 0.3, 1);
+    }
+}
+
+@keyframes plate-wash {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes plate-settle {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.995);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   Printed. A document plate leaves the screen as the Plate rendition — ink on
+   paper — with the chrome removed and the height caps lifted, because a printed
+   page is not a viewport. The Print control on a document promises this.
+   --------------------------------------------------------------------------- */
+@media print {
+    /* Force the light rendition: the sky is emitted light and does not print. */
+    :root,
+    .dark {
+        --sky: #ffffff;
+        --panel: #ffffff;
+        --plate: #ffffff;
+        --ink: #101010;
+        --ink-dim: #4a4a4a;
+        --rule: #c8c8c8;
+        --rule-bright: #a0a0a0;
+        --mark: #8c2a12;
+        --mark-read: #8c2a12;
+        --mark-soft: #f4ece9;
+        --star: #101010;
     }
 
-    /* Ensure proper spacing for complex nested structures */
-    .prose li > *:first-child {
-        margin-top: 0;
+    body {
+        background: #fff;
+        color: #101010;
+        font-size: 11pt;
     }
 
-    .prose li > *:last-child {
-        margin-bottom: 0;
+    /* The shell is screen furniture. */
+    header,
+    aside,
+    nav,
+    [role="tree"],
+    .print-hide {
+        display: none !important;
     }
 
-    /* Custom markdown content styling for better list formatting */
-    .markdown-content ul {
-        list-style-type: disc !important;
-        margin: 1.5em 0 !important;
-        padding-left: 2em !important;
+    /* The plate scrolls on screen; on paper it simply continues. */
+    #plate,
+    main {
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
     }
 
-    .markdown-content ol {
-        list-style-type: decimal !important;
-        margin: 1.5em 0 !important;
-        padding-left: 2em !important;
-    }
-
-    .markdown-content li {
-        margin: 0.75em 0 !important;
-        line-height: 1.7 !important;
-        display: list-item !important;
-    }
-
-    /* Nested lists with proper indentation */
-    .markdown-content ul ul {
-        list-style-type: circle !important;
-        margin: 0.5em 0 !important;
-        padding-left: 1.5em !important;
-    }
-
-    .markdown-content ul ul ul {
-        list-style-type: square !important;
-    }
-
-    .markdown-content ol ol {
-        list-style-type: lower-alpha !important;
-        margin: 0.5em 0 !important;
-        padding-left: 1.5em !important;
-    }
-
-    .markdown-content ol ol ol {
-        list-style-type: lower-roman !important;
-    }
-
-    /* Mixed nested lists */
-    .markdown-content ul ol,
-    .markdown-content ol ul {
-        margin: 0.5em 0 !important;
-        padding-left: 1.5em !important;
-    }
-
-    /* List items with multiple elements */
-    .markdown-content li > p {
-        margin: 0.25em 0 !important;
+    body > div,
+    article,
+    article > div {
         display: block !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
     }
 
-    .markdown-content li > p:first-child {
-        margin-top: 0 !important;
+    .plate-prose {
+        max-width: none;
+        font-size: 11pt;
+        line-height: 1.5;
     }
 
-    .markdown-content li > p:last-child {
-        margin-bottom: 0.25em !important;
+    .plate-prose h1,
+    .plate-prose h2,
+    .plate-prose h3 {
+        break-after: avoid;
     }
 
-    /* Nested lists within list items */
-    .markdown-content li > ul,
-    .markdown-content li > ol {
-        margin-top: 0.5em !important;
-        margin-bottom: 0.5em !important;
+    .plate-prose pre,
+    .plate-code,
+    .plate-prose table,
+    .plate-prose blockquote {
+        break-inside: avoid;
     }
 
-    /* Strong text in lists should maintain proper font weight */
-    .markdown-content li strong {
-        font-weight: 600 !important;
-    }
-
-    /* Code in lists */
-    .markdown-content li code {
-        font-size: 0.875em !important;
-    }
-
-    /* Ensure lists are visible and properly formatted */
-    .markdown-content ul,
-    .markdown-content ol {
-        display: block !important;
-    }
-
-    .markdown-content li {
-        display: list-item !important;
+    /* A printed page carries its source; a screen link does not. */
+    .plate-prose a[href^="http"]::after {
+        content: " (" attr(href) ")";
+        font-size: 9pt;
+        color: #4a4a4a;
     }
 }

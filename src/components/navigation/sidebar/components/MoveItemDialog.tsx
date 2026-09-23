@@ -5,6 +5,8 @@ import { Folder } from "lucide-react";
 import type { FileItem } from "@/api/fileAPI";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useEffectiveTheme } from "@/hooks/useMarkdownTheme";
+import { plateColour } from "@/lib/plateColour";
 
 interface MoveItemDialogProps {
     isOpen: boolean;
@@ -25,6 +27,8 @@ export const MoveItemDialog: React.FC<MoveItemDialogProps> = ({
     filteredFiles,
     onMoveToFolder,
 }) => {
+    const rendition = useEffectiveTheme() === "dark" ? "dark" : "light";
+
     const renderFolderList = (items: FileItem[], level = 0): React.ReactNode[] =>
         items
             .map(item => {
@@ -37,6 +41,13 @@ export const MoveItemDialog: React.FC<MoveItemDialogProps> = ({
                                 className={`h-auto w-full justify-start px-2 py-1 text-left ${level > 0 ? "ml-4" : ""}`}
                                 onClick={() => onMoveToFolder(item.path)}
                             >
+                                {/* Picking a destination is picking a folder, and a
+                                    folder has a colour everywhere else in the app. */}
+                                <span
+                                    aria-hidden="true"
+                                    className="mr-2 inline-block h-1.5 w-1.5 shrink-0 rounded-full"
+                                    style={{ background: plateColour(item.path, rendition) }}
+                                />
                                 <Folder className="mr-2 h-4 w-4" />
                                 {item.name}
                             </Button>
@@ -50,7 +61,7 @@ export const MoveItemDialog: React.FC<MoveItemDialogProps> = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-md w-full max-h-[80vh]">
+            <DialogContent className="max-h-[80vh] w-full max-w-md">
                 <DialogHeader>
                     <DialogTitle>Move "{itemName}"</DialogTitle>
                     <DialogDescription>Select a destination folder for "{itemName}"</DialogDescription>
@@ -62,8 +73,13 @@ export const MoveItemDialog: React.FC<MoveItemDialogProps> = ({
                         className="h-auto w-full justify-start px-2 py-1 text-left"
                         onClick={() => onMoveToFolder("")}
                     >
+                        <span
+                            aria-hidden="true"
+                            className="mr-2 inline-block h-1.5 w-1.5 shrink-0 rounded-full"
+                            style={{ background: plateColour("", rendition) }}
+                        />
                         <Folder className="mr-2 h-4 w-4" />
-                        📁 Root Folder
+                        Root folder
                     </Button>
                     {/* Folder list */}
                     {renderFolderList(filteredFiles)}

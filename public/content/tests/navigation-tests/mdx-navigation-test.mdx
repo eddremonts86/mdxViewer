@@ -60,7 +60,10 @@ export const AnchorDemo = ({ targetId, label }) => {
 
 # Test MDX con Componentes React
 
-Este documento combina **componentes React interactivos** con **navegación anchor** para demostrar las capacidades completas del sistema MDX.
+Este documento combina componentes React con navegación anchor. La navegación anchor funciona; los componentes no se ejecutan, porque MDX no se compila.
+
+> **MDX no se compila en este producto.** Los componentes React de este archivo no se ejecutan: el visor lo indica arriba y omite su código fuente. El archivo se conserva con esta forma para cuando se añada la compilación.
+
 
 ## Índice Interactivo
 
@@ -240,7 +243,7 @@ export const FeatureToggle = () => {
   <AlertDescription>
     Has navegado exitosamente por un documento MDX complejo que combina:
     <br />
-    ✅ Componentes React interactivos
+    ✅ Componentes React en el origen (no se ejecutan: MDX no se compila)
     <br />
     ✅ Navegación anchor funcional
     <br />

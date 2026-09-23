@@ -1,4 +1,4 @@
-import React from "react";
+import { EmptyPlate } from "@/components/atlas/EmptyPlate";
 
 interface DocumentWelcomeProps {
     title?: string;
@@ -7,18 +7,9 @@ interface DocumentWelcomeProps {
 }
 
 export function DocumentWelcome({
-    title = "Welcome to MDX Viewer",
-    message = "Select a document from the sidebar to begin viewing.",
+    title = "No object selected",
+    message = "Pick a document from the plate index, or open the chart to see the whole collection at once.",
     className,
 }: DocumentWelcomeProps) {
-    return (
-        <div className={`relative container ${className || ""}`}>
-            <div className="flex h-[450px] shrink-0 items-center justify-center rounded-md border border-dashed">
-                <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
-                    <h3 className="mt-4 text-lg font-semibold">{title}</h3>
-                    <p className="text-muted-foreground mt-2 mb-4 text-sm">{message}</p>
-                </div>
-            </div>
-        </div>
-    );
+    return <EmptyPlate designation="Awaiting selection" title={title} message={message} className={className} />;
 }

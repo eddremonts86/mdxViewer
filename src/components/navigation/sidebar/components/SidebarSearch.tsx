@@ -1,6 +1,6 @@
-import React from "react";
-
 import { SearchInput } from "@/components/search/SearchInput";
+
+import { SidebarBand } from "./SidebarBand";
 
 interface SidebarSearchProps {
     searchTerm: string;
@@ -9,26 +9,16 @@ interface SidebarSearchProps {
     resultsCount: number;
 }
 
-/**
- * Search component for the sidebar
- * Provides file filtering functionality
- */
-export const SidebarSearch: React.FC<SidebarSearchProps> = ({
-    searchTerm,
-    onSearchChange,
-    onClearSearch,
-    resultsCount,
-}) => {
+/** The filter band: one band, the same metrics as every other one. */
+export function SidebarSearch({ searchTerm, onSearchChange, onClearSearch, resultsCount }: SidebarSearchProps) {
     return (
-        <div className="border-border border-b p-4">
+        <SidebarBand>
             <SearchInput
                 searchTerm={searchTerm}
                 onSearchChange={onSearchChange}
                 onClearSearch={onClearSearch}
                 resultsCount={resultsCount}
-                hasResults={resultsCount > 0}
-                isTyping={false}
             />
-        </div>
+        </SidebarBand>
     );
-};
+}

@@ -9,7 +9,7 @@ interface NoResultsProps {
 
 export function NoResults({ searchTerm, onClearSearch }: NoResultsProps) {
     return (
-        <div className="text-muted-foreground animate-in fade-in-50 py-8 text-center text-sm duration-300">
+        <div className="text-muted-foreground py-8 text-center text-sm duration-300">
             <div className="flex flex-col items-center space-y-3">
                 <div className="relative">
                     <Search className="h-8 w-8 opacity-50" />
@@ -19,7 +19,7 @@ export function NoResults({ searchTerm, onClearSearch }: NoResultsProps) {
                 </div>
                 <div className="space-y-1">
                     <p className="font-medium">No documents found</p>
-                    <p className="text-xs">No results for "{searchTerm}"</p>
+                    <p className="text-xs">No results for"{searchTerm}"</p>
                     <Button variant="ghost" size="sm" onClick={onClearSearch} className="mt-2 h-7 text-xs">
                         Clear search
                     </Button>

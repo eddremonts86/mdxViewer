@@ -36,7 +36,94 @@ export interface CreateFolderRequest {
     path: string;
 }
 
-const API_BASE_URL = "http://localhost:3001";
+/** Frontmatter the viewer knows how to put in a title block. */
+export interface DocumentFrontmatter {
+    title?: string;
+    description?: string;
+    author?: string;
+    date?: string;
+    tags?: string[];
+    [key: string]: unknown;
+}
+
+/** Shape returned by GET /api/files/content */
+export interface DocumentContent {
+    path: string;
+    content: string;
+    /** The file as it sits on disk, frontmatter included. What the editor edits. */
+    raw?: string;
+    frontmatter?: DocumentFrontmatter;
+    size?: number;
+    lastModified?: string;
+}
+
+/** One document on its way in, with its path relative to the picked folder. */
+export interface ImportDocument {
+    path: string;
+    content: string;
+}
+
+/** What POST /api/import did with a batch. */
+export interface ImportResult {
+    imported: Array<{ path: string; size: number }>;
+    skipped: Array<{ path: string; reason: string }>;
+}
+
+/** One document that matched a search, with the line that matched it. */
+export interface SearchHit {
+    path: string;
+    name: string;
+    line: number | null;
+    excerpt: string;
+    /** Where the query sits inside `excerpt`; the client marks it rather than searching again. */
+    at: number;
+    length: number;
+    more: number;
+    /** The document's real size in bytes, measured by the server that read it. */
+    size: number;
+    inName: boolean;
+}
+
+/** What GET /api/health reports about the running service. */
+export interface ServiceHealth {
+    status: string;
+    contentPath: string;
+    /** Whether the operator has allowed `.mdx` documents to be compiled and run. */
+    mdxExecute: boolean;
+}
+
+/** One deleted document or folder, waiting to be restored or purged. */
+export interface TrashEntry {
+    id: string;
+    originalPath: string;
+    name: string;
+    type: "file" | "folder";
+    size: number;
+    deletedAt: string;
+}
+
+export interface SaveFileRequest {
+    path: string;
+    content: string;
+    /**
+     * The stamp the editor loaded. The service refuses with 409 if the file moved
+     * on since, rather than overwriting an edit its author never saw.
+     */
+    lastModified?: string;
+}
+
+/** Shape returned by POST /api/files/upload */
+export interface UploadResult {
+    uploaded: Array<{ originalName: string; filename: string; path: string; size: number }>;
+    errors: Array<{ filename: string; error: string }>;
+    totalFiles: number;
+    successCount: number;
+    errorCount: number;
+}
+
+// Relative by default, so the built app talks to whatever origin serves it.
+// The Vite dev server proxies /api to the file service on :3001.
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "";
 
 class FileAPI {
     /**
@@ -61,28 +148,142 @@ class FileAPI {
     /**
      * Get file content
      */
-    static async getFileContent(filePath: string): Promise<{ path: string; content: string }> {
-        // Convert path to kebab-case to match the file system structure
-        const kebabCasePath = filePath
-            .toLowerCase()
-            .replace(/\s+/g, "-")
-            .replace(/[^a-z0-9._/-]/g, "")
-            .replace(/_+/g, "-")
-            .replace(/-+/g, "-")
-            .replace(/\/+/g, "/")
-            .replace(/^-+/, "")
-            .replace(/-+$/, "");
-
-        const response = await fetch(`${API_BASE_URL}/api/files/content?path=${encodeURIComponent(kebabCasePath)}`);
+    static async getFileContent(filePath: string): Promise<DocumentContent> {
+        // The path comes from the file tree the server itself produced, so it is
+        // sent through unchanged. Rewriting it here used to break every file
+        // whose name contained a capital letter.
+        const response = await fetch(`${API_BASE_URL}/api/files/content?path=${encodeURIComponent(filePath)}`);
 
         if (!response.ok) {
             throw new Error(`Failed to fetch file content: ${response.statusText}`);
         }
 
-        const result: ApiResponse<{ path: string; content: string }> = await response.json();
+        const result: ApiResponse<DocumentContent> = await response.json();
 
         if (!result.success) {
             throw new Error(result.error ?? "Failed to get file content");
+        }
+
+        return result.data!;
+    }
+
+    /**
+     * Overwrite a document's text
+     */
+    static async saveFileContent(
+        params: SaveFileRequest
+    ): Promise<{ path: string; size: number; lastModified: string }> {
+        const response = await fetch(`${API_BASE_URL}/api/files/content`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(params),
+        });
+
+        const result: ApiResponse<{ path: string; size: number; lastModified: string }> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Failed to save document: ${response.statusText}`);
+        }
+
+        return result.data!;
+    }
+
+    /**
+     * Import a batch of documents, folder structure intact
+     *
+     * The service bounds one request, so a folder larger than that arrives in
+     * several calls — see `readImportableFolder` for the batching.
+     */
+    static async importDocuments(documents: ImportDocument[], targetPath = ""): Promise<ImportResult> {
+        const response = await fetch(`${API_BASE_URL}/api/import`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ path: targetPath, documents }),
+        });
+        const result: ApiResponse<ImportResult> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Import failed: ${response.statusText}`);
+        }
+
+        return result.data!;
+    }
+
+    /**
+     * Find documents by name and by what is written inside them
+     */
+    static async search(query: string): Promise<SearchHit[]> {
+        const response = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`);
+        const result: ApiResponse<{ hits: SearchHit[] }> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Search failed: ${response.statusText}`);
+        }
+
+        return result.data?.hits ?? [];
+    }
+
+    /**
+     * What the running service reports about itself
+     */
+    static async getHealth(): Promise<ServiceHealth> {
+        const response = await fetch(`${API_BASE_URL}/api/health`);
+        const result: ApiResponse<ServiceHealth> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Failed to read service health: ${response.statusText}`);
+        }
+
+        return result.data!;
+    }
+
+    /**
+     * What is waiting in the trash
+     */
+    static async getTrash(): Promise<TrashEntry[]> {
+        const response = await fetch(`${API_BASE_URL}/api/trash`);
+        const result: ApiResponse<TrashEntry[]> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Failed to read the trash: ${response.statusText}`);
+        }
+
+        return result.data ?? [];
+    }
+
+    /**
+     * Put a deleted document back where it came from
+     */
+    static async restoreFromTrash(id: string): Promise<TrashEntry> {
+        const response = await fetch(`${API_BASE_URL}/api/trash/restore`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
+        });
+        const result: ApiResponse<TrashEntry> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Failed to restore: ${response.statusText}`);
+        }
+
+        return result.data!;
+    }
+
+    /**
+     * Delete for good. Nothing comes back from here.
+     */
+    static async purgeTrash(ids: string[]): Promise<{ purged: string[] }> {
+        const response = await fetch(`${API_BASE_URL}/api/trash`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ids }),
+        });
+        const result: ApiResponse<{ purged: string[] }> = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error ?? `Failed to purge: ${response.statusText}`);
         }
 
         return result.data!;
@@ -171,7 +372,7 @@ class FileAPI {
     /**
      * Upload multiple files
      */
-    static async uploadFiles(files: File[], targetPath = "", createFolders = true): Promise<any> {
+    static async uploadFiles(files: File[], targetPath = "", createFolders = true): Promise<UploadResult> {
         const formData = new FormData();
 
         files.forEach(file => {
@@ -191,13 +392,13 @@ class FileAPI {
             throw new Error(errorResult.error ?? `Failed to upload files: ${response.statusText}`);
         }
 
-        const result: ApiResponse = await response.json();
+        const result: ApiResponse<UploadResult> = await response.json();
 
         if (!result.success) {
             throw new Error(result.error ?? "Failed to upload files");
         }
 
-        return result.data;
+        return result.data!;
     }
 
     /**

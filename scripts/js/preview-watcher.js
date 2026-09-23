@@ -19,7 +19,7 @@ const PREVIEWS_DIR = path.join(__dirname, "..", "public", "previews");
 // Configuration constants
 const DEBOUNCE_DELAY_MS = 1000;
 
-console.log("👀 Starting preview watcher...");
+console.log("Starting preview watcher...");
 console.log("Watching:", CONTENT_DIR);
 console.log("Previews:", PREVIEWS_DIR);
 
@@ -56,13 +56,13 @@ async function generatePreviewForFile(filePath) {
             folder: normalizedFolder,
         };
 
-        console.log(`🔄 File changed: ${relativePath}`);
+        console.log(`File changed: ${relativePath}`);
         const success = await generatePreview(file);
 
         if (success) {
-            console.log(`✅ Preview updated for: ${relativePath}`);
+            console.log(`Preview updated for: ${relativePath}`);
         } else {
-            console.log(`❌ Failed to update preview for: ${relativePath}`);
+            console.log(`Failed to update preview for: ${relativePath}`);
         }
     } catch (error) {
         console.error(`Error processing file ${filePath}:`, error.message);
@@ -82,7 +82,7 @@ function watchDirectory(dir) {
 
             // Only process markdown files
             if (filename.endsWith(".md") || filename.endsWith(".mdx")) {
-                console.log(`📁 File ${eventType}: ${filename}`);
+                console.log(`File ${eventType}: ${filename}`);
 
                 if (eventType === "change" || eventType === "rename") {
                     // Check if file exists (rename could be delete)
@@ -90,16 +90,11 @@ function watchDirectory(dir) {
                         if (!err) {
                             debouncedGeneratePreview(fullPath);
                         } else {
-                            console.log(`🗑️  File deleted: ${filename}`);
+                            console.log(`File deleted: ${filename}`);
                             // Optionally remove preview file
-                            const previewPath = path.join(
-                                PREVIEWS_DIR,
-                                filename.replace(/\.(md|mdx)$/, ".svg"),
-                            );
+                            const previewPath = path.join(PREVIEWS_DIR, filename.replace(/\.(md|mdx)$/, ".svg"));
                             fs.unlink(previewPath, () => {
-                                console.log(
-                                    `🗑️  Preview deleted: ${previewPath}`,
-                                );
+                                console.log(`Preview deleted: ${previewPath}`);
                             });
                         }
                     });
@@ -107,7 +102,7 @@ function watchDirectory(dir) {
             }
         });
 
-        console.log(`✅ Watching directory: ${dir}`);
+        console.log(`Watching directory: ${dir}`);
     } catch (error) {
         console.error(`Error watching directory ${dir}:`, error.message);
     }
@@ -116,15 +111,13 @@ function watchDirectory(dir) {
 // Start watching
 watchDirectory(CONTENT_DIR);
 
-console.log("\n🎯 Preview watcher is running!");
-console.log(
-    "📝 Create or edit any .md or .mdx file to see automatic preview generation",
-);
-console.log("🛑 Press Ctrl+C to stop\n");
+console.log("\n Preview watcher is running!");
+console.log("Create or edit any .md or .mdx file to see automatic preview generation");
+console.log("Press Ctrl+C to stop\n");
 
 // Keep the process alive
 process.on("SIGINT", () => {
-    console.log("\n👋 Preview watcher shutting down...");
+    console.log("\n Preview watcher shutting down...");
     process.exit(0);
 });
 

@@ -1,54 +1,37 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 
+import { DocumentLoader } from "@/components/document";
+import { RouteError } from "@/components/globals/RouteError";
 import { Layout } from "@/layouts/Layout";
-import { DocumentPage } from "@/pages/DocumentPage";
-import { DocumentsListPage } from "@/pages/DocumentsListPage";
-import { HomePage } from "@/pages/HomePage";
-import { StatisticsPage } from "@/pages/StatisticsPage";
+
+// One chunk per surface: the chart canvas and the markdown pipeline are the two
+// heaviest things in the app and neither belongs in the first payload.
+const HomePage = lazy(() => import("@/pages/HomePage").then(module => ({ default: module.HomePage })));
+const DocumentPage = lazy(() => import("@/pages/DocumentPage").then(module => ({ default: module.DocumentPage })));
+const DocumentsListPage = lazy(() =>
+    import("@/pages/DocumentsListPage").then(module => ({ default: module.DocumentsListPage }))
+);
+const StatisticsPage = lazy(() =>
+    import("@/pages/StatisticsPage").then(module => ({ default: module.StatisticsPage }))
+);
+const TrashPage = lazy(() => import("@/pages/TrashPage").then(module => ({ default: module.TrashPage })));
+const NotFoundPage = lazy(() => import("@/pages/NotFoundPage").then(module => ({ default: module.NotFoundPage })));
+
+const surface = (element: React.ReactNode) => <Suspense fallback={<DocumentLoader />}>{element}</Suspense>;
 
 export const router = createBrowserRouter([
     {
         path: "/",
         element: <Layout />,
+        errorElement: <RouteError />,
         children: [
-            {
-                index: true,
-                element: <HomePage />,
-            },
-            {
-                path: "/statistics",
-                element: <StatisticsPage />,
-            },
-            {
-                path: "/users",
-                element: (
-                    <div className="p-6">
-                        <h1 className="text-2xl font-bold">Users</h1>
-                        <p className="text-muted-foreground">User management coming soon...</p>
-                    </div>
-                ),
-            },
-            {
-                path: "/settings",
-                element: (
-                    <div className="p-6">
-                        <h1 className="text-2xl font-bold">Settings</h1>
-                        <p className="text-muted-foreground">Settings page coming soon...</p>
-                    </div>
-                ),
-            },
-            {
-                path: "/docs",
-                element: <DocumentsListPage />,
-            },
-            {
-                path: "/document/*",
-                element: <DocumentPage />,
-            },
-            {
-                path: "*",
-                element: <DocumentPage />,
-            },
+            { index: true, element: surface(<HomePage />) },
+            { path: "/docs", element: surface(<DocumentsListPage />) },
+            { path: "/statistics", element: surface(<StatisticsPage />) },
+            { path: "/trash", element: surface(<TrashPage />) },
+            { path: "/document/*", element: surface(<DocumentPage />) },
+            { path: "*", element: surface(<NotFoundPage />) },
         ],
     },
 ]);

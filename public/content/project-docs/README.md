@@ -5,8 +5,8 @@ MDX Viewer is a modern web application built with React and TypeScript for viewi
 ## Features
 
 -   **Complete Markdown Support**: Renders all standard Markdown syntax
--   **MDX Support**: Use React components within Markdown documents
--   **Multipurpose Export**: Export documents to PDF, HTML or print directly
+-   **MDX Files**: `.mdx` files are read and rendered as Markdown. MDX is **not** compiled, so their React components are not executed — the viewer says so on any document that defines them
+-   **Printing**: Documents print with their own stylesheet. There is no PDF or HTML export
 -   **Light/Dark Theme**: Switch between display modes according to preferences
 -   **Intuitive Navigation**: File system in the sidebar for easy exploration
 
@@ -74,13 +74,11 @@ npm run dev
 npm run build
 ```
 
-## Export Documents
+## Printing Documents
 
-The application allows exporting documents in different formats:
+A document prints with its own stylesheet: the shell is dropped, the light rendition is forced onto white, and external links print their URL beside them.
 
--   **PDF**: Complete export for saving or sharing
--   **HTML**: Standalone web version of the document
--   **Direct printing**: Send to printer
+There is no PDF or HTML export. Your browser's "Print to PDF" produces a file from the same stylesheet.
 
 ## Contribution
 

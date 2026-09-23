@@ -11,8 +11,7 @@ import type { FileItem } from "../types/index.js";
 /**
  * Get file extension from filename
  */
-export const getFileExtension = (filename: string): string =>
-    path.extname(filename).slice(1);
+export const getFileExtension = (filename: string): string => path.extname(filename).slice(1);
 
 /**
  * Ensure directory exists, create if it doesn't
@@ -59,18 +58,13 @@ export const deleteRecursively = async (targetPath: string): Promise<void> => {
 /**
  * Move a file or directory recursively
  */
-export const moveRecursively = async (
-    sourcePath: string,
-    destinationPath: string,
-): Promise<void> => {
+export const moveRecursively = async (sourcePath: string, destinationPath: string): Promise<void> => {
     try {
         // Try to use rename first (works if on same filesystem)
         await fs.rename(sourcePath, destinationPath);
     } catch (renameError) {
         // If rename fails, copy and delete
-        console.warn(
-            `Rename failed, falling back to copy+delete: ${(renameError as Error).message}`,
-        );
+        console.warn(`Rename failed, falling back to copy+delete: ${(renameError as Error).message}`);
 
         try {
             const stats = await fs.stat(sourcePath);
@@ -95,10 +89,7 @@ export const moveRecursively = async (
                 await fs.unlink(sourcePath);
             }
         } catch (copyError) {
-            console.error(
-                `Failed to move ${sourcePath} to ${destinationPath}:`,
-                copyError,
-            );
+            console.error(`Failed to move ${sourcePath} to ${destinationPath}:`, copyError);
             throw copyError;
         }
     }
@@ -107,9 +98,7 @@ export const moveRecursively = async (
 /**
  * Get file statistics
  */
-export const getFileStats = async (
-    filePath: string,
-): Promise<Partial<FileItem>> => {
+export const getFileStats = async (filePath: string): Promise<Partial<FileItem>> => {
     try {
         const stats = await fs.stat(filePath);
         return {
